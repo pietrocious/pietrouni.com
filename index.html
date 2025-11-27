@@ -786,6 +786,9 @@
 
             // --- Terminal State ---
             let currentPath = '/home/guest';
+            let terminalHistory = [];
+            let terminalHistoryIndex = -1;
+            let guessGame = { active: false, target: 0, attempts: 0 };
             const fileSystem = {
                 'root': {
                     'home': {
@@ -853,6 +856,15 @@
                 '9': [" 999 ", "9   9", " 9999", "    9", " 999 "],
                 ' ': ["     ", "     ", "     ", "     ", "     "]
             };
+
+            const fortunes = [
+                "The only way to go fast, is to go well.",
+                "Computers are fast; developers keep them slow.",
+                "It works on my machine.",
+                "Beware of programmers who carry screwdrivers.",
+                "Simplicity is the soul of efficiency.",
+                "Code is like humor. When you have to explain it, it’s bad."
+            ];
 
             // --- Theme & Wallpaper Logic ---
             function initTheme() {
@@ -1006,7 +1018,7 @@
                     content: `
                      <div class="h-full flex flex-col bg-[#1a100c] text-her-textLight p-6 select-none font-ui">
                         <h1 class="text-xl font-bold text-white mb-1 font-serif">About OS93</h1>
-                        <div class="text-xs text-gray-500 mb-4 font-mono">Version 1.4 (Her-Blue)</div>
+                        <div class="text-xs text-gray-500 mb-4 font-mono">Version 1.4 (Blue-Jonze)</div>
                         <div class="h-px bg-white/10 w-full mb-4"></div>
 
                         <div class="flex-1 overflow-y-auto pr-2 space-y-4 text-sm">
@@ -1273,14 +1285,14 @@
                 terminal: {
                     title: "Terminal",
                     content: `
-                    <div class="h-full bg-[#1e1e1e]/90 text-her-cream p-4 font-kernel text-sm overflow-hidden flex flex-col relative" id="term-container" onclick="document.getElementById('cmd-input').focus()">
-                        <div id="term-output" class="flex-1 overflow-y-auto space-y-1 mb-2">
-                            <div class="opacity-70">OS93 Linux mini-Kernel [v6.18-rc7]</div>
+                    <div class="h-full bg-[#1e1e1e]/95 text-white p-4 font-kernel text-sm overflow-hidden flex flex-col relative" id="term-container" onclick="document.getElementById('cmd-input').focus()">
+                        <div id="term-output" class="flex-1 overflow-y-auto space-y-1 mb-2 window-content">
+                            <div class="opacity-70">Linux portfolio 6.8.0-45-generic #45-Ubuntu SMP PREEMPT_DYNAMIC</div>
                             <div class="mb-4">Type 'help' for available commands.</div>
                         </div>
                         <div class="flex items-center gap-2 text-white z-10">
-                            <span id="term-prompt">guest@portfolio ~ $</span>
-                            <input id="cmd-input" type="text" class="flex-1 bg-transparent border-none outline-none text-her-cream font-kernel focus:ring-0" autocomplete="off" onkeydown="window.handleTerminalCommand(event)">
+                            <span id="term-prompt" class="text-white">guest@portfolio ~ $</span>
+                            <input id="cmd-input" type="text" class="flex-1 bg-transparent border-none outline-none text-white font-kernel focus:ring-0" autocomplete="off" onkeydown="window.handleTerminalCommand(event)">
                         </div>
                     </div>
                 `,
@@ -1820,29 +1832,97 @@
             }
 
             window.handleTerminalCommand = function (e) {
+                const inputEl = document.getElementById('cmd-input');
+                const output = document.getElementById('term-output');
+
+                // History Navigation
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (terminalHistory.length > 0 && terminalHistoryIndex < terminalHistory.length - 1) {
+                        terminalHistoryIndex++;
+                        inputEl.value = terminalHistory[terminalHistory.length - 1 - terminalHistoryIndex];
+                    }
+                    return;
+                }
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (terminalHistoryIndex > -1) {
+                        terminalHistoryIndex--;
+                        inputEl.value = terminalHistoryIndex >= 0 ? terminalHistory[terminalHistory.length - 1 - terminalHistoryIndex] : '';
+                    }
+                    return;
+                }
+
                 if (e.key === 'Enter') {
                     const input = e.target.value.trim();
-                    const output = document.getElementById('term-output');
+                    if (!input) return;
 
                     // Echo command
                     output.innerHTML += `<div><span class="text-white">${document.getElementById('term-prompt').innerText}</span> ${input}</div>`;
 
+                    // Handle Guessing Game Input Interception
+                    if (guessGame.active) {
+                        const guess = parseInt(input);
+                        if (isNaN(guess)) {
+                            output.innerHTML += `<div class="text-her-red">Please enter a valid number.</div>`;
+                        } else {
+                            guessGame.attempts++;
+                            if (guess === guessGame.target) {
+                                output.innerHTML += `<div class="text-green-500 font-bold">🎉 Correct! You guessed ${guessGame.target} in ${guessGame.attempts} attempts.</div>`;
+                                guessGame.active = false;
+                            } else if (guess < guessGame.target) {
+                                output.innerHTML += `<div class="text-blue-400">Too low! Try again.</div>`;
+                            } else {
+                                output.innerHTML += `<div class="text-blue-400">Too high! Try again.</div>`;
+                            }
+                        }
+                        inputEl.value = '';
+                        output.scrollTop = output.scrollHeight;
+                        return;
+                    }
+
+                    // Save to history
+                    terminalHistory.push(input);
+                    terminalHistoryIndex = -1;
+
                     const args = input.split(' ');
                     const cmd = args[0].toLowerCase();
-
-                    // Helper to resolve current directory object
-                    // Extract path from prompt string '/home/guest' etc
-                    // For simplicity, we track currentPath global variable
                     let dirObj = resolvePath(currentPath.substring(1)); // Remove leading /
 
                     switch (cmd) {
                         case 'help':
                             output.innerHTML += `
                             <div class="opacity-80 mt-1 mb-2">
-                                <div class="font-bold text-her-red">Available Commands:</div>
-                                <div>about, projects, resume, clear</div>
-                                <div>ls [-a], cd, pwd, mkdir, touch, rmdir, cat</div>
-                                <div>ascii [text], matrix, cowsay, neofetch, guess</div>
+                                <div class="font-bold text-her-red mb-1">Available Commands:</div>
+                                <div class="pl-2">
+                                    <div class="text-blue-400 font-bold text-xs uppercase mt-2">System</div>
+                                    <div>help, about, clear, neofetch</div>
+                                    
+                                    <div class="text-blue-400 font-bold text-xs uppercase mt-2">File Operations</div>
+                                    <div>ls [-a], cd, pwd, mkdir, touch, rmdir, cat</div>
+                                    
+                                    <div class="text-blue-400 font-bold text-xs uppercase mt-2">Applications</div>
+                                    <div>open [app], about, projects, resume</div>
+                                    
+                                    <div class="text-blue-400 font-bold text-xs uppercase mt-2">Fun & Games</div>
+                                    <div>💡 Try 'help-fun' for entertainment commands!</div>
+                                </div>
+                            </div>`;
+                            break;
+                        case 'help-fun':
+                            output.innerHTML += `
+                            <div class="opacity-80 mt-1 mb-2">
+                                <div class="font-bold text-purple-400 mb-1">🎮 Fun Commands:</div>
+                                <div class="pl-2 space-y-1">
+                                    <div><span class="text-blue-300">ascii [text]</span> - Generate ASCII art</div>
+                                    <div><span class="text-blue-300">cowsay [text]</span> - Make a cow say something</div>
+                                    <div><span class="text-blue-300">fortune</span> - Get a tech fortune</div>
+                                    <div><span class="text-blue-300">matrix</span> - Enter the Matrix</div>
+                                    <div><span class="text-blue-300">neofetch</span> - Display system info</div>
+                                    <div><span class="text-blue-300">calc [expr]</span> - Simple calculator</div>
+                                    <div><span class="text-blue-300">guess</span> - Play number guessing game</div>
+                                    <div><span class="text-blue-300">hack</span> - Simulate a hack</div>
+                                </div>
                             </div>`;
                             break;
                         case 'clear':
@@ -1876,7 +1956,6 @@
                                     currentPath = parts.join('/');
                                 }
                             } else {
-                                // Simple relative path check
                                 if (dirObj && dirObj[target] && typeof dirObj[target] === 'object') {
                                     currentPath = currentPath === '/' ? `/${target}` : `${currentPath}/${target}`;
                                 } else {
@@ -1919,13 +1998,21 @@
                             openWindow('experiments');
                             output.innerHTML += `<div class="text-green-500 font-bold my-2">ACCESS GRANTED. WELCOME TO R&D.</div>`;
                             break;
+                        case 'open':
+                            const appName = args[1]?.toLowerCase();
+                            if (windows[appName] || appName === 'terminal' || appName === 'vault') {
+                                window.openWindow(appName === 'terminal' ? 'terminal' : appName);
+                                output.innerHTML += `<div>Opening ${appName}...</div>`;
+                            } else {
+                                output.innerHTML += `<div class="text-red-400">App not found: ${appName}</div>`;
+                            }
+                            break;
                         case 'about': window.openWindow('about'); break;
                         case 'projects': window.openWindow('projects'); break;
                         case 'resume': window.openWindow('resume'); break;
                         case 'ascii':
                             const text = args.slice(1).join(' ').toUpperCase() || "HELLO";
                             let art = "";
-                            // Height 5
                             for (let i = 0; i < 5; i++) {
                                 let line = "";
                                 for (let char of text) {
@@ -1936,8 +2023,84 @@
                             }
                             output.innerHTML += `<pre class="text-[10px] leading-3 text-green-400 my-2 overflow-x-auto">${art}</pre>`;
                             break;
+                        case 'cowsay':
+                            const msg = args.slice(1).join(' ') || "Moo!";
+                            const cow = `
+         \\   ^__^
+          \\  (oo)\\_______
+             (__)\\       )\\/\\
+                 ||----w |
+                 ||     ||`;
+                            output.innerHTML += `<pre class="text-xs text-blue-300 my-2"> &lt; ${msg} &gt;${cow}</pre>`;
+                            break;
+                        case 'fortune':
+                            const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+                            output.innerHTML += `<div class="text-purple-300 italic my-2">🔮 ${fortune}</div>`;
+                            break;
+                        case 'calc':
+                            try {
+                                const expr = args.slice(1).join('');
+                                // Safe-ish eval for portfolio demo
+                                if (/^[0-9+\-*/().\s]+$/.test(expr)) {
+                                    // eslint-disable-next-line no-new-func
+                                    const result = new Function('return ' + expr)();
+                                    output.innerHTML += `<div class="text-green-400 font-bold">= ${result}</div>`;
+                                } else {
+                                    output.innerHTML += `<div class="text-red-400">Invalid characters in expression.</div>`;
+                                }
+                            } catch (e) {
+                                output.innerHTML += `<div class="text-red-400">Error: ${e.message}</div>`;
+                            }
+                            break;
+                        case 'guess':
+                            guessGame.active = true;
+                            guessGame.target = Math.floor(Math.random() * 100) + 1;
+                            guessGame.attempts = 0;
+                            output.innerHTML += `<div class="text-green-400 font-bold my-2">🎮 Guess the Number Game Started!</div><div>I'm thinking of a number between 1 and 100.</div><div>Type your guess below:</div>`;
+                            break;
+                        case 'hack':
+                            output.innerHTML += `<div class="text-green-500">Initiating brute force...</div>`;
+                            let progress = 0;
+                            const hackInterval = setInterval(() => {
+                                progress += 10;
+                                if (progress <= 100) {
+                                    output.innerHTML += `<div>[${'#'.repeat(progress / 10)}${'.'.repeat(10 - progress / 10)}] ${progress}% - Bypassing Mainframe...</div>`;
+                                    output.scrollTop = output.scrollHeight;
+                                } else {
+                                    clearInterval(hackInterval);
+                                    output.innerHTML += `<div class="text-green-400 font-bold">ACCESS GRANTED. SYSTEM COMPROMISED.</div>`;
+                                    output.scrollTop = output.scrollHeight;
+                                }
+                            }, 500);
+                            break;
+                        case 'neofetch':
+                            const logo = `
+       _.-;;-._
+'-..-'|   ||   |
+'-..-'|_.-;;-._|
+'-..-'|   ||   |
+'-..-'|_.-''-._|
+`;
+                            const info = `
+<span class="text-blue-400">guest@portfolio-os</span>
+--------------------
+<span class="text-her-red">OS</span>: OS93 1.4 (Blue-Jonze)
+<span class="text-her-red">Host</span>: Browser Virtual Machine
+<span class="text-her-red">Kernel</span>: Linux micro-kernel 6.8.0-45
+<span class="text-her-red">Uptime</span>: ${Math.floor(performance.now() / 60000)} mins
+<span class="text-her-red">Shell</span>: posh 1.0.0
+<span class="text-her-red">Resolution</span>: ${window.innerWidth}x${window.innerHeight}
+<span class="text-her-red">Theme</span>: ${document.documentElement.classList.contains('dark') ? 'Dark' : 'Light'}
+<span class="text-her-red">CPU</span>: Web Worker @ 2.4GHz
+<span class="text-her-red">Memory</span>: 640KB / 1337MB
+`;
+                            output.innerHTML += `<div class="flex gap-4 my-2 font-mono text-xs">
+    <pre class="text-blue-500 hidden sm:block">${logo}</pre>
+    <pre>${info}</pre>
+</div>`;
+                            break;
                         case 'matrix':
-                            // Find the terminal content container (must have id="term-container" and relative position)
+                            // Find the terminal content container
                             const container = document.getElementById('term-container');
                             if (!container) break;
 
@@ -1957,18 +2120,16 @@
                             let frameId;
 
                             function draw() {
-                                // Trail effect
                                 ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
                                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                                ctx.fillStyle = '#0F0'; // Matrix Green
+                                ctx.fillStyle = '#0F0';
                                 ctx.font = fontSize + 'px Fixedsys';
 
                                 for (let i = 0; i < drops.length; i++) {
                                     const text = chars.charAt(Math.floor(Math.random() * chars.length));
                                     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-                                    // Random reset to create rain effect
                                     if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                                         drops[i] = 0;
                                     }
@@ -1986,19 +2147,16 @@
                                 document.getElementById('cmd-input').focus();
                             }
 
-                            // Add listeners with delay to avoid immediate closure if triggered by key press
                             setTimeout(() => {
                                 document.addEventListener('keydown', stopMatrix);
                                 canvas.addEventListener('click', stopMatrix);
                             }, 200);
-
                             break;
                         default:
                             if (cmd) output.innerHTML += `<div class="text-red-400">Command not found: ${cmd}</div>`;
                     }
 
-                    e.target.value = '';
-                    // Scroll to bottom
+                    inputEl.value = '';
                     output.scrollTop = output.scrollHeight;
                 }
             }
