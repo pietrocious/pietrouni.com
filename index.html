@@ -1273,12 +1273,12 @@
                 terminal: {
                     title: "Terminal",
                     content: `
-                    <div class="h-full bg-[#1e1e1e]/90 text-her-cream p-4 font-kernel text-sm overflow-hidden flex flex-col" onclick="document.getElementById('cmd-input').focus()">
+                    <div class="h-full bg-[#1e1e1e]/90 text-her-cream p-4 font-kernel text-sm overflow-hidden flex flex-col relative" id="term-container" onclick="document.getElementById('cmd-input').focus()">
                         <div id="term-output" class="flex-1 overflow-y-auto space-y-1 mb-2">
                             <div class="opacity-70">OS93 Linux mini-Kernel [v6.18-rc7]</div>
                             <div class="mb-4">Type 'help' for available commands.</div>
                         </div>
-                        <div class="flex items-center gap-2 text-white">
+                        <div class="flex items-center gap-2 text-white z-10">
                             <span id="term-prompt">guest@portfolio ~ $</span>
                             <input id="cmd-input" type="text" class="flex-1 bg-transparent border-none outline-none text-her-cream font-kernel focus:ring-0" autocomplete="off" onkeydown="window.handleTerminalCommand(event)">
                         </div>
@@ -1937,7 +1937,61 @@
                             output.innerHTML += `<pre class="text-[10px] leading-3 text-green-400 my-2 overflow-x-auto">${art}</pre>`;
                             break;
                         case 'matrix':
-                            output.innerHTML += `<div class="text-green-500">Wake up, Neo...</div>`;
+                            // Find the terminal content container (must have id="term-container" and relative position)
+                            const container = document.getElementById('term-container');
+                            if (!container) break;
+
+                            const canvas = document.createElement('canvas');
+                            canvas.className = "absolute inset-0 z-50 cursor-pointer";
+                            container.appendChild(canvas);
+
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = container.clientWidth;
+                            canvas.height = container.clientHeight;
+
+                            const fontSize = 16;
+                            const columns = Math.floor(canvas.width / fontSize);
+                            const drops = new Array(columns).fill(1);
+                            const chars = "01";
+
+                            let frameId;
+
+                            function draw() {
+                                // Trail effect
+                                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                                ctx.fillStyle = '#0F0'; // Matrix Green
+                                ctx.font = fontSize + 'px Fixedsys';
+
+                                for (let i = 0; i < drops.length; i++) {
+                                    const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                                    // Random reset to create rain effect
+                                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                                        drops[i] = 0;
+                                    }
+                                    drops[i]++;
+                                }
+                                frameId = requestAnimationFrame(draw);
+                            }
+
+                            draw();
+
+                            function stopMatrix() {
+                                cancelAnimationFrame(frameId);
+                                if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+                                document.removeEventListener('keydown', stopMatrix);
+                                document.getElementById('cmd-input').focus();
+                            }
+
+                            // Add listeners with delay to avoid immediate closure if triggered by key press
+                            setTimeout(() => {
+                                document.addEventListener('keydown', stopMatrix);
+                                canvas.addEventListener('click', stopMatrix);
+                            }, 200);
+
                             break;
                         default:
                             if (cmd) output.innerHTML += `<div class="text-red-400">Command not found: ${cmd}</div>`;
