@@ -569,21 +569,10 @@
     <div id="boot-screen" style="background-color: #4A7C9D;"
         class="absolute inset-0 flex flex-col justify-center items-center overflow-hidden transition-opacity duration-1000">
         <!-- Canvas for Mobius Loop Animation -->
-        <canvas id="boot-canvas" width="600" height="400" class="mb-12 w-full max-w-[600px]"></canvas>
-
-        <!-- Minimal Progress Bar - Ultra thin & white -->
-        <div class="w-48 h-[2px] bg-white/10 rounded-full overflow-hidden relative">
-            <div id="boot-progress" class="h-full bg-white w-0 relative shadow-[0_0_15px_rgba(255,255,255,0.9)]"
-                style="transition: width 3.5s cubic-bezier(0.22, 1, 0.36, 1);">
-                <!-- Leading edge shine -->
-                <div
-                    class="absolute right-0 top-0 bottom-0 w-[20px] bg-gradient-to-r from-transparent to-white shadow-[0_0_10px_2px_rgba(255,255,255,1)]">
-                </div>
-            </div>
-        </div>
+        <canvas id="boot-canvas" width="600" height="400" class="w-full max-w-[600px]"></canvas>
 
         <!-- Subtle status text fading in -->
-        <div class="mt-4 text-white/40 text-[10px] font-mono tracking-[0.2em] animate-pulse uppercase">Initializing...
+        <div class="text-white/40 text-[10px] font-mono tracking-[0.2em] animate-pulse uppercase mt-4">Initializing...
         </div>
     </div>
 
@@ -691,52 +680,56 @@
                     </svg>
                 </div>
 
-                <!-- Projects (Layers/Stack) -->
+                <!-- Projects (Hexagon/Infrastructure) -->
                 <div class="dock-item cursor-pointer group" onclick="restoreWindow('projects')" title="Projects">
                     <span class="dock-label">Projects</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
-                            d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.94-1.47L12 11 9.06 9.53 12 11zm10 2l-10 5-10-5-2.23 1.12L12 19l12.23-4.88L22 13zm0-4l-2.23 1.12L12 15l-7.77-4.88L2 9l10 5 10-5z" />
-                        <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                        <polygon points="2 11 12 16 22 11 22 9 12 14 2 9 2 11" />
-                        <polygon points="2 15 12 20 22 15 22 13 12 18 2 13 2 15" />
+                            d="M12 2l8.66 5v10L12 22 3.34 17V7L12 2zM12 4.33L4.93 8.16v7.68L12 19.67l7.07-3.83V8.16L12 4.33z" />
+                        <path d="M12 8.5l4.5 2.6-4.5 2.6-4.5-2.6L12 8.5z" />
                     </svg>
                 </div>
 
-                <!-- Resume (Document) -> Renamed from Document -->
+                <!-- Resume (Profile Clipboard) -->
                 <div class="dock-item cursor-pointer group" onclick="restoreWindow('resume')" title="Resume">
                     <span class="dock-label">Resume</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
-                            d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                            d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z" />
+                        <circle cx="12" cy="11" r="2" />
+                        <path d="M8 17h8" />
                     </svg>
                 </div>
 
-                <!-- Vault (Lock) -->
+                <!-- Vault (Secure Archive/Briefcase) -->
                 <div class="dock-item cursor-pointer group" onclick="restoreWindow('vault')" title="Vault">
                     <span class="dock-label">Vault</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
-                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                            d="M20 6h-3V4c0-1.1-.9-2-2-2h-6c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM9 4h6v2H9V4zm11 14H4V8h16v10z" />
+                        <path d="M12 14c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" />
                     </svg>
                 </div>
 
-                <!-- Terminal (Prompt) -> Renamed from System -->
+                <!-- Terminal (Command Console) -->
                 <div class="dock-item cursor-pointer group" onclick="restoreWindow('terminal')" title="Terminal">
                     <span class="dock-label">Terminal</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 18V6h16v12H4z" />
-                        <path d="M7.5 15l4.5-3-4.5-3v6zM13 15h4v-2h-4v2z" />
+                        <path d="M8 10l3 3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" fill="none" />
+                        <path d="M13 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" />
                     </svg>
                 </div>
 
-                <!-- Monitor (Analytics) -> Renamed from Pulse to Monitoring -->
+                <!-- Monitor (Bar Chart Panel) -->
                 <div class="dock-item cursor-pointer group" onclick="restoreWindow('monitor')" title="Monitoring">
                     <span class="dock-label">Monitoring</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
-                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2v-3h2v3zm4 0h-2v-5h2v5z" />
+                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM5 19V5h14v14H5z" />
+                        <path d="M7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z" />
                     </svg>
                 </div>
             </div>
@@ -1016,15 +1009,15 @@
                 sysinfo: {
                     title: "About OS93",
                     content: `
-                     <div class="h-full flex flex-col bg-[#1a100c] text-her-textLight p-6 select-none font-ui">
-                        <h1 class="text-xl font-bold text-white mb-1 font-serif">About OS93</h1>
-                        <div class="text-xs text-gray-500 mb-4 font-mono">Version 1.4 (Blue-Jonze)</div>
-                        <div class="h-px bg-white/10 w-full mb-4"></div>
+                     <div class="h-full flex flex-col bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight p-6 select-none font-ui">
+                        <h1 class="text-xl font-bold mb-1 font-serif">About OS93</h1>
+                        <div class="text-xs opacity-60 mb-4 font-mono">Version 1.4 (Blue-Jonze)</div>
+                        <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-4"></div>
 
                         <div class="flex-1 overflow-y-auto pr-2 space-y-4 text-sm">
                             <div>
-                                <div class="font-bold text-gray-400 mb-2 text-xs uppercase tracking-wider">Built with</div>
-                                <ul class="space-y-1 text-gray-300">
+                                <div class="font-bold opacity-40 mb-2 text-xs uppercase tracking-wider">Built with</div>
+                                <ul class="space-y-1 opacity-80">
                                     <li>• HTML5 & Vanilla JavaScript</li>
                                     <li>• Tailwind CSS (CDN)</li>
                                     <li>• HTML5 Canvas (Animations)</li>
@@ -1033,8 +1026,8 @@
                             </div>
 
                             <div>
-                                <div class="font-bold text-gray-400 mb-2 text-xs uppercase tracking-wider">Typography</div>
-                                <ul class="space-y-3 text-gray-300">
+                                <div class="font-bold opacity-40 mb-2 text-xs uppercase tracking-wider">Typography</div>
+                                <ul class="space-y-3 opacity-80">
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">Serif (Display)</span>
                                         <span class="font-serif font-extrabold text-lg">Copernicus Trial</span>
@@ -1056,13 +1049,13 @@
 
                         </div>
 
-                        <div class="mt-6 text-center text-xs text-gray-600 font-mono">
+                        <div class="mt-6 text-center text-xs opacity-60 font-mono">
                             Created by Pietro Uni<br>
                             © 2025 All rights reserved
                         </div>
 
                         <div class="mt-4 flex justify-center">
-                            <button onclick="closeWindow('sysinfo')" class="px-6 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-md text-sm font-medium transition-colors text-white">Close</button>
+                            <button onclick="closeWindow('sysinfo')" class="px-6 py-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-her-text/10 dark:border-white/10 rounded-md text-sm font-medium transition-colors">Close</button>
                         </div>
                      </div>
                 `,
@@ -2061,11 +2054,13 @@
                             break;
                         case 'neofetch':
                             const logo = `
-       _.-;;-._
-'-..-'|   ||   |
-'-..-'|_.-;;-._|
-'-..-'|   ||   |
-'-..-'|_.-''-._|
+        .--.
+       |o_o |
+       |:_/ |
+      //   \\ \\
+     (|     |)
+    /'\\_   _/ \`\\
+    \\___)=(___/
 `;
                             const info = `
 <span class="text-blue-400">guest@portfolio-os</span>
@@ -2346,15 +2341,14 @@
                 }, 1000);
             }
 
-            // --- Boot Sequence (Her OS1 Style - Polished) ---
+            // --- Boot Sequence (Her OS1 Style - Simple Circle) ---
             function renderBootLoop() {
                 const cvs = document.getElementById('boot-canvas');
                 if (!cvs) return;
-                const ctx = cvs.getContext('2d', { alpha: false }); // Opt for no alpha if bg is solid
+                const ctx = cvs.getContext('2d', { alpha: false });
                 let t = 0;
 
                 function resizeBootCanvas() {
-                    // Ensure sharp rendering
                     const dpr = window.devicePixelRatio || 1;
                     cvs.width = cvs.clientWidth * dpr;
                     cvs.height = cvs.clientHeight * dpr;
@@ -2369,95 +2363,47 @@
                     const w = cvs.clientWidth;
                     const h = cvs.clientHeight;
 
-                    // Clear with solid color to avoid trails - UPDATED to Blue
                     ctx.fillStyle = '#4A7C9D';
                     ctx.fillRect(0, 0, w, h);
 
                     const cx = w / 2;
                     const cy = h / 2;
-                    // Scale animates slightly for "breathing" effect
-                    const scale = (Math.min(w, h) * 0.25);
+                    const radius = 90;
 
                     ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-
-                    // Multi-layered glow for "Neon" effect
-                    ctx.shadowBlur = 25;
-                    ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
                     ctx.strokeStyle = '#FFFFFF';
-                    ctx.lineWidth = 4;
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
 
                     ctx.beginPath();
 
-                    const segments = 300;
-                    // We draw 2 full periods to ensure loop closure and thickness
-                    const totalAngle = Math.PI * 2;
+                    // Simple drawing circle
+                    // We want it to continuously spin (loop) in sync with loading
+                    // The boot duration is roughly 3.5-4s.
+                    // We can rotate the dash offset over time.
 
-                    const rotationY = t * 0.02;
-                    const rotationX = t * 0.015;
+                    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
 
-                    let firstPoint = null;
+                    const circumference = 2 * Math.PI * radius;
 
-                    for (let i = 0; i <= segments; i++) {
-                        const u = (i / segments) * totalAngle;
+                    // Gap size (10% gap)
+                    const gap = circumference * 0.15;
+                    const solid = circumference - gap;
 
-                        // Parametric equation for a twisted loop (Trefoil-ish / Lissajous)
-                        // (3, 2) Lissajous on a sphere projection
-                        let x = Math.sin(3 * u);
-                        let y = Math.sin(2 * u);
-                        let z = Math.cos(3 * u); // Depth
+                    ctx.setLineDash([solid, gap]);
 
-                        // Rotate 3D
-                        // Rotate Y
-                        let x1 = x * Math.cos(rotationY) - z * Math.sin(rotationY);
-                        let z1 = x * Math.sin(rotationY) + z * Math.cos(rotationY);
-
-                        // Rotate X
-                        let y2 = y * Math.cos(rotationX) - z1 * Math.sin(rotationX);
-                        let z2 = y * Math.sin(rotationX) + z1 * Math.cos(rotationX);
-
-                        // Perspective projection
-                        const fov = 4;
-                        const projection = fov / (fov + z2 * 0.5);
-
-                        const px = cx + x1 * scale * projection;
-                        const py = cy + y2 * scale * projection;
-
-                        if (i === 0) {
-                            ctx.moveTo(px, py);
-                            firstPoint = { x: px, y: py };
-                        } else {
-                            ctx.lineTo(px, py);
-                        }
-                    }
-
-                    // Close the loop perfectly
-                    if (firstPoint) ctx.lineTo(firstPoint.x, firstPoint.y);
-
-                    // Drawing effect logic
-                    const pathLen = scale * 12;
-                    // Draw phase duration roughly 2s (120 frames)
-                    const duration = 120;
-                    const progress = Math.min(t / duration, 1);
-
-                    if (progress < 1) {
-                        // ease out
-                        const ease = 1 - Math.pow(1 - progress, 4);
-                        ctx.setLineDash([pathLen, pathLen]);
-                        ctx.lineDashOffset = pathLen * (1 - ease);
-                    } else {
-                        ctx.setLineDash([]);
-                    }
+                    // Rotate the offset
+                    // Speed: 1 full rotation every ~1.5 seconds or so
+                    // t increments ~60 times per second
+                    // 1 rotation = circumference offset
+                    const speed = 2.5;
+                    const offset = -(t * speed);
+                    ctx.lineDashOffset = offset;
 
                     ctx.stroke();
 
-                    // Secondary intense core stroke
-                    ctx.shadowBlur = 0;
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = 'rgba(255,255,255,1)';
-                    ctx.stroke();
-
-                    t += 1;
+                    t++;
                     bootAnimationId = requestAnimationFrame(animate);
                 }
                 animate();
@@ -2471,11 +2417,6 @@
                 }
 
                 renderBootLoop();
-
-                // Animate Progress Bar
-                setTimeout(() => {
-                    document.getElementById('boot-progress').style.width = '100%';
-                }, 300);
 
                 // Finish
                 setTimeout(() => {
