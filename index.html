@@ -56,6 +56,7 @@
                     },
                     animation: {
                         'gradient-x': 'gradient-x 30s ease infinite',
+                        'dock-bounce': 'dockBounce 0.5s ease',
                     },
                     keyframes: {
                         'gradient-x': {
@@ -68,6 +69,10 @@
                                 'background-position': 'right center'
                             },
                         },
+                        dockBounce: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
                     }
                 }
             }
@@ -322,53 +327,65 @@
             scrollbar-color: #4A7C9D transparent;
         }
 
-        /* Dock - Bottom Centered */
+        /* Dock - Refined Design */
         .dock-container {
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            background: rgba(244, 235, 217, 0.6);
-            border: 1px solid rgba(74, 124, 157, 0.2);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(253, 251, 247, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 24px;
+            position: relative;
+            transform-origin: bottom center;
+            transition: width 0.3s ease;
         }
 
         html.dark .dock-container {
-            background: rgba(62, 39, 35, 0.6);
-            border: 1px solid rgba(74, 124, 157, 0.2);
-            color: #4A7C9D;
-            /* Light mode icon color - Blue */
-            position: relative;
-            transform-origin: bottom center;
+            background: rgba(45, 26, 20, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
         @media (min-width: 768px) {
             .dock-item {
-                width: 56px;
-                height: 56px;
+                width: 52px;
+                height: 52px;
+                position: relative;
+                transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), margin 0.2s;
             }
+        }
+
+        .dock-item {
+            color: #4A7C9D; /* Default icon color */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         html.dark .dock-item {
             color: #4A7C9D;
-            /* Dark mode icon color - Blue */
         }
 
         .dock-item:hover {
-            opacity: 1;
-            transform: scale(1.1) translateY(-5px);
+            transform: scale(1.15) translateY(-8px);
         }
 
-        .dock-item.active {
-            opacity: 1;
-        }
-
+        /* Active Indicator Dot */
         .dock-item.active::after {
             content: '';
             position: absolute;
-            bottom: -6px;
+            bottom: -4px;
             width: 4px;
             height: 4px;
             border-radius: 50%;
-            background-color: currentColor;
+            background-color: #4A7C9D;
+            box-shadow: 0 0 4px #4A7C9D;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Launch Animation */
+        .animate-dock-bounce {
+            animation: dockBounce 0.6s cubic-bezier(0.28, 0.84, 0.42, 1);
         }
 
         /* Icon Shapes (SVG) */
@@ -376,33 +393,34 @@
             width: 28px;
             height: 28px;
             fill: currentColor;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
         }
 
         @media (min-width: 768px) {
             .dock-icon {
-                width: 32px;
-                height: 32px;
+                width: 30px;
+                height: 30px;
             }
         }
 
         /* Tooltip Labels */
         .dock-label {
             position: absolute;
-            bottom: 70px;
+            bottom: 65px;
             left: 50%;
-            transform: translateX(-50%) translateY(10px);
+            transform: translateX(-50%) translateY(8px);
             background: #3E2723;
             color: #F4EBD9;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
             font-family: 'Copernicus Trial', serif;
             font-weight: 800;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.2s ease-out;
-            display: none;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         @media (min-width: 768px) {
@@ -560,7 +578,7 @@
         <canvas id="boot-canvas" width="600" height="400" class="w-full max-w-[600px]"></canvas>
 
         <!-- Subtle status text fading in -->
-        <div class="text-white/40 text-[10px] font-mono tracking-[0.2em] animate-pulse uppercase mt-4">Initializing...
+        <div class="text-white/40 text-[10px] font-mono tracking-[0.2em] animate-pulse uppercase mt-0">Initializing...
         </div>
     </div>
 
@@ -657,11 +675,11 @@
 
         <!-- Bottom Dock -->
         <div
-            class="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 z-[9999] mix-blend-normal pointer-events-auto w-full md:w-auto flex justify-center">
-            <div class="dock-container rounded-2xl px-4 md:px-6 py-2 flex items-end gap-2 md:gap-4 shadow-2xl">
+            class="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 z-[9999] mix-blend-normal pointer-events-auto w-full md:w-auto flex justify-center">
+            <div class="dock-container rounded-3xl px-6 py-3 flex items-end gap-4 shadow-2xl">
 
-                <!-- About (Identity/Profile) -> Renamed to README.md -->
-                <div class="dock-item cursor-pointer group" onclick="restoreWindow('about')" title="README.md">
+                <!-- README.md -->
+                <div id="dock-about" class="dock-item cursor-pointer group" onclick="restoreWindow('about')" title="README.md">
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="8" r="4" />
                         <path d="M12 14c-5 0-9 3-9 7h18c0-4-4-7-9-7z" />
@@ -669,7 +687,7 @@
                 </div>
 
                 <!-- Projects (Hexagon/Infrastructure) -->
-                <div class="dock-item cursor-pointer group" onclick="restoreWindow('projects')" title="Projects">
+                <div id="dock-projects" class="dock-item cursor-pointer group" onclick="restoreWindow('projects')" title="Projects">
                     <span class="dock-label">Projects</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -679,7 +697,7 @@
                 </div>
 
                 <!-- Resume (Profile Clipboard) -->
-                <div class="dock-item cursor-pointer group" onclick="restoreWindow('resume')" title="Resume">
+                <div id="dock-resume" class="dock-item cursor-pointer group" onclick="restoreWindow('resume')" title="Resume">
                     <span class="dock-label">Resume</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -690,7 +708,7 @@
                 </div>
 
                 <!-- Vault (Secure Archive/Briefcase) -->
-                <div class="dock-item cursor-pointer group" onclick="restoreWindow('vault')" title="Vault">
+                <div id="dock-vault" class="dock-item cursor-pointer group" onclick="restoreWindow('vault')" title="Vault">
                     <span class="dock-label">Vault</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -700,7 +718,7 @@
                 </div>
 
                 <!-- Terminal (Command Console) -->
-                <div class="dock-item cursor-pointer group" onclick="restoreWindow('terminal')" title="Terminal">
+                <div id="dock-terminal" class="dock-item cursor-pointer group" onclick="restoreWindow('terminal')" title="Terminal">
                     <span class="dock-label">Terminal</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -712,7 +730,7 @@
                 </div>
 
                 <!-- Monitor (Bar Chart Panel) -->
-                <div class="dock-item cursor-pointer group" onclick="restoreWindow('monitor')" title="Monitoring">
+                <div id="dock-monitor" class="dock-item cursor-pointer group" onclick="restoreWindow('monitor')" title="Monitoring">
                     <span class="dock-label">Monitoring</span>
                     <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -839,12 +857,12 @@
             };
 
             const fortunes = [
-                "The only way to go fast, is to go well.",
-                "Computers are fast; developers keep them slow.",
-                "It works on my machine.",
-                "Beware of programmers who carry screwdrivers.",
-                "Simplicity is the soul of efficiency.",
-                "Code is like humor. When you have to explain it, it’s bad."
+                "If you don’t work hard on your own dreams, you’ll eventually end up building someone else’s.",
+                "The only way to do great work is to love what you do.",
+                "Sometimes the correct path, the bravest path is the least obvious, and also the gentlest.",
+                "If you don't like what is being said, change the conversation.",
+                "Even though success is a reality, it's effects are temporary.",
+                "Take a gamble that love exists, and do a loving act."
             ];
 
             // --- Theme & Wallpaper Logic ---
@@ -1517,6 +1535,13 @@
                 document.getElementById('windows-container').appendChild(winEl);
 
                 activeWindows[id] = { element: winEl, config: winConfig, maximized: false, prevRect: null };
+                
+                // Dock Animation & State
+                const dockItem = document.getElementById(`dock-${id}`);
+                if(dockItem) {
+                    dockItem.classList.add('active', 'animate-dock-bounce');
+                    setTimeout(() => dockItem.classList.remove('animate-dock-bounce'), 600);
+                }
 
                 // App specific logic init
                 if (id === 'monitor') startMonitor();
@@ -1537,6 +1562,11 @@
                 const win = document.getElementById(`win-${id}`);
                 if (win) win.remove();
                 delete activeWindows[id];
+                
+                // Dock State
+                const dockItem = document.getElementById(`dock-${id}`);
+                if(dockItem) dockItem.classList.remove('active');
+
                 if (id === 'monitor' && monitorInterval) clearInterval(monitorInterval);
             }
 
@@ -1644,7 +1674,9 @@
                     const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
 
                     // Constrain to viewport (approx)
-                    const containerRect = win.offsetParent.getBoundingClientRect();
+                    // Constrain to viewport (approx)
+                    const container = win.offsetParent || document.body;
+                    const containerRect = container.getBoundingClientRect();
                     let newX = clientX - dragOffset.x - containerRect.left;
                     let newY = clientY - dragOffset.y - containerRect.top;
 
