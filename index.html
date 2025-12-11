@@ -487,10 +487,6 @@
             background: #4A7C9D;
         }
 
-        #boot-screen {
-            z-index: 9999;
-        }
-
         canvas {
             image-rendering: auto;
         }
@@ -545,45 +541,8 @@
 <body
     class="h-screen w-screen text-her-text dark:text-her-textLight relative overflow-hidden transition-colors duration-1000 font-ui">
 
-    <!-- Safety Script to prevent boot loop -->
-    <script>
-            (function () {
-                // Failsafe: If JS errors or hangs, hide boot screen after 6 seconds
-                setTimeout(() => {
-                    const boot = document.getElementById('boot-screen');
-                    if (boot && boot.style.display !== 'none' && window.getComputedStyle(boot).opacity !== '0') {
-                        console.warn('Boot sequence timed out. Forcing desktop load.');
-                        boot.style.opacity = '0';
-                        setTimeout(() => {
-                            boot.style.display = 'none';
-                            document.getElementById('desktop')?.classList.remove('hidden');
-                        }, 500);
-                    }
-                }, 6000);
-
-                window.onerror = function (msg, url, line) {
-                    console.error('Critical Error:', msg, line);
-                    const boot = document.getElementById('boot-screen');
-                    if (boot) boot.style.display = 'none';
-                    document.getElementById('desktop')?.classList.remove('hidden');
-                    return false;
-                };
-            })();
-    </script>
-
-    <!-- Boot Screen (Her OS1 Style) -->
-    <div id="boot-screen" style="background-color: #4A7C9D;"
-        class="absolute inset-0 flex flex-col justify-center items-center overflow-hidden transition-opacity duration-1000">
-        <!-- Canvas for Mobius Loop Animation -->
-        <canvas id="boot-canvas" width="600" height="400" class="w-full max-w-[600px]"></canvas>
-
-        <!-- Subtle status text fading in -->
-        <div class="text-white/40 text-[10px] font-mono tracking-[0.2em] animate-pulse uppercase mt-0">Initializing...
-        </div>
-    </div>
-
     <!-- Desktop Environment -->
-    <div id="desktop" class="absolute inset-0 hidden her-bg-dark transition-all duration-1000">
+    <div id="desktop" class="absolute inset-0 her-bg-dark transition-all duration-1000">
 
         <!-- Menu Bar (MacOS Style) -->
         <div id="menubar"
@@ -748,15 +707,13 @@
 
             // --- Configuration ---
             const config = {
-                bootDuration: 4000,
-                autoBoot: true
+                // Config simplified as boot is removed
             };
 
             // --- State ---
             let zIndexCounter = 100;
             let activeWindows = {}; // Stores { element, config, state }
             let monitorInterval = null;
-            let bootAnimationId = null;
             let activeWallpaperIndex = 0;
 
             // --- Wallpapers ---
@@ -2245,7 +2202,7 @@
                 window.renderVault();
             }
 
-            // --- Monitor Logic ---
+            // --- Fake Monitor Logic ---
             window.switchMonitorTab = function (tab) {
                 document.getElementById('mon-view-infra').style.display = 'none';
                 document.getElementById('mon-view-cloudfront').style.display = 'none';
@@ -2362,100 +2319,10 @@
                 }, 1000);
             }
 
-            // --- Boot Sequence (Her OS1 Style - Simple Circle) ---
-            function renderBootLoop() {
-                const cvs = document.getElementById('boot-canvas');
-                if (!cvs) return;
-                const ctx = cvs.getContext('2d', { alpha: false });
-                let t = 0;
-
-                function resizeBootCanvas() {
-                    const dpr = window.devicePixelRatio || 1;
-                    cvs.width = cvs.clientWidth * dpr;
-                    cvs.height = cvs.clientHeight * dpr;
-                    ctx.scale(dpr, dpr);
-                }
-                window.addEventListener('resize', resizeBootCanvas);
-                resizeBootCanvas();
-
-                function animate() {
-                    if (document.getElementById('boot-screen').style.display === 'none') return;
-
-                    const w = cvs.clientWidth;
-                    const h = cvs.clientHeight;
-
-                    ctx.fillStyle = '#4A7C9D';
-                    ctx.fillRect(0, 0, w, h);
-
-                    const cx = w / 2;
-                    const cy = h / 2;
-                    const radius = 90;
-
-                    ctx.lineCap = 'round';
-                    ctx.strokeStyle = '#FFFFFF';
-                    ctx.lineWidth = 3;
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
-
-                    ctx.beginPath();
-
-                    // Simple drawing circle
-                    // We want it to continuously spin (loop) in sync with loading
-                    // The boot duration is roughly 3.5-4s.
-                    // We can rotate the dash offset over time.
-
-                    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-
-                    const circumference = 2 * Math.PI * radius;
-
-                    // Gap size (10% gap)
-                    const gap = circumference * 0.15;
-                    const solid = circumference - gap;
-
-                    ctx.setLineDash([solid, gap]);
-
-                    // Rotate the offset
-                    // Speed: 1 full rotation every ~1.5 seconds or so
-                    // t increments ~60 times per second
-                    // 1 rotation = circumference offset
-                    const speed = 2.5;
-                    const offset = -(t * speed);
-                    ctx.lineDashOffset = offset;
-
-                    ctx.stroke();
-
-                    t++;
-                    bootAnimationId = requestAnimationFrame(animate);
-                }
-                animate();
-            }
-
-            async function startBootSequence() {
-                if (!config.autoBoot) {
-                    document.getElementById('boot-screen').style.display = 'none';
-                    document.getElementById('desktop').classList.remove('hidden');
-                    return;
-                }
-
-                renderBootLoop();
-
-                // Finish
-                setTimeout(() => {
-                    const boot = document.getElementById('boot-screen');
-                    boot.style.opacity = '0';
-                    if (bootAnimationId) cancelAnimationFrame(bootAnimationId);
-
-                    setTimeout(() => {
-                        boot.style.display = 'none';
-                        document.getElementById('desktop').classList.remove('hidden');
-                        // Don't auto open 'about' to keep desktop clean initially or user choice
-                        setTimeout(() => window.openWindow('about'), 500);
-                    }, 1000);
-                }, config.bootDuration);
-            }
-
-            // Start everything only after variables are defined
-            startBootSequence();
+            // Initial site Launch
+            setTimeout(() => {
+                window.openWindow('about');
+            }, 100);
 
         });
     </script>
