@@ -195,7 +195,7 @@
             border-radius: 4px;
         }
 
-        /* Add a subtle border in dark mode to distinguish cards */
+        /* subtle border in dark mode to distinguish cards */
         body.dark .skill-category {
             border: 1px solid var(--border-color);
         }
@@ -475,9 +475,9 @@
         <h2>Technical Projects</h2>
 
         <div class="project">
-            <div class="project-title">Production Cloud Infrastructure Platform</div>
-            <a href="https://github.com/pietrocious/suprsymmetry" class="project-link"
-                target="_blank">github.com/pietrocious/suprsymmetry</a>
+            <div class="project-title">Terraform Infrastructure for a Static Site</div>
+            <a href="https://github.com/pietrocious/terraform-aws-pietrouni" class="project-link"
+                target="_blank">github.com/pietrocious/terraform-aws-pietrouni</a>
             <ul>
                 <li>Architected and deployed production-grade AWS infrastructure including multi-AZ VPC with
                     public/private subnets, Application Load Balancers, and Auto Scaling Groups; infrastructure scales
@@ -490,7 +490,7 @@
 
         <div class="project">
             <div class="project-title">Personal Portfolio Website (you are here)</div>
-            <a href="https://suprsymmetry.com" class="project-link" target="_blank">suprsymmetry.com</a>
+            <a href="https://pietrouni.com" class="project-link" target="_blank">pietrouni.com</a>
             <ul>
                 <li>Deployed static website on AWS using S3, CloudFront CDN, and Route53 for DNS management; configured
                     SSL/TLS certificates via AWS Certificate Manager for secure HTTPS access</li>
@@ -498,6 +498,7 @@
                     dynamodb locking); the entire site infrastructure is reproducible from code</li>
                 <li>Built reusable terraform modules for vpc networking (multi-az with public/private subnets), alb/asg
                     compute resources, validated through destroy/rebuild testing</li>
+                <li>Portfolio website built in a single HTML file using JavaScript and Tailwinds CSS.</li>
             </ul>
         </div>
 
