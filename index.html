@@ -175,7 +175,7 @@
         }
 
         .window.minimized {
-            transform: scale(0) translateY(500px);
+            transform: scale(0);
             opacity: 0;
             pointer-events: none;
         }
@@ -1436,20 +1436,39 @@
                 const randY = Math.floor(Math.random() * 50);
 
                 // Container for dynamic window centering
-                const containerW = document.getElementById('windows-container').clientWidth;
-                const containerH = document.getElementById('windows-container').clientHeight;
+                const container = document.getElementById('windows-container');
+                const containerW = container.clientWidth;
+                const containerH = container.clientHeight;
 
                 // Mobile Detection
                 const isMobile = window.innerWidth < 768;
+                
+                // Safe Area Calculation (Dock Buffer)
+                const dockBuffer = 120; 
+                const maxAvailableHeight = containerH - dockBuffer;
 
-                // Responsive Size & Position
+                // Responsive Size Calculation
                 let finalW = isMobile ? containerW * 0.92 : winConfig.width;
-                let finalH = isMobile ? containerH * 0.8 : winConfig.height;
+                
+                // Height Constraint: Clamp to safe area
+                let finalH = winConfig.height;
+                if (!isMobile && finalH > maxAvailableHeight) {
+                    finalH = maxAvailableHeight;
+                } else if (isMobile) {
+                    finalH = containerH * 0.8;
+                }
 
-                // Default center if space allows, otherwise logic handles it via CSS/drag
-                // Adding 50px top offset to ensure header is below menu bar
+                // Default center if space allows
                 let leftPos = isMobile ? (containerW - finalW) / 2 : Math.max(0, (containerW - finalW) / 2) + randX;
-                let topPos = isMobile ? 20 : Math.max(50, (containerH - finalH) / 2) - 40 + randY;
+                
+                // Vertical Center within safe area
+                let topPos = isMobile ? 20 : Math.max(10, (maxAvailableHeight - finalH) / 2) + randY;
+
+                // Boundary Check: prevent overlap with dock
+                if (topPos + finalH > maxAvailableHeight) {
+                    topPos = maxAvailableHeight - finalH;
+                    if (topPos < 10) topPos = 10;
+                }
 
                 const winEl = document.createElement('div');
                 winEl.className = 'window absolute flex flex-col active-window';
@@ -1531,8 +1550,45 @@
                 const winObj = activeWindows[id];
                 if (!winObj) return;
 
-                winObj.element.classList.add('minimized');
-                winObj.element.classList.remove('active-window');
+                const el = winObj.element;
+                const dockItem = document.getElementById(`dock-${id}`);
+                
+                // Calculate Transform Origin for "Scale" effect towards dock
+                let originX = '50%';
+                let originY = '100%';
+
+                if (dockItem) {
+                    const dockRect = dockItem.getBoundingClientRect();
+                    const winRect = el.getBoundingClientRect();
+                    
+                    // Destination is center of dock icon
+                    const destX = dockRect.left + dockRect.width / 2;
+                    const destY = dockRect.top + dockRect.height / 2;
+                    
+                    // Origin relative to window top-left
+                    const relX = destX - winRect.left;
+                    const relY = destY - winRect.top;
+                    
+                    originX = `${relX}px`;
+                    originY = `${relY}px`;
+                } else {
+                    // Fallback to center bottom
+                    const winRect = el.getBoundingClientRect();
+                    const destX = window.innerWidth / 2;
+                    const destY = window.innerHeight;
+                    originX = `${destX - winRect.left}px`;
+                    originY = `${destY - winRect.top}px`;
+                }
+
+                // Smooth Transition
+                el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease';
+                el.style.transformOrigin = `${originX} ${originY}`;
+
+                // Trigger Reflow
+                el.offsetHeight;
+
+                el.classList.add('minimized');
+                el.classList.remove('active-window');
             }
 
             window.restoreWindow = function (id) {
@@ -1541,8 +1597,21 @@
                     return;
                 }
                 const winObj = activeWindows[id];
-                winObj.element.classList.remove('minimized');
+                const el = winObj.element;
+
+                // Restore Transition
+                el.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease';
+                
+                el.classList.remove('minimized');
                 bringToFront(id);
+                
+                // Cleanup inline styles after animation
+                setTimeout(() => {
+                    if (!el.classList.contains('minimized')) {
+                        el.style.transition = '';
+                        el.style.transformOrigin = '';
+                    }
+                }, 450);
             }
 
             window.toggleMaximize = function (id) {
@@ -2186,20 +2255,6 @@
                 `;
                     grid.appendChild(card);
                 });
-            }
-
-            window.filterVault = function (cat) {
-                // Update UI tabs
-                document.querySelectorAll('.vault-tab').forEach(b => {
-                    if (b.innerText.toLowerCase().includes(cat.toLowerCase()) || (cat === 'all' && b.innerText === 'ALL')) {
-                        b.classList.add('active', 'bg-her-red', 'text-white');
-                        b.classList.remove('hover:bg-black/5', 'opacity-70');
-                    } else {
-                        b.classList.remove('active', 'bg-her-red', 'text-white');
-                        b.classList.add('hover:bg-black/5', 'opacity-70');
-                    }
-                });
-                window.renderVault();
             }
 
             // --- Fake Monitor Logic ---
