@@ -15,6 +15,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pietro Uni | Interactive Portfolio</title>
     <meta name="description" content="An OS-inspired interactive portfolio showcasing my journey and projects" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pietrouni.com/">
+    <meta property="og:title" content="Pietro Uni | Interactive Portfolio">
+    <meta property="og:description" content="OS-inspired interactive portfolio showcasing DevOps and Infrastructure projects">
+    <meta property="og:image" content="https://pietrouni.com/og-image.jpg">
+
+    <!-- fka twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://pietrouni.com/">
+    <meta name="twitter:title" content="Pietro Uni | Interactive Portfolio">
+    <meta name="twitter:description" content="OS-inspired interactive portfolio showcasing DevOps and Infrastructure projects">
+    <meta name="twitter:image" content="https://pietrouni.com/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
 
     <!-- Preconnect to speed up external resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -635,11 +656,12 @@
         <!-- Bottom Dock -->
         <div
             class="absolute bottom-6 md:bottom-10 left-1/2 transform -translate-x-1/2 z-[9999] mix-blend-normal pointer-events-auto w-full md:w-auto flex justify-center">
-            <div class="dock-container rounded-3xl px-6 py-3 flex items-end gap-4 shadow-2xl">
+            <div class="dock-container rounded-3xl px-6 py-3 flex items-end gap-4 shadow-2xl" role="navigation" aria-label="Application dock">
 
                 <!-- README.md -->
-                <div id="dock-about" class="dock-item cursor-pointer group" onclick="restoreWindow('about')" title="README.md">
-                    <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <div id="dock-about" class="dock-item cursor-pointer group" onclick="restoreWindow('about')" title="README.md" role="button" aria-label="Open README.md">
+                    <span class="dock-label">README.md</span>
+                    <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <circle cx="12" cy="8" r="4" />
                         <path d="M12 14c-5 0-9 3-9 7h18c0-4-4-7-9-7z" />
                     </svg>
@@ -765,7 +787,8 @@
                             },
                             'readme.md': 'FILE',
                             'todo.txt': 'FILE',
-                            '.config': 'FILE'
+                            '.config': 'FILE',
+                            '.secrets': 'FILE'
                         }
                     },
                     'bin': {},
@@ -1111,37 +1134,43 @@
                         
                         <div class="dyn-grid">
                             <!-- pietrouni.com -->
-                            <div class="p-6 border border-her-red/20 rounded-lg hover:border-her-red/50 transition-colors bg-white/40 dark:bg-black/10 cursor-pointer" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank')">
-                                <h3 class="font-serif font-extrabold text-lg mb-2 text-her-red dark:text-her-red">pietrouni.com</h3>
+                            <div class="p-6 border border-her-red/20 rounded-lg transition-colors bg-white/40 dark:bg-black/10 opacity-70">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-serif font-extrabold text-lg text-her-red dark:text-her-red">pietrouni.com</h3>
+                                    <span class="px-2 py-0.5 text-[10px] font-bold bg-yellow-100 text-yellow-800 rounded">Repo Coming Soon</span>
+                                </div>
                                 <p class="text-sm opacity-80 mb-4">Full desktop portfolio website, with infrastructure on AWS.</p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">HTML</span>
+                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">CSS</span>
+                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">JAVASCRIPT</span>
+                                </div>
+                            </div>
+
+                            <!-- AWS Terraform Modules -->
+                            <div class="p-6 border border-her-red/20 rounded-lg hover:border-her-red/50 transition-colors bg-white/40 dark:bg-black/10 cursor-pointer" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
+                                <h3 class="font-serif font-extrabold text-lg mb-2 text-her-red dark:text-her-red">Terraform AWS Modules</h3>
+                                <p class="text-sm opacity-80 mb-4">Opinionated, production-ready modules for VPC, EKS, and RDS.</p>
                                 <div class="flex flex-wrap gap-2 mb-4">
                                     <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">TERRAFORM</span>
                                     <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">AWS</span>
                                     <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">CICD</span>
                                 </div>
-                                <div class="text-xs font-bold uppercase tracking-wide opacity-60">(Source code coming soon) -></div>
-                            </div>
-
-                            <!-- AWS Terraform Modules -->
-                            <div class="p-6 border border-her-red/20 rounded-lg hover:border-her-red/50 transition-colors bg-white/40 dark:bg-black/10 cursor-pointer" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
-                                <h3 class="font-serif font-extrabold text-lg mb-2 text-her-red dark:text-her-red">Reusable Terraform Modules</h3>
-                                <p class="text-sm opacity-80 mb-4">Opinionated, production-ready modules for VPC, EKS, and RDS.</p>
-                                <div class="flex flex-wrap gap-2 mb-4">
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">HCL</span>
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">BEST PRACTICES</span>
-                                </div>
-                                <div class="text-xs font-bold uppercase tracking-wide opacity-60">View Profile -></div>
+                                <div class="text-xs font-bold uppercase tracking-wide opacity-60">View Repo -></div>
                             </div>
                             
                             <!-- Automation Scripts -->
-                            <div class="p-6 border border-her-red/20 rounded-lg hover:border-her-red/50 transition-colors bg-white/40 dark:bg-black/10 cursor-pointer" onclick="window.open('https://github.com/pietrocious/powershell-scripts', '_blank')">
-                                <h3 class="font-serif font-extrabold text-lg mb-2 text-her-red dark:text-her-red">Automation Scripts in python, bash and PS</h3>
-                                <p class="text-sm opacity-80 mb-4">Python/bash/PS scripts for Cisco IOS config management and compliance checks, and other automation scripts.</p>
-                                <div class="flex flex-wrap gap-2 mb-4">
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">PYTHON</span>
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">NETMIKO</span>
+                            <div class="p-6 border border-her-red/20 rounded-lg transition-colors bg-white/40 dark:bg-black/10 opacity-70">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-serif font-extrabold text-lg text-her-red dark:text-her-red">Automation Scripts</h3>
+                                    <span class="px-2 py-0.5 text-[10px] font-bold bg-yellow-100 text-yellow-800 rounded">Repo Coming Soon</span>
                                 </div>
-                                <div class="text-xs font-bold uppercase tracking-wide opacity-60">(Repo coming soon) -></div>
+                                <p class="text-sm opacity-80 mb-4">PowerShell/bash/Python scripts for Cisco IOS config management and compliance checks.</p>
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">POWERSHELL</span>
+                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">BASH</span>
+                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">PYTHON</span>
+                                </div>
                             </div>
                         </div>
                      </div>
@@ -2014,6 +2043,8 @@
                         case 'cat':
                             if (args[1] === 'readme.md') {
                                 output.innerHTML += `<div class="whitespace-pre-wrap opacity-80 my-2">Hi, I'm Pietro. This is my interactive portfolio.\nRun 'about' to see the graphical version.</div>`;
+                            } else if (args[1] === '.secrets') {
+                                output.innerHTML += `<div class="whitespace-pre-wrap my-2 text-purple-400">🔮 You found a secret!\n\nHints:\n  - Try 'noclip' for R&D access\n  - 'hack' might do something fun\n  - 'matrix' is quite immersive\n  - 'guess' starts a mini-game\n\nThanks for exploring! 🚀</div>`;
                             } else if (dirObj && dirObj[args[1]] === 'FILE') {
                                 output.innerHTML += `<div>(Empty file)</div>`;
                             } else {
