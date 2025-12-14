@@ -848,7 +848,10 @@
                 "Sometimes the correct path, the bravest path is the least obvious, and also the gentlest.",
                 "If you don't like what is being said, change the conversation.",
                 "Even though success is a reality, it's effects are temporary.",
-                "Take a gamble that love exists, and do a loving act."
+                "You don't have to be great to start, but you have to start to be great.",
+                "In the middle of difficulty lies opportunity.",
+                "Every expert was once a beginner who refused to quit.",
+                "The only way to make sense out of change is to plunge into it, move with it, and join the dance."
             ];
             
             // Shuffle-based quote system to avoid repetition
@@ -3245,6 +3248,33 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
                             } else {
                                 output.innerHTML += `<div class="text-gray-500 text-xs">Usage: terraform [plan|apply|destroy]</div>`;
                             }
+                            output.scrollTop = output.scrollHeight;
+                            break;
+                        case 'pietro':
+                            // Secret easter egg - personal neofetch
+                            const pietroLogo = `
+ ██████╗ ██╗███████╗████████╗██████╗  ██████╗ 
+ ██╔══██╗██║██╔════╝╚══██╔══╝██╔══██╗██╔═══██╗
+ ██████╔╝██║█████╗     ██║   ██████╔╝██║   ██║
+ ██╔═══╝ ██║██╔══╝     ██║   ██╔══██╗██║   ██║
+ ██║     ██║███████╗   ██║   ██║  ██║╚██████╔╝
+ ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝`;
+                            const pietroInfo = `
+<span class="text-purple-400 font-bold">pietro@life</span>
+<span class="text-gray-500">──────────────────────────────</span>
+<span class="text-her-red">Role</span>: Infrastructure Engineer
+<span class="text-her-red">Location</span>: Barcelona, Spain, Planet Earth 🌍
+<span class="text-her-red">Uptime</span>: ${(() => { const dob = new Date(1993, 5, 13, 1, 0, 0); const now = new Date(); let years = now.getFullYear() - dob.getFullYear(); const monthDiff = now.getMonth() - dob.getMonth(); if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < dob.getDate())) years--; const lastBday = new Date(now.getFullYear(), 5, 13, 1, 0, 0); if (now < lastBday) lastBday.setFullYear(lastBday.getFullYear() - 1); const daysDiff = Math.floor((now - lastBday) / (1000 * 60 * 60 * 24)); const hours = now.getHours(); const mins = now.getMinutes(); return years + ' years, ' + daysDiff + ' days, ' + hours + 'h ' + mins + 'm'; })()}
+<span class="text-her-red">Languages</span>: Spanish, English, Italian
+<span class="text-her-red">Coffee</span>: ████████████████ 100%
+<span class="text-her-red">Sleep</span>: ██░░░░░░░░░░░░░░ 12%
+<span class="text-gray-500">──────────────────────────────</span>
+<span class="text-gray-400 italic">"Take a gamble that love exists, and do a loving act."</span>
+<span class="text-gray-400 italic">- Sister Calderón</span>`;
+                            output.innerHTML += `<div class="flex gap-4 my-2 font-mono text-xs">
+    <pre class="text-purple-400 hidden sm:block">${pietroLogo}</pre>
+    <pre>${pietroInfo}</pre>
+</div>`;
                             output.scrollTop = output.scrollHeight;
                             break;
                         default:
