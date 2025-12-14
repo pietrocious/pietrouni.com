@@ -772,6 +772,7 @@
             let terminalHistoryIndex = -1;
             let guessGame = { active: false, target: 0, attempts: 0 };
             let ciscoMode = { active: false };
+            let terraformMode = { active: false };
             const fileSystem = {
                 'root': {
                     'home': {
@@ -2102,6 +2103,34 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms</div>`;
                         return;
                     }
 
+                    // Handle Terraform Apply Confirmation
+                    if (terraformMode.active) {
+                        const tfResponse = input.toLowerCase().trim();
+                        
+                        if (tfResponse === 'yes' || tfResponse === 'y') {
+                            terraformMode.active = false;
+                            output.innerHTML += `<div class="text-xs my-2">
+<span class="text-green-400">aws_instance.productivity: Creating...</span>
+<span class="text-green-400">aws_instance.productivity: Creation complete after 42s [id=i-0abc123def456789]</span>
+<span class="text-yellow-400">aws_s3_bucket.bugs: Modifying...</span>
+<span class="text-yellow-400">aws_s3_bucket.bugs: Modifications complete after 3s</span>
+<span class="text-red-400">aws_instance.weekend: Destroying...</span>
+<span class="text-red-400">aws_instance.weekend: Destruction complete after 10s</span>
+
+<span class="text-green-400 font-bold">Apply complete! Resources: 1 added, 1 changed, 1 destroyed.</span>
+<span class="text-gray-500">The state of your infrastructure has been saved.</span></div>`;
+                        } else if (tfResponse === 'no' || tfResponse === 'n') {
+                            terraformMode.active = false;
+                            output.innerHTML += `<div class="text-yellow-400 text-xs">Apply cancelled.</div>`;
+                        } else if (tfResponse) {
+                            output.innerHTML += `<div class="text-gray-500 text-xs">Please enter 'yes' or 'no':</div>`;
+                        }
+                        
+                        inputEl.value = '';
+                        output.scrollTop = output.scrollHeight;
+                        return;
+                    }
+
                     // Save to history
                     terminalHistory.push(input);
                     terminalHistoryIndex = -1;
@@ -3166,9 +3195,27 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
                             output.scrollTop = output.scrollHeight;
                             break;
                         case 'terraform':
-                            // Humorous terraform plan
-                            const tfCmd = args[1] || 'plan';
-                            if (tfCmd === 'plan') {
+                            // Humorous terraform commands
+                            const tfCmd = args[1];
+                            if (!tfCmd) {
+                                output.innerHTML += `<pre class="text-xs my-2"><span class="text-purple-400 font-bold">Usage:</span> terraform [command]
+
+<span class="text-gray-400">Main commands:</span>
+  <span class="text-blue-300">init</span>      Prepare your working directory
+  <span class="text-blue-300">plan</span>      Show changes required by the current config
+  <span class="text-blue-300">apply</span>     Create or update infrastructure
+  <span class="text-blue-300">destroy</span>   Destroy previously-created infrastructure
+
+<span class="text-gray-500">Run 'terraform plan' to get started!</span></pre>`;
+                            } else if (tfCmd === 'init') {
+                                output.innerHTML += `<pre class="text-xs my-2"><span class="text-white">Initializing the backend...</span>
+<span class="text-white">Initializing provider plugins...</span>
+- Finding latest version of hashicorp/aws...
+- Installing hashicorp/aws v5.31.0...
+- Installed hashicorp/aws v5.31.0 (signed by HashiCorp)
+
+<span class="text-green-400 font-bold">Terraform has been successfully initialized!</span></pre>`;
+                            } else if (tfCmd === 'plan') {
                                 output.innerHTML += `<pre class="text-xs my-2"><span class="text-white font-bold">Terraform will perform the following actions:</span>
 
 <span class="text-green-400">  + aws_instance.productivity</span>
@@ -3189,7 +3236,8 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
 
 <span class="text-white font-bold">Plan:</span> <span class="text-green-400">1 to add</span>, <span class="text-yellow-400">1 to change</span>, <span class="text-red-400">1 to destroy</span>
 
-<span class="text-gray-500">Do you want to perform these actions? (yes/no)</span></pre>`;
+<span class="text-gray-500">Do you want to perform these actions? Enter 'yes' or 'no':</span></pre>`;
+                                terraformMode.active = true;
                             } else if (tfCmd === 'apply') {
                                 output.innerHTML += `<div class="text-red-400 text-xs">Error: terraform apply requires --auto-approve-yolo flag in production</div>`;
                             } else if (tfCmd === 'destroy') {
