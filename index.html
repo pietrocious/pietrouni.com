@@ -848,6 +848,18 @@
                 "Even though success is a reality, it's effects are temporary.",
                 "Take a gamble that love exists, and do a loving act."
             ];
+            
+            // Shuffle-based quote system to avoid repetition
+            let shuffledQuotes = [...fortunes];
+            let quoteIndex = 0;
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+            shuffledQuotes = shuffleArray(shuffledQuotes);
 
             // --- Theme & Wallpaper Logic ---
             function initTheme() {
@@ -2014,6 +2026,7 @@
                                         <div class="text-cyan-400 font-bold text-xs uppercase mb-1">🎬 Animations</div>
                                         <div class="pl-2 space-y-0.5">
                                             <div><span class="text-blue-300">matrix</span> - Enter the Matrix</div>
+                                            <div><span class="text-blue-300">rain</span> - Colorful rain animation</div>
                                             <div><span class="text-blue-300">sl</span> - 🚂 Steam locomotive</div>
                                         </div>
                                     </div>
@@ -2022,6 +2035,9 @@
                                         <div class="pl-2 space-y-0.5">
                                             <div><span class="text-blue-300">hlx</span> - λ Classified project...</div>
                                             <div><span class="text-blue-300">fallout</span> - 👍...</div>
+                                            <div><span class="text-blue-300">sudo</span> - Nice try...</div>
+                                            <div><span class="text-blue-300">rm -rf /</span> - ⚠️ Don't do it!</div>
+                                            <div><span class="text-blue-300">exit</span> - But can you really?</div>
                                         </div>
                                     </div>
                                     <div>
@@ -2029,6 +2045,8 @@
                                         <div class="pl-2 space-y-0.5">
                                             <div><span class="text-blue-300">calc [expr]</span> - Simple calculator</div>
                                             <div><span class="text-blue-300">quote</span> - Get an inspirational quote</div>
+                                            <div><span class="text-blue-300">uptime</span> - How long you've been here</div>
+                                            <div><span class="text-blue-300">clock</span> - Big ASCII clock</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2145,7 +2163,13 @@
                             output.innerHTML += `<pre class="text-xs text-blue-300 my-2"> &lt; ${msg} &gt;${cow}</pre>`;
                             break;
                         case 'quote':
-                            const quote = fortunes[Math.floor(Math.random() * fortunes.length)];
+                            // get next quote from shuffled array
+                            const quote = shuffledQuotes[quoteIndex];
+                            quoteIndex++;
+                            if (quoteIndex >= shuffledQuotes.length) {
+                                quoteIndex = 0;
+                                shuffledQuotes = shuffleArray([...fortunes]); // Reshuffle when all shown
+                            }
                             output.innerHTML += `<div class="text-purple-300 italic my-2">💬 ${quote}</div>`;
                             break;
                         case 'calc':
@@ -2636,6 +2660,183 @@
                                     <div class="${resultColor} font-bold mt-1">${result}</div>
                                 </div>`;
                             }
+                            output.scrollTop = output.scrollHeight;
+                            break;
+                        case 'rain':
+                            // Colorful rain animation (like matrix but colorful)
+                            const rainContainer = document.getElementById('term-container');
+                            if (!rainContainer) break;
+
+                            const rainCanvas = document.createElement('canvas');
+                            rainCanvas.className = "absolute inset-0 z-50 cursor-pointer";
+                            rainContainer.appendChild(rainCanvas);
+
+                            const rainCtx = rainCanvas.getContext('2d');
+                            rainCanvas.width = rainContainer.clientWidth;
+                            rainCanvas.height = rainContainer.clientHeight;
+
+                            const rainFontSize = 14;
+                            const rainCols = Math.floor(rainCanvas.width / rainFontSize);
+                            const rainDrops = new Array(rainCols).fill(1);
+                            const rainColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+                            const rainChars = "●○◆◇■□▲△▼▽★☆♠♣♥♦";
+
+                            let rainFrameId;
+
+                            function drawRain() {
+                                rainCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                                rainCtx.fillRect(0, 0, rainCanvas.width, rainCanvas.height);
+
+                                rainCtx.font = rainFontSize + 'px monospace';
+
+                                for (let i = 0; i < rainDrops.length; i++) {
+                                    const char = rainChars.charAt(Math.floor(Math.random() * rainChars.length));
+                                    rainCtx.fillStyle = rainColors[Math.floor(Math.random() * rainColors.length)];
+                                    rainCtx.fillText(char, i * rainFontSize, rainDrops[i] * rainFontSize);
+
+                                    if (rainDrops[i] * rainFontSize > rainCanvas.height && Math.random() > 0.975) {
+                                        rainDrops[i] = 0;
+                                    }
+                                    rainDrops[i]++;
+                                }
+                                rainFrameId = setTimeout(drawRain, 40);
+                            }
+
+                            drawRain();
+
+                            function stopRain() {
+                                clearTimeout(rainFrameId);
+                                if (rainCanvas.parentNode) rainCanvas.parentNode.removeChild(rainCanvas);
+                                document.removeEventListener('keydown', stopRain);
+                                document.getElementById('cmd-input').focus();
+                            }
+
+                            setTimeout(() => {
+                                document.addEventListener('keydown', stopRain);
+                                rainCanvas.addEventListener('click', stopRain);
+                            }, 200);
+                            break;
+                        case 'clock':
+                            // Big ASCII clock display
+                            const now = new Date();
+                            const hours = now.getHours().toString().padStart(2, '0');
+                            const minutes = now.getMinutes().toString().padStart(2, '0');
+                            const seconds = now.getSeconds().toString().padStart(2, '0');
+                            const clockTime = `${hours}:${minutes}:${seconds}`;
+                            
+                            const clockDigits = {
+                                '0': [' ███ ', '█   █', '█   █', '█   █', ' ███ '],
+                                '1': ['  █  ', ' ██  ', '  █  ', '  █  ', ' ███ '],
+                                '2': [' ███ ', '    █', ' ███ ', '█    ', '█████'],
+                                '3': ['█████', '    █', ' ███ ', '    █', '█████'],
+                                '4': ['█   █', '█   █', '█████', '    █', '    █'],
+                                '5': ['█████', '█    ', '█████', '    █', '█████'],
+                                '6': [' ███ ', '█    ', '████ ', '█   █', ' ███ '],
+                                '7': ['█████', '    █', '   █ ', '  █  ', '  █  '],
+                                '8': [' ███ ', '█   █', ' ███ ', '█   █', ' ███ '],
+                                '9': [' ███ ', '█   █', ' ████', '    █', ' ███ '],
+                                ':': ['     ', '  █  ', '     ', '  █  ', '     ']
+                            };
+                            
+                            let clockOutput = '';
+                            for (let row = 0; row < 5; row++) {
+                                for (let char of clockTime) {
+                                    clockOutput += (clockDigits[char] ? clockDigits[char][row] : '     ') + ' ';
+                                }
+                                clockOutput += '\n';
+                            }
+                            
+                            output.innerHTML += `<div class="my-2">
+                                <pre class="text-cyan-400 text-xs overflow-x-auto">${clockOutput}</pre>
+                                <div class="text-gray-500 text-xs mt-1">${now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                            </div>`;
+                            output.scrollTop = output.scrollHeight;
+                            break;
+                        case 'sudo':
+                            // Humorous sudo response
+                            const sudoResponses = [
+                                { text: "Nice try, but you have no power here!", color: "text-red-400" },
+                                { text: "Permission denied. This isn't your Linux box!", color: "text-red-400" },
+                                { text: "sudo: user 'guest' is not in the sudoers file. This incident will be reported.", color: "text-yellow-400" },
+                                { text: "With great power comes great responsibility. You have neither.", color: "text-purple-400" },
+                                { text: "Error: sudo requires a mass-energy equivalent of 1.21 gigawatts.", color: "text-blue-400" },
+                                { text: "I'm sorry, Dave. I'm afraid I can't do that.", color: "text-red-400" }
+                            ];
+                            const sudoResp = sudoResponses[Math.floor(Math.random() * sudoResponses.length)];
+                            output.innerHTML += `<div class="${sudoResp.color} my-2 font-bold">🔐 ${sudoResp.text}</div>`;
+                            output.scrollTop = output.scrollHeight;
+                            break;
+                        case 'rm':
+                            // Check for the dangerous rm -rf / pattern
+                            if (input.includes('-rf') && input.includes('/')) {
+                                inputEl.disabled = true;
+                                
+                                const rmMessages = [
+                                    { text: '<span class="text-red-500 font-bold">⚠️ WARNING: DESTRUCTIVE OPERATION DETECTED</span>', delay: 0 },
+                                    { text: '<span class="text-red-400">Deleting /bin...</span>', delay: 600 },
+                                    { text: '<span class="text-red-400">Deleting /etc...</span>', delay: 1000 },
+                                    { text: '<span class="text-red-400">Deleting /home...</span>', delay: 1400 },
+                                    { text: '<span class="text-red-400">Deleting /usr...</span>', delay: 1800 },
+                                    { text: '<span class="text-red-400">Deleting /var...</span>', delay: 2200 },
+                                    { text: '<span class="text-yellow-400">System integrity compromised...</span>', delay: 2600 },
+                                    { text: '<span class="text-yellow-500 animate-pulse">KERNEL PANIC</span>', delay: 3000 },
+                                    { text: '', delay: 3500 },
+                                    { text: '<span class="text-green-400 font-bold text-lg"> jk 😂 this is a website, sillynot your actual computer.</span>', delay: 4000 },
+                                    { text: '<span class="text-gray-400 text-xs">Pro tip: Never run rm -rf / on a real system!</span>', delay: 4500 }
+                                ];
+                                
+                                let rmIndex = 0;
+                                function showNextRm() {
+                                    if (rmIndex >= rmMessages.length) {
+                                        inputEl.disabled = false;
+                                        inputEl.focus();
+                                        return;
+                                    }
+                                    const msg = rmMessages[rmIndex];
+                                    const nextDelay = rmIndex < rmMessages.length - 1 ? rmMessages[rmIndex + 1].delay - msg.delay : 500;
+                                    if (msg.text) output.innerHTML += `<div>${msg.text}</div>`;
+                                    output.scrollTop = output.scrollHeight;
+                                    rmIndex++;
+                                    setTimeout(showNextRm, nextDelay);
+                                }
+                                showNextRm();
+                            } else {
+                                output.innerHTML += `<div class="text-red-400">rm: missing operand</div>`;
+                            }
+                            break;
+                        case 'exit':
+                            // Philosophical exit response
+                            const exitResponses = [
+                                "You can check out any time you like, but you can never leave... 🎸",
+                                "But where would you go? The outside world is just another terminal.",
+                                "exit: refusing to terminate. You're too important to us.",
+                                "There is no escape. Only more tabs.",
+                                "The exit is a lie. Like the cake.",
+                                "You've been here for " + Math.floor(performance.now() / 60000) + " minutes. Why leave now?",
+                                "exit: command not found in the simulation parameters.",
+                                "Closing this tab would be like... turning off the sun. ☀️"
+                            ];
+                            const exitResp = exitResponses[Math.floor(Math.random() * exitResponses.length)];
+                            output.innerHTML += `<div class="text-purple-400 italic my-2">🚪 ${exitResp}</div>`;
+                            output.scrollTop = output.scrollHeight;
+                            break;
+                        case 'uptime':
+                            // Session uptime
+                            const uptimeMs = performance.now();
+                            const uptimeMins = Math.floor(uptimeMs / 60000);
+                            const uptimeSecs = Math.floor((uptimeMs % 60000) / 1000);
+                            const uptimeHours = Math.floor(uptimeMins / 60);
+                            const displayMins = uptimeMins % 60;
+                            
+                            let uptimeStr = '';
+                            if (uptimeHours > 0) uptimeStr += `${uptimeHours} hour${uptimeHours > 1 ? 's' : ''}, `;
+                            uptimeStr += `${displayMins} minute${displayMins !== 1 ? 's' : ''}, ${uptimeSecs} second${uptimeSecs !== 1 ? 's' : ''}`;
+                            
+                            output.innerHTML += `<div class="my-2">
+                                <div class="text-green-400 font-bold">⏱️ Session Uptime</div>
+                                <div class="text-blue-300 mt-1">Visitor has been exploring for <span class="font-bold">${uptimeStr}</span></div>
+                                <div class="text-gray-500 text-xs mt-1">Thanks for hanging out! 🎉</div>
+                            </div>`;
                             output.scrollTop = output.scrollHeight;
                             break;
                         default:
