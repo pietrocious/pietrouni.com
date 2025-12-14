@@ -1996,7 +1996,6 @@
                                     <div><span class="text-blue-300">cowsay [text]</span> - Make a cow say something</div>
                                     <div><span class="text-blue-300">fortune</span> - Get a tech fortune</div>
                                     <div><span class="text-blue-300">matrix</span> - Enter the Matrix</div>
-                                    <div><span class="text-blue-300">neofetch</span> - Display system info</div>
                                     <div><span class="text-blue-300">calc [expr]</span> - Simple calculator</div>
                                     <div><span class="text-blue-300">guess</span> - Play number guessing game</div>
                                     <div><span class="text-blue-300">hack</span> - Hack this site!</div>
@@ -2198,7 +2197,8 @@
                             const fontSize = 16;
                             const columns = Math.floor(canvas.width / fontSize);
                             const drops = new Array(columns).fill(1);
-                            const chars = "01";
+                            // Matrix characters: Japanese katakana + numbers + symbols
+                            const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789:・.\"=*+-<>¦|_";
 
                             let frameId;
 
@@ -2206,25 +2206,31 @@
                                 ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
                                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                                ctx.fillStyle = '#0F0';
-                                ctx.font = fontSize + 'px Fixedsys';
+                                ctx.font = fontSize + 'px monospace';
 
                                 for (let i = 0; i < drops.length; i++) {
                                     const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                                    
+                                    // Leading character is brighter (white/bright green)
+                                    ctx.fillStyle = '#AFA';
                                     ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                                    
+                                    // Trail characters are standard green
+                                    ctx.fillStyle = '#0F0';
 
                                     if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                                         drops[i] = 0;
                                     }
                                     drops[i]++;
                                 }
-                                frameId = requestAnimationFrame(draw);
+                                // Slower frame rate (~30fps) for cinematic Matrix feel
+                                frameId = setTimeout(draw, 33);
                             }
 
                             draw();
 
                             function stopMatrix() {
-                                cancelAnimationFrame(frameId);
+                                clearTimeout(frameId);
                                 if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
                                 document.removeEventListener('keydown', stopMatrix);
                                 document.getElementById('cmd-input').focus();
