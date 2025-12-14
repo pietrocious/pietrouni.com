@@ -2000,6 +2000,7 @@
                                     <div><span class="text-blue-300">calc [expr]</span> - Simple calculator</div>
                                     <div><span class="text-blue-300">guess</span> - Play number guessing game</div>
                                     <div><span class="text-blue-300">hack</span> - Hack this site!</div>
+                                    <div><span class="text-blue-300">sl</span> - 🚂 Choo choo! (typo corrector)</div>
                                 </div>
                             </div>`;
                             break;
@@ -2233,6 +2234,99 @@
                                 document.addEventListener('keydown', stopMatrix);
                                 canvas.addEventListener('click', stopMatrix);
                             }, 200);
+                            break;
+                        case 'sl':
+                            // Steam Locomotive - Classic typo corrector!
+                            const slContainer = document.getElementById('term-container');
+                            if (!slContainer) break;
+
+                            // Hide the input while train is running
+                            inputEl.disabled = true;
+
+                            // Create overlay for the animation
+                            const slOverlay = document.createElement('div');
+                            slOverlay.className = "absolute inset-0 z-50 bg-black overflow-hidden font-mono";
+                            slOverlay.style.fontSize = '10px';
+                            slOverlay.style.lineHeight = '1.2';
+                            slContainer.appendChild(slOverlay);
+
+                            // Steam Locomotive ASCII frames
+                            const trainFrames = [
+                                [
+                                    "                         (@@) (  ) (@)  ( )  @@    ()    @     O     @     O      @",
+                                    "                    (   )",
+                                    "                (@@@@)",
+                                    "             (    )",
+                                    "",
+                                    "           (@@@)",
+                                    "        ====        ________                ___________",
+                                    "    _D _|  |_______/        \\__I_I_____===__|_________|",
+                                    "     |(_)---  |   H\\________/ |   |        =|___ ___|      _________________",
+                                    "     /     |  |   H  |  |     |   |         ||_| |_||     _|                \\_____A",
+                                    "    |      |  |   H  |__--------------------| [___] |   =|                        |",
+                                    "    | ________|___H__/__|_____/[][]~\\_______|       |   -|                        |",
+                                    "    |/ |   |-----------I_____I [][] []  D   |=======|____|________________________|_",
+                                    "__/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|__________________________|_",
+                                    " |/-=|___|=    ||    ||    ||    |_____/~\\___/          |_D__D__D_|  |_D__D__D_|",
+                                    "  \\_/      \\O=====O=====O=====O_/      \\_/               \\_/   \\_/    \\_/   \\_/"
+                                ],
+                                [
+                                    "                         (  ) (@@) ( )  (@)  ()    @@    O     @     O     @      O",
+                                    "                    (@@@)",
+                                    "                (    )",
+                                    "             (@@@@)",
+                                    "",
+                                    "           (   )",
+                                    "        ====        ________                ___________",
+                                    "    _D _|  |_______/        \\__I_I_____===__|_________|",
+                                    "     |(_)---  |   H\\________/ |   |        =|___ ___|      _________________",
+                                    "     /     |  |   H  |  |     |   |         ||_| |_||     _|                \\_____A",
+                                    "    |      |  |   H  |__--------------------| [___] |   =|                        |",
+                                    "    | ________|___H__/__|_____/[][]~\\_______|       |   -|                        |",
+                                    "    |/ |   |-----------I_____I [][] []  D   |=======|____|________________________|_",
+                                    "__/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|__________________________|_",
+                                    " |/-=|___|=O=====O=====O=====O   |_____/~\\___/          |_D__D__D_|  |_D__D__D_|",
+                                    "  \\_/      \\_/   \\_/   \\_/   \\_/      \\_/               \\_/   \\_/    \\_/   \\_/"
+                                ]
+                            ];
+
+                            const trainWidth = 90;
+                            let slPosition = slOverlay.clientWidth;
+                            let slFrame = 0;
+                            let slAnimationId;
+
+                            function renderTrain() {
+                                const frame = trainFrames[slFrame % 2];
+                                const padding = Math.max(0, Math.floor(slPosition));
+                                
+                                let trainHtml = '<pre class="text-green-400 whitespace-pre" style="position:absolute;left:' + padding + 'px;top:20px;">';
+                                frame.forEach(line => {
+                                    trainHtml += line + '\n';
+                                });
+                                trainHtml += '</pre>';
+                                
+                                slOverlay.innerHTML = trainHtml;
+                                slPosition -= 8; // Speed
+                                slFrame++;
+
+                                if (slPosition > -trainWidth * 10) {
+                                    slAnimationId = requestAnimationFrame(renderTrain);
+                                } else {
+                                    // Animation complete
+                                    stopSl();
+                                }
+                            }
+
+                            function stopSl() {
+                                cancelAnimationFrame(slAnimationId);
+                                if (slOverlay.parentNode) slOverlay.parentNode.removeChild(slOverlay);
+                                inputEl.disabled = false;
+                                inputEl.focus();
+                                output.innerHTML += `<div class="text-yellow-400 mt-2">🚂 Did you mean <span class="text-blue-300 font-bold">ls</span>?</div>`;
+                                output.scrollTop = output.scrollHeight;
+                            }
+
+                            renderTrain();
                             break;
                         default:
                             if (cmd) output.innerHTML += `<div class="text-red-400">Command not found: ${cmd}</div>`;
