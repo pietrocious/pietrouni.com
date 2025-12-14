@@ -918,8 +918,8 @@
                 terminal: {
                     title: "Terminal",
                     content: `
-                    <div class="h-full bg-black/90 backdrop-blur-xl text-white p-4 font-kernel text-sm flex flex-col-reverse md:flex-col" id="term-container" onclick="document.getElementById('cmd-input').focus()">
-                        <div id="term-output" class="flex-1 overflow-y-auto space-y-1 window-content">
+                    <div class="h-full bg-black/90 backdrop-blur-xl text-white p-4 font-kernel text-sm flex flex-col-reverse md:flex-col overflow-hidden" id="term-container" onclick="document.getElementById('cmd-input').focus()">
+                        <div id="term-output" class="flex-1 overflow-y-auto space-y-1 window-content" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
                             <div class="text-gray-400 hidden md:block">OS93 v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
                             <div class="text-gray-500 hidden md:block">Type 'help' for available commands</div>
                             <div class="text-gray-500 mb-4 hidden md:block">...and 'help-fun' for fun commands!</div>
