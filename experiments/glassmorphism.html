@@ -64,16 +64,26 @@
                         mono: ['"JetBrains Mono"', 'monospace'],
                     },
                     colors: {
-                        // 'Her' Palette - Warm & Organic
+                        // macOS 26 Liquid Glass Palette
+                        glass: {
+                            bg: "#1a1a1e",        // macOS dark bg
+                            surface: "rgba(255, 255, 255, 0.05)",
+                            border: "rgba(255, 255, 255, 0.1)",
+                            glow: "rgba(0, 122, 255, 0.2)",
+                            accent: "#007AFF",    // macOS system blue
+                            text: "#ffffff",
+                            muted: "#98989d"
+                        },
+                        // Keep her for backwards compat
                         her: {
-                            red: "#4A7C9D",      // Blue accent color
-                            orange: "#5B9AB8",   // Lighter blue
-                            cream: "#F4EBD9",    // Paper background
-                            paper: "#FDFBF7",    // Brighter paper
-                            dark: "#3E2723",     // Deep warm brown
-                            darker: "#2D1A14",   // Darkest brown
-                            text: "#4E342E",     // Standard text
-                            textLight: "#EFEBE9" // Light text
+                            red: "#007AFF",       // macOS blue
+                            orange: "#34C759",    // macOS green
+                            cream: "#f5f5f7",     // macOS light bg
+                            paper: "rgba(255,255,255,0.9)",
+                            dark: "#1d1d1f",      // macOS dark
+                            darker: "#000000",
+                            text: "#1d1d1f",      // Dark text for light mode
+                            textLight: "#f5f5f7"  // Light text for dark mode
                         }
                     },
                     animation: {
@@ -163,60 +173,122 @@
             overscroll-behavior: none;
         }
 
-        /* Warm Ambient Background - Base Classes */
-        @keyframes herGradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* macOS 26 Liquid Glass Background */
+        @keyframes liquidFlow {
+            0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            33% { transform: translate(50px, -30px) rotate(2deg) scale(1.05); }
+            66% { transform: translate(-30px, 40px) rotate(-1deg) scale(0.98); }
+        }
+
+        @keyframes shimmer {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+            100% { opacity: 0.3; }
         }
 
         .her-bg {
-            background: linear-gradient(-45deg, #E8E0D5, #D4C8BC, #C9BFB5, #E8E0D5);
-            background-size: 400% 400%;
-            animation: herGradient 15s ease infinite;
+            background: linear-gradient(135deg, #e8ecf0 0%, #dfe4ea 50%, #d1d9e0 100%);
         }
 
         .her-bg-dark {
-            /* Muted dark tones */
-            background: linear-gradient(-45deg, #1a1412, #252019, #2d2620, #1a1412);
-            background-size: 400% 400%;
-            animation: herGradient 20s ease infinite;
+            background: linear-gradient(180deg, #1a1d24 0%, #0d0f12 100%);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Cards / Windows (Tactile, not Glass) */
+        /* Liquid Glass ambient light blobs - softer, more realistic */
+        .her-bg-dark::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -30%;
+            width: 160%;
+            height: 160%;
+            background: 
+                radial-gradient(ellipse at 25% 20%, rgba(0, 122, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 75%, rgba(88, 86, 214, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(100, 150, 255, 0.03) 0%, transparent 60%);
+            animation: liquidFlow 30s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* Shimmer overlay for refractive effect */
+        .her-bg-dark::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, 
+                transparent 0%,
+                rgba(255, 255, 255, 0.01) 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.015) 75%,
+                transparent 100%);
+            animation: shimmer 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        /* macOS 26 Liquid Glass Windows */
         .window {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            /* Solid paper feel */
-            background-color: #FDFBF7;
-            box-shadow: 0 10px 30px rgba(62, 39, 35, 0.15);
-            border: 1px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Liquid glass material - lighter, more translucent */
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.08) 0%, 
+                rgba(255, 255, 255, 0.04) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+            /* Realistic glass shadows and highlights */
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.12),
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+            /* Subtle refracted border */
+            border: 0.5px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
-            border-radius: 20px;
             container-type: inline-size;
             overflow: hidden;
-            /* Clip content for border radius */
             pointer-events: auto;
             touch-action: none;
-            /* Prevent browser scrolling handling */
+            color: #1e293b;
+        }
+
+        /* Active/hover state - more prominent glass effect */
+        .window:hover {
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+
+        .window.active-window {
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.18),
+                0 4px 16px rgba(0, 0, 0, 0.12),
+                0 0 0 0.5px rgba(255, 255, 255, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.05);
         }
 
         .window.maximized {
             transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease;
             border-radius: 0;
-            box-shadow: none;
         }
 
         .window.minimized {
-            transform: scale(0);
+            transform: scale(0.8);
             opacity: 0;
             pointer-events: none;
         }
 
         html.dark .window {
-            background-color: #3E2723;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            color: #EFEBE9;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.08) 0%, 
+                rgba(255, 255, 255, 0.04) 100%);
+            color: #ffffff;
         }
 
         /* Window Header (macOS Style) */
@@ -379,13 +451,13 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* Dock Item - Mobile First */
+        /* Dock Item */
         .dock-item {
             width: 52px;
             height: 52px;
             position: relative;
             transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), margin 0.2s;
-            color: #1a1a1a; /* Black icon color */
+            color: rgba(255, 255, 255, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -399,14 +471,14 @@
         }
 
         html.dark .dock-item {
-            color: #E8E0D5; /* Light icons for dark mode */
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .dock-item:hover {
             transform: scale(1.15) translateY(-8px);
         }
 
-        /* Active Indicator Dot */
+        /* Active Indicator Dot - macOS Blue */
         .dock-item.active::after {
             content: '';
             position: absolute;
@@ -414,8 +486,8 @@
             width: 4px;
             height: 4px;
             border-radius: 50%;
-            background-color: #4A7C9D;
-            box-shadow: 0 0 4px #4A7C9D;
+            background-color: #007AFF;
+            box-shadow: 0 0 6px rgba(0, 122, 255, 0.5);
             transition: opacity 0.3s ease;
         }
 
@@ -439,24 +511,27 @@
             }
         }
 
-        /* Tooltip Labels */
+        /* macOS 26 Tooltip Labels */
         .dock-label {
             position: absolute;
             bottom: 65px;
             left: 50%;
             transform: translateX(-50%) translateY(8px);
-            background: #3E2723;
-            color: #F4EBD9;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-family: 'Copernicus Trial', serif;
-            font-weight: 800;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+            backdrop-filter: blur(30px) saturate(150%);
+            -webkit-backdrop-filter: blur(30px) saturate(150%);
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Noto Sans', sans-serif;
+            font-weight: 500;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15), inset 0 0.5px 0 rgba(255,255,255,0.2);
+            border: 0.5px solid rgba(255, 255, 255, 0.15);
         }
 
         @media (min-width: 768px) {
@@ -466,8 +541,8 @@
         }
 
         html.dark .dock-label {
-            background: #F4EBD9;
-            color: #3E2723;
+            background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+            color: #ffffff;
         }
 
         .dock-item:hover .dock-label {
@@ -475,39 +550,46 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* Floating Glass Dock */
+        /* macOS 26 Liquid Glass Dock */
         .dock-container {
-            background: rgba(244, 235, 217, 0.5);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(40px) saturate(180%) brightness(1.02);
+            -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.02);
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.12),
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255,255,255,0.25),
+                inset 0 -1px 0 rgba(0,0,0,0.05);
             transition: all 0.3s ease;
         }
 
         html.dark .dock-container {
-            background: rgba(62, 39, 35, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 0.5px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.2);
         }
 
-        /* Menu Bar */
+        /* macOS 26 Fully Transparent Menu Bar */
         #menubar {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            background: rgba(244, 235, 217, 0.4);
-            border-bottom: 1px solid rgba(74, 124, 157, 0.1);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.04) 100%);
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05);
         }
 
         html.dark #menubar {
-            background: rgba(62, 39, 35, 0.4);
-            border-bottom: 1px solid rgba(74, 124, 157, 0.1);
+            background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* Spotlight Search */
+        /* Spotlight Search - Glass */
         #spotlight {
-            backdrop-filter: blur(8px);
-            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .spotlight-result {
@@ -517,26 +599,30 @@
 
         .spotlight-result.selected,
         .spotlight-result:hover {
-            background: rgba(74, 124, 157, 0.1);
-            border-left: 3px solid #4A7C9D;
+            background: rgba(0, 122, 255, 0.12);
+            border-left: 3px solid #007AFF;
         }
 
-        /* Custom Scrollbar - Blue */
+        /* Custom Scrollbar - macOS Blue */
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: transparent;
+            background: rgba(255, 255, 255, 0.02);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #4A7C9D;
-            border-radius: 4px;
+            background: rgba(0, 122, 255, 0.5);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 122, 255, 0.7);
         }
 
         html.dark ::-webkit-scrollbar-thumb {
-            background: #4A7C9D;
+            background: rgba(0, 122, 255, 0.5);
         }
 
         canvas {
@@ -546,15 +632,15 @@
         /* Minimalist Inputs */
         .her-input {
             background: transparent;
-            border-bottom: 2px solid #4A7C9D;
+            border-bottom: 2px solid #007AFF;
             color: inherit;
-            font-family: 'Copernicus Trial', serif;
-            font-weight: 800;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Noto Sans', sans-serif;
+            font-weight: 500;
         }
 
         .her-input:focus {
             outline: none;
-            border-bottom-color: #4A7C9D;
+            border-bottom-color: #0056CC;
         }
 
         /* Typography Override */
@@ -570,22 +656,22 @@
 
         /* Link styling in content */
         .content-link {
-            color: #4A7C9D;
+            color: #007AFF;
             text-decoration: none;
             border-bottom: 1px solid transparent;
             transition: border-color 0.2s;
         }
 
         .content-link:hover {
-            border-bottom-color: #4A7C9D;
+            border-bottom-color: #007AFF;
         }
 
         html.dark .content-link {
-            color: #4A7C9D;
+            color: #64B5F6;
         }
 
         html.dark .content-link:hover {
-            border-bottom-color: #4A7C9D;
+            border-bottom-color: #64B5F6;
         }
     </style>
 </head>
@@ -598,7 +684,7 @@
 
         <!-- Menu Bar (MacOS Style) -->
         <div id="menubar"
-            class="absolute top-0 left-0 w-full h-8 z-[5000] flex justify-between items-center px-4 select-none text-xs md:text-sm font-medium text-black dark:text-her-textLight">
+            class="absolute top-0 left-0 w-full h-8 z-[5000] flex justify-between items-center px-4 select-none text-xs md:text-sm font-medium text-slate-800 dark:text-white">
             <div class="flex items-center gap-4">
                 <span class="font-bold">Welcome Guest!</span>
             </div>
