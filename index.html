@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
     <!-- Google tag (gtag.js) -->
@@ -893,6 +893,25 @@
                 if (event.data && event.data.type === 'request-theme') {
                     const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
                     event.source.postMessage({ type: 'theme-change', theme: currentTheme }, '*');
+                }
+            });
+
+            // Listen for real-time system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                // Only auto-switch if user hasn't manually set a preference
+                if (!('theme' in localStorage)) {
+                    if (e.matches) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                    applyWallpaper();
+                    // Notify iframes of theme change
+                    const frames = document.querySelectorAll('iframe');
+                    const newTheme = e.matches ? 'dark' : 'light';
+                    frames.forEach(frame => {
+                        frame.contentWindow.postMessage({ type: 'theme-change', theme: newTheme }, '*');
+                    });
                 }
             });
 
