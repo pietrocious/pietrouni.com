@@ -2005,6 +2005,7 @@
                                         <div class="text-green-400 font-bold text-xs uppercase mb-1">🎲 Games & Interactive</div>
                                         <div class="pl-2 space-y-0.5">
                                             <div><span class="text-blue-300">guess</span> - Number guessing game</div>
+                                            <div><span class="text-blue-300">rps [r/p/s]</span> - Rock Paper Scissors</div>
                                             <div><span class="text-blue-300">8ball [question]</span> - Tech decision oracle</div>
                                             <div><span class="text-blue-300">hack</span> - Hack this site!</div>
                                         </div>
@@ -2027,7 +2028,7 @@
                                         <div class="text-orange-400 font-bold text-xs uppercase mb-1">🔧 Utilities</div>
                                         <div class="pl-2 space-y-0.5">
                                             <div><span class="text-blue-300">calc [expr]</span> - Simple calculator</div>
-                                            <div><span class="text-blue-300">fortune</span> - Get your daily fortune</div>
+                                            <div><span class="text-blue-300">quote</span> - Get an inspirational quote</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2143,9 +2144,9 @@
                  ||     ||`;
                             output.innerHTML += `<pre class="text-xs text-blue-300 my-2"> &lt; ${msg} &gt;${cow}</pre>`;
                             break;
-                        case 'fortune':
-                            const fortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-                            output.innerHTML += `<div class="text-purple-300 italic my-2">🔮 ${fortune}</div>`;
+                        case 'quote':
+                            const quote = fortunes[Math.floor(Math.random() * fortunes.length)];
+                            output.innerHTML += `<div class="text-purple-300 italic my-2">💬 ${quote}</div>`;
                             break;
                         case 'calc':
                             try {
@@ -2582,6 +2583,59 @@
                                 figletOutput += line + '\n';
                             }
                             output.innerHTML += `<pre class="text-green-400 text-xs my-2 overflow-x-auto">${figletOutput}</pre>`;
+                            output.scrollTop = output.scrollHeight;
+                            break;
+                        case 'rps':
+                            // Rock Paper Scissors game
+                            const rpsChoices = ['rock', 'paper', 'scissors'];
+                            const rpsEmojis = { rock: '🪨', paper: '📄', scissors: '✂️' };
+                            const rpsInput = (args[1] || '').toLowerCase();
+                            
+                            // Parse user input (allow shortcuts)
+                            let playerChoice = null;
+                            if (rpsInput.startsWith('r')) playerChoice = 'rock';
+                            else if (rpsInput.startsWith('p')) playerChoice = 'paper';
+                            else if (rpsInput.startsWith('s')) playerChoice = 'scissors';
+                            
+                            if (!playerChoice) {
+                                output.innerHTML += `<div class="text-yellow-400 my-2">
+                                    <div>Usage: <span class="text-blue-300">rps [rock|paper|scissors]</span></div>
+                                    <div class="text-xs opacity-70 mt-1">Shortcuts: r, p, s</div>
+                                </div>`;
+                            } else {
+                                const cpuChoice = rpsChoices[Math.floor(Math.random() * 3)];
+                                
+                                // Determine winner
+                                let result, resultColor;
+                                if (playerChoice === cpuChoice) {
+                                    result = "It's a draw!";
+                                    resultColor = "text-yellow-400";
+                                } else if (
+                                    (playerChoice === 'rock' && cpuChoice === 'scissors') ||
+                                    (playerChoice === 'paper' && cpuChoice === 'rock') ||
+                                    (playerChoice === 'scissors' && cpuChoice === 'paper')
+                                ) {
+                                    result = "You win! 🎉";
+                                    resultColor = "text-green-400";
+                                } else {
+                                    result = "You lose! 💀";
+                                    resultColor = "text-red-400";
+                                }
+                                
+                                output.innerHTML += `<div class="my-2">
+                                    <div class="flex items-center gap-4 text-2xl mb-2">
+                                        <span>${rpsEmojis[playerChoice]}</span>
+                                        <span class="text-gray-500 text-sm">vs</span>
+                                        <span>${rpsEmojis[cpuChoice]}</span>
+                                    </div>
+                                    <div class="text-sm">
+                                        <span class="text-blue-300">You:</span> ${playerChoice} 
+                                        <span class="text-gray-500">|</span> 
+                                        <span class="text-purple-300">CPU:</span> ${cpuChoice}
+                                    </div>
+                                    <div class="${resultColor} font-bold mt-1">${result}</div>
+                                </div>`;
+                            }
                             output.scrollTop = output.scrollHeight;
                             break;
                         default:
