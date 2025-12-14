@@ -2386,19 +2386,37 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms</div>`;
                             output.innerHTML += `<div class="text-green-400 font-bold my-2">🎮 Guess the Number Game Started!</div><div>I'm thinking of a number between 1 and 100.</div><div>Type your guess below:</div>`;
                             break;
                         case 'hack':
-                            output.innerHTML += `<div class="text-green-500">Initiating brute force...</div>`;
-                            let progress = 0;
-                            const hackInterval = setInterval(() => {
-                                progress += 10;
-                                if (progress <= 100) {
-                                    output.innerHTML += `<div>[${'#'.repeat(progress / 10)}${'.'.repeat(10 - progress / 10)}] ${progress}% - Bypassing Mainframe...</div>`;
-                                    output.scrollTop = output.scrollHeight;
-                                } else {
-                                    clearInterval(hackInterval);
-                                    output.innerHTML += `<div class="text-green-400 font-bold">ACCESS GRANTED. SYSTEM COMPROMISED.</div>`;
-                                    output.scrollTop = output.scrollHeight;
-                                }
-                            }, 500);
+                            inputEl.disabled = true;
+                            
+                            const hackSequence = [
+                                { text: '<span class="text-red-500 font-bold">Initializing fsociety protocol...</span>', delay: 400 },
+                                { text: 'Target: <span class="text-white">E Corp Mainframe</span>', delay: 1000 },
+                                { text: 'Exploit: <span class="text-red-400">EternalBlue</span>', delay: 1800 },
+                                { text: 'Bypassing firewall...', delay: 2400 },
+                                { text: '<span class="text-gray-500 text-xs">0x4F 0x75 0x74 0x20 0x6F 0x66 0x20 0x74 0x69 0x6D 0x65</span>', delay: 2600 },
+                                { text: '<span class="text-gray-500 text-xs">0x49 0x20 0x61 0x6D 0x20 0x47 0x6F 0x64</span>', delay: 2700 },
+                                { text: '<span class="text-gray-500 text-xs text-opacity-50">Injector.exe running...</span>', delay: 2900 },
+                                { text: 'Root access: <span class="text-green-500">GRANTED</span>', delay: 3800 },
+                                { text: 'Downloading sensitive_data.dat...', delay: 4500 },
+                                { text: '<span class="text-red-500 font-bold tracking-widest">SYSTEM COMPROMISED.</span>', delay: 5500 },
+                                { text: '', delay: 6500 }, // Pause
+                                { text: '<span class="text-white font-bold text-lg font-serif">Hello, friend.</span>', delay: 7200 },
+                                { text: '<span class="text-gray-400 italic text-xs">...maybe I should give you a name.</span>', delay: 9000 }
+                            ];
+
+                            hackSequence.forEach(step => {
+                                setTimeout(() => {
+                                    if (step.text) {
+                                        output.innerHTML += `<div>${step.text}</div>`;
+                                        output.scrollTop = output.scrollHeight;
+                                    }
+                                    
+                                    if (step === hackSequence[hackSequence.length - 1]) {
+                                        inputEl.disabled = false;
+                                        inputEl.focus();
+                                    }
+                                }, step.delay);
+                            });
                             break;
                         case 'neofetch':
                             const logo = `
