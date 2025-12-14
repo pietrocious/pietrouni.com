@@ -842,7 +842,7 @@
                 ' ': ["     ", "     ", "     ", "     ", "     "]
             };
 
-            const fortunes = [
+            const quotes = [
                 "If you don’t work hard on your own dreams, you’ll eventually end up building someone else’s.",
                 "The only way to do great work is to love what you do.",
                 "Sometimes the correct path, the bravest path is the least obvious, and also the gentlest.",
@@ -855,7 +855,7 @@
             ];
             
             // Shuffle-based quote system to avoid repetition
-            let shuffledQuotes = [...fortunes];
+            let shuffledQuotes = [...quotes];
             let quoteIndex = 0;
             function shuffleArray(arr) {
                 for (let i = arr.length - 1; i > 0; i--) {
@@ -1950,10 +1950,16 @@
 
                 if (e.key === 'Enter') {
                     const input = e.target.value.trim();
-                    if (!input) return;
-
-                    // Echo command
+                    
+                    // Echo command (show prompt even if empty)
                     output.innerHTML += `<div><span class="text-white">${document.getElementById('term-prompt').innerText}</span> ${input}</div>`;
+                    
+                    // Handle empty input - just show new prompt
+                    if (!input) {
+                        inputEl.value = '';
+                        output.scrollTop = output.scrollHeight;
+                        return;
+                    }
 
                     // Handle Guessing Game Input Interception
                     if (guessGame.active) {
@@ -2335,7 +2341,7 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms</div>`;
                             quoteIndex++;
                             if (quoteIndex >= shuffledQuotes.length) {
                                 quoteIndex = 0;
-                                shuffledQuotes = shuffleArray([...fortunes]); // Reshuffle when all shown
+                                shuffledQuotes = shuffleArray([...quotes]); // Reshuffle when all shown
                             }
                             output.innerHTML += `<div class="text-purple-300 italic my-2">💬 ${quote}</div>`;
                             break;
