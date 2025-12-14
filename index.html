@@ -771,6 +771,7 @@
             let terminalHistory = [];
             let terminalHistoryIndex = -1;
             let guessGame = { active: false, target: 0, attempts: 0 };
+            let ciscoMode = { active: false };
             const fileSystem = {
                 'root': {
                     'home': {
@@ -1032,7 +1033,7 @@
                     content: `
                      <div class="h-full flex flex-col bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight p-6 select-none font-ui">
                         <h1 class="text-xl font-bold mb-1 font-serif">About OS93</h1>
-                        <div class="text-xs opacity-60 mb-4 font-mono">Version 1.4 (Blue-Jonze)</div>
+                        <div class="text-xs opacity-60 mb-4 font-mono">Version 1.4 (Jade-Jonze)</div>
                         <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-4"></div>
 
                         <div class="flex-1 overflow-y-auto pr-2 space-y-4 text-sm">
@@ -1293,7 +1294,7 @@
                     content: `
                     <div class="h-full bg-[#1e1e1e]/95 text-white p-4 font-kernel text-sm overflow-hidden flex flex-col relative" id="term-container" onclick="document.getElementById('cmd-input').focus()">
                         <div id="term-output" class="flex-1 overflow-y-auto space-y-1 mb-2 window-content">
-                            <div class="opacity-70">OS93 v1.4 (Blue-Jonze) | Linux micro-kernel 6.8.0-45</div>
+                            <div class="opacity-70">OS93 v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
                             <div class="mb-4">Type 'help' for available commands.</div>
                         </div>
                         <div class="flex items-center gap-2 text-white z-10">
@@ -1971,6 +1972,136 @@
                         return;
                     }
 
+                    // Handle Cisco IOS Mode
+                    if (ciscoMode.active) {
+                        const ciscoCmd = input.toLowerCase().trim();
+                        const prompt = document.getElementById('term-prompt');
+                        
+                        if (ciscoCmd === 'exit' || ciscoCmd === 'quit' || ciscoCmd === 'logout') {
+                            ciscoMode.active = false;
+                            prompt.innerText = 'guest@portfolio ~ $';
+                            output.innerHTML += `<div class="text-gray-500">[Connection to CORE-RTR-01 closed]</div>`;
+                        } else if (ciscoCmd === '?' || ciscoCmd === 'help') {
+                            output.innerHTML += `<div class="text-cyan-400 my-2">
+<pre class="text-xs">Exec commands:
+  show        Show running system information
+  ping        Send echo messages
+  exit        Exit from the EXEC
+  enable      Turn on privileged commands (already enabled)
+  configure   Enter configuration mode (disabled)
+  
+Show commands:
+  show running-config    Current operating configuration
+  show ip interface brief Interface status summary
+  show version           System hardware and software status
+  show interfaces        Interface statistics
+  show ip route          IP routing table</pre></div>`;
+                        } else if (ciscoCmd === 'show running-config' || ciscoCmd === 'show run') {
+                            output.innerHTML += `<pre class="text-cyan-400 text-xs my-2">Building configuration...
+
+Current configuration : 1842 bytes
+!
+version 15.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname CORE-RTR-01
+!
+boot-start-marker
+boot-end-marker
+!
+enable secret 5 $1$mERr$hx5rVt7rPNoS4wqbXKX7m0
+!
+interface GigabitEthernet0/0
+ description WAN Uplink
+ ip address 203.0.113.1 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ description LAN Segment
+ ip address 192.168.1.1 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ description DMZ
+ ip address 10.0.0.1 255.255.255.0
+ duplex auto
+ speed auto
+!
+ip route 0.0.0.0 0.0.0.0 203.0.113.254
+!
+line con 0
+line aux 0
+line vty 0 4
+ login local
+ transport input ssh
+!
+end</pre>`;
+                        } else if (ciscoCmd === 'show ip interface brief' || ciscoCmd === 'show ip int brief' || ciscoCmd === 'sh ip int br') {
+                            output.innerHTML += `<pre class="text-cyan-400 text-xs my-2">Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0     203.0.113.1     YES manual up                    up
+GigabitEthernet0/1     192.168.1.1     YES manual up                    up
+GigabitEthernet0/2     10.0.0.1        YES manual up                    up
+Loopback0              1.1.1.1         YES manual up                    up</pre>`;
+                        } else if (ciscoCmd === 'show version' || ciscoCmd === 'sh ver') {
+                            output.innerHTML += `<pre class="text-cyan-400 text-xs my-2">Cisco IOS Software, ISR Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 15.9(3)M
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2024 by Cisco Systems, Inc.
+
+ROM: IOS-XE ROMMON
+BOOTLDR: Version 15.9(3)M
+
+CORE-RTR-01 uptime is 42 days, 7 hours, 23 minutes
+System returned to ROM by reload at 03:14:15 UTC Mon Nov 4 2024
+
+Cisco ISR4331/K9 (1RU) processor with 1687137K/6147K bytes of memory.
+3 Gigabit Ethernet interfaces
+32768K bytes of non-volatile configuration memory.
+4194304K bytes of physical memory.
+
+Configuration register is 0x2102</pre>`;
+                        } else if (ciscoCmd === 'show interfaces' || ciscoCmd === 'sh int') {
+                            output.innerHTML += `<pre class="text-cyan-400 text-xs my-2">GigabitEthernet0/0 is up, line protocol is up
+  Hardware is ISR4331-3x1GE, address is 0050.56ff.0001
+  Description: WAN Uplink
+  Internet address is 203.0.113.1/24
+  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec
+     reliability 255/255, txload 1/255, rxload 1/255
+  Encapsulation ARPA, loopback not set
+  5 minute input rate 847000 bits/sec, 423 packets/sec
+  5 minute output rate 234000 bits/sec, 187 packets/sec
+     847293847 packets input, 284729384729 bytes
+     234987234 packets output, 98723498723 bytes</pre>`;
+                        } else if (ciscoCmd === 'show ip route' || ciscoCmd === 'sh ip ro') {
+                            output.innerHTML += `<pre class="text-cyan-400 text-xs my-2">Codes: C - connected, S - static, R - RIP, O - OSPF
+
+Gateway of last resort is 203.0.113.254 to network 0.0.0.0
+
+S*    0.0.0.0/0 [1/0] via 203.0.113.254
+C     10.0.0.0/24 is directly connected, GigabitEthernet0/2
+C     192.168.1.0/24 is directly connected, GigabitEthernet0/1
+C     203.0.113.0/24 is directly connected, GigabitEthernet0/0</pre>`;
+                        } else if (ciscoCmd.startsWith('ping')) {
+                            const target = ciscoCmd.split(' ')[1] || '8.8.8.8';
+                            output.innerHTML += `<div class="text-cyan-400 text-xs my-2">Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to ${target}, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms</div>`;
+                        } else if (ciscoCmd === 'enable') {
+                            output.innerHTML += `<div class="text-gray-500 text-xs">Already in privileged mode.</div>`;
+                        } else if (ciscoCmd === 'configure terminal' || ciscoCmd === 'conf t') {
+                            output.innerHTML += `<div class="text-red-400 text-xs">% Configuration mode disabled for security reasons.</div>`;
+                        } else if (ciscoCmd) {
+                            output.innerHTML += `<div class="text-gray-500 text-xs">% Unknown command or unrecognized keyword. Type '?' for help.</div>`;
+                        }
+                        
+                        inputEl.value = '';
+                        output.scrollTop = output.scrollHeight;
+                        return;
+                    }
+
                     // Save to history
                     terminalHistory.push(input);
                     terminalHistoryIndex = -1;
@@ -2037,6 +2168,7 @@
                                             <div><span class="text-blue-300">fallout</span> - 👍...</div>
                                             <div><span class="text-blue-300">sudo</span> - Nice try...</div>
                                             <div><span class="text-blue-300">rm -rf /</span> - ⚠️ Don't do it!</div>
+                                            <div><span class="text-blue-300">cisco</span> - 🌐 SSH into a router</div>
                                             <div><span class="text-blue-300">exit</span> - But can you really?</div>
                                         </div>
                                     </div>
@@ -2245,7 +2377,7 @@
                             const info = `
 <span class="text-blue-400">guest@portfolio-os</span>
 --------------------
-<span class="text-her-red">OS</span>: OS93 Version 1.4 (Blue-Jonze)
+<span class="text-her-red">OS</span>: OS93 Version 1.4 (Jade-Jonze)
 <span class="text-her-red">Host</span>: Browser Virtual Machine
 <span class="text-her-red">Kernel</span>: Linux micro-kernel 6.8.0-45
 <span class="text-her-red">Uptime</span>: ${Math.floor(performance.now() / 60000)} mins
@@ -2271,22 +2403,22 @@
                                     </div>
                                     <div class="flex gap-4">
                                         <span class="text-gray-500">1.1</span>
-                                        <span class="text-gray-300">Silver-Spike</span>
+                                        <span class="text-teal-400">Teal-Twombly</span>
                                         <span class="text-gray-600">Window System</span>
                                     </div>
                                     <div class="flex gap-4">
                                         <span class="text-gray-500">1.2</span>
-                                        <span class="text-teal-400">Teal-Twombly</span>
+                                        <span class="text-orange-400">Coral-Catherine</span>
                                         <span class="text-gray-600">Terminal v1</span>
                                     </div>
                                     <div class="flex gap-4">
                                         <span class="text-gray-500">1.3</span>
-                                        <span class="text-orange-400">Coral-Catherine</span>
+                                        <span class="text-amber-700">Walnut-Watts</span>
                                         <span class="text-gray-600">Vault & Themes</span>
                                     </div>
                                     <div class="flex gap-4">
                                         <span class="text-green-400 font-bold">1.4</span>
-                                        <span class="text-blue-400 font-bold">Blue-Jonze</span>
+                                        <span class="text-emerald-400 font-bold">Jade-Jonze</span>
                                         <span class="text-gray-400">Current ✓</span>
                                     </div>
                                 </div>
@@ -2895,6 +3027,38 @@
                                 <div class="text-gray-500 text-xs mt-1">Thanks for hanging out! 🎉</div>
                             </div>`;
                             output.scrollTop = output.scrollHeight;
+                            break;
+                        case 'cisco':
+                        case 'ssh':
+                            // Simulate SSH connection to Cisco router
+                            inputEl.disabled = true;
+                            const sshPrompt = document.getElementById('term-prompt');
+                            
+                            const sshMessages = [
+                                { text: '<span class="text-gray-400">Connecting to CORE-RTR-01 (192.168.1.1)...</span>', delay: 0 },
+                                { text: '<span class="text-gray-400">Verifying SSH key fingerprint...</span>', delay: 500 },
+                                { text: '<span class="text-green-400">Connection established.</span>', delay: 1000 },
+                                { text: '', delay: 1200 },
+                                { text: '<span class="text-cyan-400">CORE-RTR-01#</span> <span class="text-gray-500">Type ? for available commands, exit to disconnect</span>', delay: 1400 }
+                            ];
+                            
+                            let sshIndex = 0;
+                            function showNextSsh() {
+                                if (sshIndex >= sshMessages.length) {
+                                    ciscoMode.active = true;
+                                    sshPrompt.innerText = 'CORE-RTR-01#';
+                                    inputEl.disabled = false;
+                                    inputEl.focus();
+                                    return;
+                                }
+                                const msg = sshMessages[sshIndex];
+                                const nextDelay = sshIndex < sshMessages.length - 1 ? sshMessages[sshIndex + 1].delay - msg.delay : 200;
+                                if (msg.text) output.innerHTML += `<div>${msg.text}</div>`;
+                                output.scrollTop = output.scrollHeight;
+                                sshIndex++;
+                                setTimeout(showNextSsh, nextDelay);
+                            }
+                            showNextSsh();
                             break;
                         default:
                             if (cmd) output.innerHTML += `<div class="text-red-400">Command not found: ${cmd}</div>`;
