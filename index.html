@@ -1290,8 +1290,8 @@
                         </div>
                     </div>
                 `,
-                    width: 650,
-                    height: 450
+                    width: 850,
+                    height: 520
                 },
                 monitor: {
                     title: "Monitoring",
@@ -1990,21 +1990,46 @@
                         case 'help-fun':
                             output.innerHTML += `
                             <div class="opacity-80 mt-1 mb-2">
-                                <div class="font-bold text-purple-400 mb-1">🎮 Fun Commands:</div>
-                                <div class="pl-2 space-y-1">
-                                    <div><span class="text-blue-300">ascii [text]</span> - Generate ASCII art</div>
-                                    <div><span class="text-blue-300">cowsay [text]</span> - Make a cow say something</div>
-                                    <div><span class="text-blue-300">fortune</span> - Get your daily fortune</div>
-                                    <div><span class="text-blue-300">matrix</span> - Enter the Matrix</div>
-                                    <div><span class="text-blue-300">calc [expr]</span> - Simple calculator</div>
-                                    <div><span class="text-blue-300">guess</span> - Play number guessing game</div>
-                                    <div><span class="text-blue-300">hack</span> - Hack this site!</div>
-                                    <div><span class="text-blue-300">sl</span> - 🚂 Choo choo! (typo corrector)</div>
-                                    <div><span class="text-blue-300">hlx</span> - λ Classified project...</div>
-                                    <div><span class="text-blue-300">fallout</span> - 👍...</div>
-                                    <div><span class="text-blue-300">8ball [question]</span> - 🎱 Tech decision oracle</div>
-                                    <div><span class="text-blue-300">flip [text]</span> - ɟlᴉd ʇǝxʇ ndsᴉpǝ poʍu</div>
-                                    <div><span class="text-blue-300">figlet [text]</span> - Big ASCII text</div>
+                                <div class="font-bold text-purple-400 mb-2">🎮 Fun Commands:</div>
+                                <div class="pl-2 space-y-2">
+                                    <div>
+                                        <div class="text-pink-400 font-bold text-xs uppercase mb-1">📝 Text & Art</div>
+                                        <div class="pl-2 space-y-0.5">
+                                            <div><span class="text-blue-300">ascii [text]</span> - Generate ASCII art</div>
+                                            <div><span class="text-blue-300">figlet [text]</span> - Big block ASCII text</div>
+                                            <div><span class="text-blue-300">cowsay [text]</span> - Make a cow say something</div>
+                                            <div><span class="text-blue-300">flip [text]</span> - ɟlᴉd ʇǝxʇ ndsᴉpǝ poʍu</div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-green-400 font-bold text-xs uppercase mb-1">🎲 Games & Interactive</div>
+                                        <div class="pl-2 space-y-0.5">
+                                            <div><span class="text-blue-300">guess</span> - Number guessing game</div>
+                                            <div><span class="text-blue-300">8ball [question]</span> - Tech decision oracle</div>
+                                            <div><span class="text-blue-300">hack</span> - Hack this site!</div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-cyan-400 font-bold text-xs uppercase mb-1">🎬 Animations</div>
+                                        <div class="pl-2 space-y-0.5">
+                                            <div><span class="text-blue-300">matrix</span> - Enter the Matrix</div>
+                                            <div><span class="text-blue-300">sl</span> - 🚂 Steam locomotive</div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-yellow-400 font-bold text-xs uppercase mb-1">🥚 Easter Eggs</div>
+                                        <div class="pl-2 space-y-0.5">
+                                            <div><span class="text-blue-300">hlx</span> - λ Classified project...</div>
+                                            <div><span class="text-blue-300">fallout</span> - 👍...</div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-orange-400 font-bold text-xs uppercase mb-1">🔧 Utilities</div>
+                                        <div class="pl-2 space-y-0.5">
+                                            <div><span class="text-blue-300">calc [expr]</span> - Simple calculator</div>
+                                            <div><span class="text-blue-300">fortune</span> - Get your daily fortune</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>`;
                             break;
