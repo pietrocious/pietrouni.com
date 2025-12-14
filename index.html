@@ -1986,7 +1986,7 @@
                                 <div class="font-bold text-her-red mb-1">Available Commands:</div>
                                 <div class="pl-2">
                                     <div class="text-blue-400 font-bold text-xs uppercase mt-2">System</div>
-                                    <div>help, about, clear, neofetch</div>
+                                    <div>help, about, clear, neofetch, version</div>
                                     
                                     <div class="text-blue-400 font-bold text-xs uppercase mt-2">File Operations</div>
                                     <div>ls [-a], cd, pwd, mkdir, touch, rmdir, cat</div>
@@ -2175,16 +2175,40 @@
                         case 'calc':
                             try {
                                 const expr = args.slice(1).join('');
-                                // Safe-ish eval for portfolio demo
-                                if (/^[0-9+\-*/().\s]+$/.test(expr)) {
+                                
+                                // Show usage if no expression provided
+                                if (!expr.trim()) {
+                                    output.innerHTML += `<div class="my-2">
+                                        <div class="text-yellow-400 font-bold">🧮 Calculator Usage:</div>
+                                        <div class="pl-2 mt-1 space-y-1 text-sm">
+                                            <div><span class="text-blue-300">calc [expression]</span></div>
+                                            <div class="text-gray-400 text-xs mt-2">Examples:</div>
+                                            <div class="pl-2 text-gray-300">calc 2 + 2</div>
+                                            <div class="pl-2 text-gray-300">calc (10 * 5) / 2</div>
+                                            <div class="pl-2 text-gray-300">calc 3.14 * 10</div>
+                                            <div class="text-gray-400 text-xs mt-2">Supported: + - * / ( ) and decimal numbers</div>
+                                        </div>
+                                    </div>`;
+                                    break;
+                                }
+                                
+                                // Safe eval for portfolio demo - only allow math characters
+                                if (/^[0-9+\-*/().%\s]+$/.test(expr)) {
                                     // eslint-disable-next-line no-new-func
                                     const result = new Function('return ' + expr)();
-                                    output.innerHTML += `<div class="text-green-400 font-bold">= ${result}</div>`;
+                                    output.innerHTML += `<div class="text-green-400 font-bold my-1">= ${result}</div>`;
                                 } else {
-                                    output.innerHTML += `<div class="text-red-400">Invalid characters in expression.</div>`;
+                                    output.innerHTML += `<div class="my-2">
+                                        <div class="text-red-400">❌ Invalid characters in expression.</div>
+                                        <div class="text-gray-400 text-xs mt-1">Only numbers and operators allowed: <span class="text-blue-300">+ - * / ( ) %</span></div>
+                                        <div class="text-gray-500 text-xs">Example: <span class="text-gray-300">calc 2 + 2</span></div>
+                                    </div>`;
                                 }
                             } catch (e) {
-                                output.innerHTML += `<div class="text-red-400">Error: ${e.message}</div>`;
+                                output.innerHTML += `<div class="my-2">
+                                    <div class="text-red-400">❌ Error: ${e.message}</div>
+                                    <div class="text-gray-500 text-xs mt-1">Check your expression syntax.</div>
+                                </div>`;
                             }
                             break;
                         case 'guess':
@@ -2235,6 +2259,39 @@
     <pre class="text-blue-500 hidden sm:block">${logo}</pre>
     <pre>${info}</pre>
 </div>`;
+                            break;
+                        case 'version':
+                            output.innerHTML += `<div class="my-2">
+                                <div class="text-her-red font-bold mb-2">📋 OS93 Version History</div>
+                                <div class="font-mono text-xs space-y-1">
+                                    <div class="flex gap-4">
+                                        <span class="text-gray-500">1.0</span>
+                                        <span class="text-red-400">Scarlet-Samantha</span>
+                                        <span class="text-gray-600">Initial Release</span>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <span class="text-gray-500">1.1</span>
+                                        <span class="text-gray-300">Silver-Spike</span>
+                                        <span class="text-gray-600">Window System</span>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <span class="text-gray-500">1.2</span>
+                                        <span class="text-teal-400">Teal-Twombly</span>
+                                        <span class="text-gray-600">Terminal v1</span>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <span class="text-gray-500">1.3</span>
+                                        <span class="text-orange-400">Coral-Catherine</span>
+                                        <span class="text-gray-600">Vault & Themes</span>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <span class="text-green-400 font-bold">1.4</span>
+                                        <span class="text-blue-400 font-bold">Blue-Jonze</span>
+                                        <span class="text-gray-400">Current ✓</span>
+                                    </div>
+                                </div>
+                                <div class="text-gray-600 text-xs mt-3 italic">Type 'neofetch' for system info</div>
+                            </div>`;
                             break;
                         case 'matrix':
                             // Find the terminal content container
