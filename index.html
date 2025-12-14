@@ -368,20 +368,23 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
         }
 
-        @media (min-width: 768px) {
-            .dock-item {
-                width: 52px;
-                height: 52px;
-                position: relative;
-                transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), margin 0.2s;
-            }
-        }
-
+        /* Dock Item - Mobile First */
         .dock-item {
+            width: 52px;
+            height: 52px;
+            position: relative;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), margin 0.2s;
             color: #4A7C9D; /* Default icon color */
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        @media (min-width: 768px) {
+            .dock-item {
+                width: 52px;
+                height: 52px;
+            }
         }
 
         html.dark .dock-item {
@@ -410,10 +413,10 @@
             animation: dockBounce 0.6s cubic-bezier(0.28, 0.84, 0.42, 1);
         }
 
-        /* Icon Shapes (SVG) */
+        /* Icon Shapes (SVG) - Mobile First */
         .dock-icon {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             fill: currentColor;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
         }
@@ -1493,28 +1496,28 @@
                 const isMobile = window.innerWidth < 768;
                 
                 // Safe Area Calculation (Dock Buffer)
-                const dockBuffer = 120; 
+                const dockBuffer = isMobile ? 100 : 120; 
                 const maxAvailableHeight = containerH - dockBuffer;
 
-                // Responsive Size Calculation
-                let finalW = isMobile ? containerW * 0.92 : winConfig.width;
+                // Responsive Size Calculation - Full screen on mobile
+                let finalW = isMobile ? containerW : winConfig.width;
                 
-                // Height Constraint: Clamp to safe area
+                // Height Constraint: Full height on mobile (minus dock), clamp on desktop
                 let finalH = winConfig.height;
-                if (!isMobile && finalH > maxAvailableHeight) {
+                if (isMobile) {
                     finalH = maxAvailableHeight;
-                } else if (isMobile) {
-                    finalH = containerH * 0.8;
+                } else if (finalH > maxAvailableHeight) {
+                    finalH = maxAvailableHeight;
                 }
 
-                // Default center if space allows
-                let leftPos = isMobile ? (containerW - finalW) / 2 : Math.max(0, (containerW - finalW) / 2) + randX;
+                // Position: Edge-to-edge on mobile, centered on desktop
+                let leftPos = isMobile ? 0 : Math.max(0, (containerW - finalW) / 2) + randX;
                 
-                // Vertical Center within safe area
-                let topPos = isMobile ? 20 : Math.max(10, (maxAvailableHeight - finalH) / 2) + randY;
+                // Vertical position: Top on mobile, centered on desktop
+                let topPos = isMobile ? 0 : Math.max(10, (maxAvailableHeight - finalH) / 2) + randY;
 
-                // Boundary Check: prevent overlap with dock
-                if (topPos + finalH > maxAvailableHeight) {
+                // Boundary Check: prevent overlap with dock (desktop only)
+                if (!isMobile && topPos + finalH > maxAvailableHeight) {
                     topPos = maxAvailableHeight - finalH;
                     if (topPos < 10) topPos = 10;
                 }
