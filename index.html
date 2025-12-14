@@ -183,6 +183,106 @@
             animation: herGradient 20s ease infinite;
         }
 
+        /* ===== Apple-Style Animated Wallpapers ===== */
+
+        /* Sonoma Flow - Organic Flowing Blobs */
+        @keyframes sonomaFlow {
+            0%, 100% { 
+                background-position: 0% 50%, 100% 50%, 50% 100%;
+            }
+            25% { 
+                background-position: 50% 0%, 0% 100%, 100% 50%;
+            }
+            50% { 
+                background-position: 100% 50%, 50% 0%, 0% 50%;
+            }
+            75% { 
+                background-position: 50% 100%, 100% 50%, 50% 0%;
+            }
+        }
+
+        .sonoma-bg {
+            background: 
+                radial-gradient(ellipse 80% 60% at 20% 40%, rgba(147, 197, 253, 0.5) 0%, transparent 50%),
+                radial-gradient(ellipse 70% 80% at 80% 60%, rgba(196, 181, 253, 0.5) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 70% at 50% 80%, rgba(165, 180, 252, 0.4) 0%, transparent 50%),
+                linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f0fdff 100%);
+            background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+            animation: sonomaFlow 20s ease-in-out infinite;
+        }
+
+        .sonoma-bg-dark {
+            background: 
+                radial-gradient(ellipse 80% 60% at 20% 40%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse 70% 80% at 80% 60%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 70% at 50% 80%, rgba(99, 102, 241, 0.25) 0%, transparent 50%),
+                linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c4a6e 100%);
+            background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+            animation: sonomaFlow 20s ease-in-out infinite;
+        }
+
+        /* Sequoia Gradient - Rich Layered Diagonals */
+        @keyframes sequoiaShift {
+            0%, 100% { 
+                background-position: 0% 0%, 100% 100%;
+            }
+            50% { 
+                background-position: 100% 100%, 0% 0%;
+            }
+        }
+
+        .sequoia-bg {
+            background: 
+                linear-gradient(135deg, rgba(253, 186, 116, 0.6) 0%, rgba(251, 146, 60, 0.4) 30%, transparent 60%),
+                linear-gradient(315deg, rgba(252, 165, 165, 0.5) 0%, rgba(253, 224, 71, 0.3) 40%, transparent 70%),
+                linear-gradient(180deg, #fffbeb 0%, #fef3c7 50%, #ffedd5 100%);
+            background-size: 200% 200%, 200% 200%, 100% 100%;
+            animation: sequoiaShift 15s ease-in-out infinite;
+        }
+
+        .sequoia-bg-dark {
+            background: 
+                linear-gradient(135deg, rgba(22, 101, 52, 0.6) 0%, rgba(6, 78, 59, 0.5) 30%, transparent 60%),
+                linear-gradient(315deg, rgba(30, 58, 138, 0.5) 0%, rgba(23, 37, 84, 0.4) 40%, transparent 70%),
+                linear-gradient(180deg, #052e16 0%, #0c1629 50%, #0a0a0a 100%);
+            background-size: 200% 200%, 200% 200%, 100% 100%;
+            animation: sequoiaShift 15s ease-in-out infinite;
+        }
+
+        /* Ventura Waves - Smooth Flowing Layers */
+        @keyframes venturaWave {
+            0%, 100% { 
+                background-position: 0% 50%, 50% 0%, 100% 50%;
+            }
+            33% { 
+                background-position: 100% 50%, 0% 50%, 50% 100%;
+            }
+            66% { 
+                background-position: 50% 100%, 100% 50%, 0% 50%;
+            }
+        }
+
+        .ventura-bg {
+            background: 
+                linear-gradient(120deg, rgba(153, 246, 228, 0.4) 0%, rgba(167, 243, 208, 0.3) 50%, transparent 80%),
+                linear-gradient(240deg, rgba(196, 181, 253, 0.4) 0%, rgba(221, 214, 254, 0.3) 50%, transparent 80%),
+                linear-gradient(360deg, rgba(165, 180, 252, 0.3) 0%, rgba(199, 210, 254, 0.2) 50%, transparent 80%),
+                linear-gradient(135deg, #f0fdfa 0%, #faf5ff 50%, #eef2ff 100%);
+            background-size: 300% 300%, 300% 300%, 300% 300%, 100% 100%;
+            animation: venturaWave 18s ease-in-out infinite;
+        }
+
+        .ventura-bg-dark {
+            background: 
+                linear-gradient(120deg, rgba(20, 184, 166, 0.3) 0%, rgba(6, 182, 212, 0.25) 50%, transparent 80%),
+                linear-gradient(240deg, rgba(139, 92, 246, 0.3) 0%, rgba(124, 58, 237, 0.25) 50%, transparent 80%),
+                linear-gradient(360deg, rgba(99, 102, 241, 0.25) 0%, rgba(79, 70, 229, 0.2) 50%, transparent 80%),
+                linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #134e4a 100%);
+            background-size: 300% 300%, 300% 300%, 300% 300%, 100% 100%;
+            animation: venturaWave 18s ease-in-out infinite;
+        }
+
+
         /* Cards / Windows (Tactile, not Glass) */
         .window {
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -770,14 +870,22 @@
             let activeWallpaperIndex = 0;
 
             // --- Wallpapers ---
-            // --- Wallpapers ---
+            // Apple-Style Animated Wallpapers
             const wallpapers = [
-                // Default Warm/Dark (Animated Her Theme)
-                { type: 'class', light: 'her-bg', dark: 'her-bg-dark' },
-                // Blue Mist
-                { light: 'linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)', dark: 'linear-gradient(120deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' },
-                // Abstract Dusk
-                { light: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)', dark: 'linear-gradient(to right, #243949 0%, #517fa4 100%)' }
+                // Sonoma Flow - Organic Flowing Blobs (Default)
+                { type: 'class', light: 'sonoma-bg', dark: 'sonoma-bg-dark' },
+                // Sequoia Gradient - Rich Layered Diagonals
+                { type: 'class', light: 'sequoia-bg', dark: 'sequoia-bg-dark' },
+                // Ventura Waves - Smooth Flowing Layers
+                { type: 'class', light: 'ventura-bg', dark: 'ventura-bg-dark' }
+            ];
+
+            // List of all wallpaper classes for cleanup
+            const allWallpaperClasses = [
+                'her-bg', 'her-bg-dark',
+                'sonoma-bg', 'sonoma-bg-dark',
+                'sequoia-bg', 'sequoia-bg-dark',
+                'ventura-bg', 'ventura-bg-dark'
             ];
 
             function applyWallpaper() {
@@ -785,9 +893,9 @@
                 const wp = wallpapers[activeWallpaperIndex];
                 const desktop = document.getElementById('desktop');
                 
-                // Reset
+                // Reset - remove all wallpaper classes and inline styles
                 desktop.style.background = '';
-                desktop.classList.remove('her-bg', 'her-bg-dark');
+                allWallpaperClasses.forEach(cls => desktop.classList.remove(cls));
 
                 if (wp.type === 'class') {
                     desktop.classList.add(isDark ? wp.dark : wp.light);
@@ -795,6 +903,7 @@
                     desktop.style.background = isDark ? wp.dark : wp.light;
                 }
             }
+
 
             // --- Vault Data ---
             const vaultData = [
