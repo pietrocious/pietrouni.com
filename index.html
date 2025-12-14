@@ -40,10 +40,11 @@
     <!-- Preconnect to speed up external resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com">
     <link rel="preconnect" href="https://images.unsplash.com">
 
     <!-- Preload Critical Font -->
-    <link rel="preload" href="/fonts/fixedsys.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="/fonts/fixedsys.ttf" as="font" type="font/ttf" crossorigin fetchpriority="high">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -1180,7 +1181,7 @@
                 },
                 resume: {
                     title: "Resume",
-                    content: `<iframe src="resume.html" class="w-full h-full border-none bg-white dark:bg-[#1a100c]" onload="this.contentWindow.postMessage({type:'theme-change', theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'}, '*')"></iframe>`,
+                    content: `<iframe src="resume.html" loading="lazy" class="w-full h-full border-none bg-white dark:bg-[#1a100c]" onload="this.contentWindow.postMessage({type:'theme-change', theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'}, '*')"></iframe>`,
                     width: 850,
                     height: 900
                 },
