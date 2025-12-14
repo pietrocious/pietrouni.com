@@ -64,14 +64,14 @@
                         mono: ['"JetBrains Mono"', 'monospace'],
                     },
                     colors: {
-                        // 'Her' Palette - Updated to Blue Theme
+                        // 'Her' Palette - Warm & Organic
                         her: {
-                            red: "#4A7C9D",      // The distinct blue interface color
-                            orange: "#4A7C9D",   // Mapped to Blue for consistency in Dark Mode accents
+                            red: "#4A7C9D",      // Blue accent color
+                            orange: "#5B9AB8",   // Lighter blue
                             cream: "#F4EBD9",    // Paper background
                             paper: "#FDFBF7",    // Brighter paper
-                            dark: "#3E2723",     // Deep warm brown (instead of black)
-                            darker: "#1a100c",   // Darkest brown
+                            dark: "#3E2723",     // Deep warm brown
+                            darker: "#2D1A14",   // Darkest brown
                             text: "#4E342E",     // Standard text
                             textLight: "#EFEBE9" // Light text
                         }
@@ -164,12 +164,23 @@
         }
 
         /* Warm Ambient Background - Base Classes */
+        @keyframes herGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .her-bg {
-            background: linear-gradient(135deg, #F4EBD9 0%, #E6CEB3 100%);
+            background: linear-gradient(-45deg, #E8E0D5, #D4C8BC, #C9BFB5, #E8E0D5);
+            background-size: 400% 400%;
+            animation: herGradient 15s ease infinite;
         }
 
         .her-bg-dark {
-            background: linear-gradient(135deg, #2D1A14 0%, #1A0F0C 100%);
+            /* Muted dark tones */
+            background: linear-gradient(-45deg, #1a1412, #252019, #2d2620, #1a1412);
+            background-size: 400% 400%;
+            animation: herGradient 20s ease infinite;
         }
 
         /* Cards / Windows (Tactile, not Glass) */
@@ -181,7 +192,7 @@
             border: 1px solid transparent;
             display: flex;
             flex-direction: column;
-            border-radius: 12px;
+            border-radius: 20px;
             container-type: inline-size;
             overflow: hidden;
             /* Clip content for border radius */
@@ -374,7 +385,7 @@
             height: 52px;
             position: relative;
             transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), margin 0.2s;
-            color: #4A7C9D; /* Default icon color */
+            color: #1a1a1a; /* Black icon color */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -388,7 +399,7 @@
         }
 
         html.dark .dock-item {
-            color: #4A7C9D;
+            color: #E8E0D5; /* Light icons for dark mode */
         }
 
         .dock-item:hover {
@@ -464,6 +475,22 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* Floating Glass Dock */
+        .dock-container {
+            background: rgba(244, 235, 217, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        html.dark .dock-container {
+            background: rgba(62, 39, 35, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
         /* Menu Bar */
         #menubar {
             backdrop-filter: blur(12px);
@@ -505,7 +532,7 @@
 
         ::-webkit-scrollbar-thumb {
             background: #4A7C9D;
-            border-radius: 2px;
+            border-radius: 4px;
         }
 
         html.dark ::-webkit-scrollbar-thumb {
@@ -571,7 +598,7 @@
 
         <!-- Menu Bar (MacOS Style) -->
         <div id="menubar"
-            class="absolute top-0 left-0 w-full h-8 z-[5000] flex justify-between items-center px-4 select-none text-xs md:text-sm font-medium text-her-red dark:text-her-red">
+            class="absolute top-0 left-0 w-full h-8 z-[5000] flex justify-between items-center px-4 select-none text-xs md:text-sm font-medium text-black dark:text-her-textLight">
             <div class="flex items-center gap-4">
                 <span class="font-bold">Welcome Guest!</span>
             </div>
@@ -743,14 +770,31 @@
             let activeWallpaperIndex = 0;
 
             // --- Wallpapers ---
+            // --- Wallpapers ---
             const wallpapers = [
-                // Default Warm/Dark
-                { light: 'linear-gradient(135deg, #F4EBD9 0%, #E6CEB3 100%)', dark: 'linear-gradient(135deg, #2D1A14 0%, #1A0F0C 100%)' },
+                // Default Warm/Dark (Animated Her Theme)
+                { type: 'class', light: 'her-bg', dark: 'her-bg-dark' },
                 // Blue Mist
                 { light: 'linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)', dark: 'linear-gradient(120deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' },
                 // Abstract Dusk
                 { light: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)', dark: 'linear-gradient(to right, #243949 0%, #517fa4 100%)' }
             ];
+
+            function applyWallpaper() {
+                const isDark = document.documentElement.classList.contains('dark');
+                const wp = wallpapers[activeWallpaperIndex];
+                const desktop = document.getElementById('desktop');
+                
+                // Reset
+                desktop.style.background = '';
+                desktop.classList.remove('her-bg', 'her-bg-dark');
+
+                if (wp.type === 'class') {
+                    desktop.classList.add(isDark ? wp.dark : wp.light);
+                } else {
+                    desktop.style.background = isDark ? wp.dark : wp.light;
+                }
+            }
 
             // --- Vault Data ---
             const vaultData = [
@@ -880,12 +924,7 @@
                 applyWallpaper();
             }
 
-            function applyWallpaper() {
-                const isDark = document.documentElement.classList.contains('dark');
-                const wp = wallpapers[activeWallpaperIndex];
-                const desktop = document.getElementById('desktop');
-                desktop.style.background = isDark ? wp.dark : wp.light;
-            }
+
 
             window.toggleTheme = function () {
                 if (document.documentElement.classList.contains('dark')) {
@@ -1093,7 +1132,7 @@
                     content: `
                     <div class="h-full dyn-p font-sans dyn-text overflow-y-auto window-content selection:bg-her-red selection:text-white transition-colors">
                         <!-- Header -->
-                        <h1 class="dyn-h1 font-serif font-extrabold text-her-red dark:text-her-red tracking-tight">Hi, I'm Pietro 👋</h1>
+                        <h1 class="text-3xl font-serif font-extrabold text-her-red dark:text-her-red tracking-tight">Hi, I'm Pietro 👋</h1>
                         
                         <div class="space-y-4">
                             <!-- My Journey -->
@@ -1168,50 +1207,105 @@
                 projects: {
                     title: "Projects",
                     content: `
-                     <div class="h-full dyn-p font-sans overflow-y-auto window-content selection:bg-her-red selection:text-white">
-                        <h1 class="dyn-h1 font-serif font-extrabold text-her-red dark:text-her-red tracking-tight mb-8">Projects</h1>
-                        <p class="mb-8 opacity-80 dyn-text">A collection of my infrastructure and automation work.</p>
-                        
-                        <div class="dyn-grid">
-                            <!-- pietrouni.com -->
-                            <div class="p-6 border border-her-red/20 rounded-lg transition-colors bg-white/40 dark:bg-black/10 opacity-70">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-serif font-extrabold text-lg text-her-red dark:text-her-red">pietrouni.com</h3>
-                                    <span class="px-2 py-0.5 text-[10px] font-bold bg-yellow-100 text-yellow-800 rounded">Repo Coming Soon</span>
+                     <div class="h-full dyn-p font-sans overflow-y-auto window-content selection:bg-her-red selection:text-white p-2">
+                        <!-- Header -->
+                        <div class="mb-8 p-4">
+                            <h1 class="font-serif font-extrabold text-2xl text-her-dark dark:text-her-textLight mb-1">Projects</h1>
+                            <p class="text-sm opacity-60 text-her-dark dark:text-her-textLight">Building at the intersection of AI, markets, and optimization</p>
+                        </div>
+
+                        <div class="space-y-8 p-2">
+
+                            <!-- Current Projects -->
+                            <div>
+                                <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    Current Projects
                                 </div>
-                                <p class="text-sm opacity-80 mb-4">Full desktop portfolio website, with infrastructure on AWS.</p>
-                                <div class="flex flex-wrap gap-2 mb-4">
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">HTML</span>
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">CSS</span>
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">JAVASCRIPT</span>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    
+                                    <!-- Terraform AWS Modules -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-bold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">Complete AWS infrastructure featuring Multi-AZ networking, Auto-scaling, and CloudFront. Built to demonstrate enterprise DevOps practices.</p>
+                                        <div class="flex flex-wrap gap-1.5 mb-4">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TERRAFORM</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CICD</span>
+                                        </div>
+                                        <div class="flex gap-3 text-xs opacity-60">
+                                            <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg> GitHub</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- pietrouni.com -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-bold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">I build this interactive OS-themed portfolio website. I will open source the code soon.</p>
+                                        <div class="flex flex-wrap gap-1.5 mb-4">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">HTML</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CSS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">JAVASCRIPT</span>
+                                        </div>
+                                        <div class="flex gap-3 text-xs opacity-50">
+                                            <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg> Coming soon</span>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
-                            <!-- AWS Terraform Modules -->
-                            <div class="p-6 border border-her-red/20 rounded-lg hover:border-her-red/50 transition-colors bg-white/40 dark:bg-black/10 cursor-pointer" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
-                                <h3 class="font-serif font-extrabold text-lg mb-2 text-her-red dark:text-her-red">Terraform AWS Modules</h3>
-                                <p class="text-sm opacity-80 mb-4">Opinionated, production-ready modules for VPC, EKS, and RDS.</p>
-                                <div class="flex flex-wrap gap-2 mb-4">
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">TERRAFORM</span>
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">AWS</span>
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">CICD</span>
+                            <!-- Scripts -->
+                            <div>
+                                <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
+                                    <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                                    Scripts
                                 </div>
-                                <div class="text-xs font-bold uppercase tracking-wide opacity-60">View Repo -></div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    
+                                    <!-- Automation Scripts -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-bold text-her-dark dark:text-her-textLight">Automation Scripts</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 h-8 text-her-dark dark:text-her-textLight">PowerShell/bash/Python scripts for Cisco IOS config management and compliance checks.</p>
+                                        <div class="flex flex-wrap gap-1.5 mb-4">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">POWERSHELL</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">BASH</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PYTHON</span>
+                                        </div>
+                                        <div class="flex gap-3 text-xs opacity-50">
+                                            <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg> Coming soon</span>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
                             
-                            <!-- Automation Scripts -->
-                            <div class="p-6 border border-her-red/20 rounded-lg transition-colors bg-white/40 dark:bg-black/10 opacity-70">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h3 class="font-serif font-extrabold text-lg text-her-red dark:text-her-red">Automation Scripts</h3>
-                                    <span class="px-2 py-0.5 text-[10px] font-bold bg-yellow-100 text-yellow-800 rounded">Repo Coming Soon</span>
+                            <!-- Personal Projects -->
+                             <div>
+                                <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
+                                    <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                                    Personal Projects
                                 </div>
-                                <p class="text-sm opacity-80 mb-4">PowerShell/bash/Python scripts for Cisco IOS config management and compliance checks.</p>
-                                <div class="flex flex-wrap gap-2 mb-4">
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">POWERSHELL</span>
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">BASH</span>
-                                    <span class="px-2 py-1 text-[10px] font-mono border border-her-text/20 rounded">PYTHON</span>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    
+                                    <!-- Placeholder -->
+                                    <div class="p-4 border border-dashed border-her-text/10 bg-white/20 dark:bg-white/5 rounded-lg flex flex-col justify-center items-center h-48 opacity-50">
+                                        <div class="text-xs uppercase font-bold tracking-widest mb-2">More coming soon</div>
+                                        <div class="text-[10px] px-2 py-1 rounded bg-black/5 dark:bg-white/10">Planned</div>
+                                    </div>
+
                                 </div>
                             </div>
+
                         </div>
                      </div>
                 `,
