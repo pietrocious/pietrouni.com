@@ -191,8 +191,8 @@ body {
     overflow: hidden;
     /* Clip content for border radius */
     pointer-events: auto;
-    touch-action: none;
-    /* Prevent browser scrolling handling */
+    touch-action: pan-y;
+    /* Allow vertical scrolling, prevent horizontal pan */
 }
 
 .window.maximized {
