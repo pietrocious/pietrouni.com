@@ -215,63 +215,37 @@
                 <!-- README.md -->
                 <div id="dock-about" class="dock-item cursor-pointer group" onclick="restoreWindow('about')" title="README.md" role="button" aria-label="Open README.md">
                     <span class="dock-label">README.md</span>
-                    <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <circle cx="12" cy="8" r="4" />
-                        <path d="M12 14c-5 0-9 3-9 7h18c0-4-4-7-9-7z" />
-                    </svg>
+                    <img class="dock-icon" src="icons/text-x-generic.svg" alt="README" aria-hidden="true">
                 </div>
 
                 <!-- Projects (Hexagon/Infrastructure) -->
                 <div id="dock-projects" class="dock-item cursor-pointer group" onclick="restoreWindow('projects')" title="Projects">
                     <span class="dock-label">Projects</span>
-                    <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M12 2l8.66 5v10L12 22 3.34 17V7L12 2zM12 4.33L4.93 8.16v7.68L12 19.67l7.07-3.83V8.16L12 4.33z" />
-                        <path d="M12 8.5l4.5 2.6-4.5 2.6-4.5-2.6L12 8.5z" />
-                    </svg>
+                    <img class="dock-icon" src="icons/org.gnome.tweaks.svg" alt="Projects" aria-hidden="true">
                 </div>
 
                 <!-- Resume (Profile Clipboard) -->
                 <div id="dock-resume" class="dock-item cursor-pointer group" onclick="restoreWindow('resume')" title="Resume">
                     <span class="dock-label">Resume</span>
-                    <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v7h7v9H6z" />
-                        <circle cx="12" cy="11" r="2" />
-                        <path d="M8 17h8" />
-                    </svg>
+                    <img class="dock-icon" src="icons/oasis-master-document.svg" alt="Resume" aria-hidden="true">
                 </div>
 
                 <!-- Vault (Secure Archive/Briefcase) -->
                 <div id="dock-vault" class="dock-item cursor-pointer group" onclick="restoreWindow('vault')" title="Vault">
                     <span class="dock-label">Vault</span>
-                    <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M20 6h-3V4c0-1.1-.9-2-2-2h-6c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM9 4h6v2H9V4zm11 14H4V8h16v10z" />
-                        <path d="M12 14c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" />
-                    </svg>
+                    <img class="dock-icon" src="icons/org.gnome.Nautilus.svg" alt="Vault" aria-hidden="true">
                 </div>
 
                 <!-- Terminal (Command Console) -->
                 <div id="dock-terminal" class="dock-item cursor-pointer group" onclick="restoreWindow('terminal')" title="Terminal">
                     <span class="dock-label">Terminal</span>
-                    <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 18V6h16v12H4z" />
-                        <path d="M8 10l3 3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" fill="none" />
-                        <path d="M13 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" />
-                    </svg>
+                    <img class="dock-icon" src="icons/org.gnome.Terminal.svg" alt="Terminal" aria-hidden="true">
                 </div>
 
                 <!-- Monitor (Bar Chart Panel) -->
                 <div id="dock-monitor" class="dock-item cursor-pointer group" onclick="restoreWindow('monitor')" title="Monitoring">
                     <span class="dock-label">Monitoring</span>
-                    <svg class="dock-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM5 19V5h14v14H5z" />
-                        <path d="M7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z" />
-                    </svg>
+                    <img class="dock-icon" src="icons/org.gnome.SystemMonitor.svg" alt="Monitoring" aria-hidden="true">
                 </div>
             </div>
         </div>
@@ -293,7 +267,6 @@
             let activeWallpaperIndex = 0;
 
             // --- Wallpapers ---
-            // Apple-Style Animated Wallpapers
             const wallpapers = [
                 // Sonoma Flow - Organic Flowing Blobs (Default)
                 { type: 'class', light: 'sonoma-bg', dark: 'sonoma-bg-dark' },

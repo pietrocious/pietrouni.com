@@ -422,19 +422,20 @@ html.dark .dock-item {
     animation: dockBounce 0.6s cubic-bezier(0.28, 0.84, 0.42, 1);
 }
 
-/* Icon Shapes (SVG) */
+/* Icon Shapes (img or SVG) */
 .dock-icon {
-    width: 30px;
-    height: 30px;
-    fill: currentColor;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+    transition: transform 0.15s ease;
 }
 
 /* Mobile: smaller icons */
 @media (max-width: 767px) {
     .dock-icon {
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
     }
 }
 
