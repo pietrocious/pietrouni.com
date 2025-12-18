@@ -12,7 +12,7 @@
         gtag('config', 'G-8308NNRLFJ');
     </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=overlays-content">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>Pietro Uni | Interactive Portfolio</title>
     <meta name="description" content="An OS-inspired interactive portfolio showcasing my journey and projects" />
     
@@ -896,7 +896,7 @@
                 terminal: {
                     title: "Terminal",
                     content: `
-                    <div class="h-full bg-transparent text-white p-4 font-kernel text-sm flex flex-col-reverse md:flex-col overflow-hidden" id="term-container" onclick="document.getElementById('cmd-input').focus()">
+                    <div class="h-full bg-transparent text-white p-4 font-kernel text-sm flex flex-col overflow-hidden" id="term-container" onclick="document.getElementById('cmd-input').focus()">
                         <div id="term-output" class="flex-1 overflow-y-auto space-y-1 window-content" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
                             <div class="text-gray-400 hidden md:block">OS93 v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
                             <div class="text-gray-500 hidden md:block">Type 'help' for available commands</div>
@@ -999,10 +999,18 @@
                 
                 // Height Constraint: Full height on mobile (minus dock), clamp on desktop
                 let finalH = winConfig.height;
+                let heightStyle = ''; // Store CSS value string
+                
                 if (isMobile) {
-                    finalH = maxAvailableHeight;
-                } else if (finalH > maxAvailableHeight) {
-                    finalH = maxAvailableHeight;
+                    // Mobile: Adjust for dock and potential safe area
+                    // using dynamic height so it resizes with keyboard
+                    heightStyle = 'calc(100vh - 85px)'; // slightly more than dock buffer to be safe
+                    finalH = maxAvailableHeight; // For initial calculation if needed, though style takes precedence
+                } else {
+                    if (finalH > maxAvailableHeight) {
+                        finalH = maxAvailableHeight;
+                    }
+                    heightStyle = `${finalH}px`;
                 }
 
                 // Position: Edge-to-edge on mobile, centered on desktop
@@ -1021,7 +1029,7 @@
                 winEl.className = 'window absolute flex flex-col active-window window-opening';
                 winEl.id = `win-${id}`;
                 winEl.style.width = `${finalW}px`;
-                winEl.style.height = `${finalH}px`;
+                winEl.style.height = heightStyle;
                 winEl.style.left = `${leftPos}px`;
                 winEl.style.top = `${topPos}px`;
                 winEl.style.zIndex = ++zIndexCounter;
@@ -1292,7 +1300,7 @@
 
                     const isMobile = window.innerWidth < 768;
                     // On Mobile maximize full height, on desktop leave room for dock
-                    el.style.height = isMobile ? '100%' : 'calc(100% - 90px)';
+                    el.style.height = isMobile ? 'calc(100vh - 85px)' : 'calc(100% - 90px)';
 
                     winObj.maximized = true;
                 } else {

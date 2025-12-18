@@ -1,0 +1,70 @@
+/* Base overrides to ensure we can see things */
+.window {
+    transition: width 0.05s ease, height 0.05s ease, top 0.05s ease, left 0.05s ease;
+}
+
+/* Style 1: Invisible (Default) */
+/* Already handled by JS cursor logic, but we can make it explicit if needed. 
+   No extra CSS needed for visual, but we rely on the 10px invisible zones. */
+.window-resize-invisible {
+    /* No visual changes */
+}
+
+/* Style 2: Visible Corner Grips (Classic) */
+.window-resize-grip::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    /* Diagonal stripes/dots using radial gradient or linear gradient */
+    background-image: radial-gradient(circle, rgba(0,0,0,0.4) 1px, transparent 1px);
+    background-size: 4px 4px;
+    background-position: bottom right;
+    cursor: se-resize;
+    pointer-events: none; /* Let JS handle the click on the window border area */
+    display: block;
+    z-index: 20;
+}
+
+html.dark .window-resize-grip::after {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px);
+}
+
+/* Style 3: Border Draggable (Visible Border) */
+.window-resize-border {
+    border: 1px solid rgba(0,0,0,0.1);
+}
+html.dark .window-resize-border {
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* When hovering near edges (simulated class active on hover) */
+.window-resize-border:hover {
+    border-color: #4A7C9D;
+    box-shadow: 0 0 0 2px rgba(74, 124, 157, 0.3);
+}
+
+
+/* Style 4: Mac-style / Modern Pill */
+.window-resize-pill::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 10px;
+    cursor: s-resize;
+    pointer-events: none;
+}
+html.dark .window-resize-pill::after {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.window-resize-pill:hover::after {
+    background-color: #4A7C9D;
+}
