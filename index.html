@@ -14,6 +14,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>Pietro Uni | Interactive Portfolio</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans:wght@300;400;500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <meta name="description" content="An OS-inspired interactive portfolio showcasing my journey and projects" />
     
     <!-- Open Graph / Facebook -->
@@ -1745,7 +1747,27 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms</div>`;
                     let dirObj = resolvePath(currentPath.substring(1)); // Remove leading /
 
                     switch (cmd) {
-                        case 'help':
+                        case 'cyberpunk':
+                const termWin = document.getElementById('win-terminal');
+                if (termWin) {
+                    const isCyber = termWin.classList.toggle('theme-cyberpunk');
+                    const titleEl = termWin.querySelector('.window-title');
+                    
+                    if (isCyber) {
+                        if (titleEl) titleEl.innerText = "NET_TERM // V2.0";
+                        output.innerHTML += `<div class="text-[#FF003C] font-bold">INITIALIZING NETRUNNER INTERFACE...</div>`;
+                        setTimeout(() => { output.innerHTML += `<div class="text-[#FCEE0A]">BREACH PROTOCOL: ACTIVE</div>`; output.scrollTop = output.scrollHeight; }, 200);
+                        setTimeout(() => { output.innerHTML += `<div class="text-[#FCEE0A]">Connection secured. Welcome, V.</div>`; output.scrollTop = output.scrollHeight; }, 400);
+                    } else {
+                        if (titleEl) titleEl.innerText = "Terminal";
+                        output.innerHTML += `<div class="text-blue-400">Reverting to standard shell...</div>`;
+                    }
+                } else {
+                    output.innerHTML += `<div class="text-red-500">Error: Terminal window not found.</div>`;
+                }
+                break;
+                
+            case 'help':
                             output.innerHTML += `
                             <div class="opacity-80 mt-1 mb-2">
                                 <div class="font-bold text-her-red mb-1">Available Commands:</div>
