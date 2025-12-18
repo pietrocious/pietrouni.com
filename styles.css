@@ -294,10 +294,26 @@ html.dark *::-webkit-scrollbar-thumb:hover {
     pointer-events: none;
 }
 
+
 html.dark .window {
     background-color: #3E2723;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
     color: #EFEBE9;
+}
+
+/* Terminal Window - Acrylic/Transparent Effect */
+#win-terminal {
+    background-color: rgba(10, 10, 10, 0.75) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #EFEBE9 !important; /* Force light text always */
+}
+
+#win-terminal .window-header {
+    background-color: #0a0a0a !important; /* Opaque dark header */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Mobile fullscreen windows */
@@ -328,107 +344,52 @@ html.dark .window-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.traffic-lights {
+/* Neon Flat Window Controls */
+.controls-neon-flat {
     display: flex;
-    flex-direction: row-reverse; /* Reverse order: close on far right */
-    gap: 8px;
+    gap: 10px;
     position: absolute;
     right: 16px;
     z-index: 10;
 }
 
-.win-btn {
-    width: 18px;
-    height: 18px;
+.btn-neon {
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    border: 1.5px solid;
-    background: transparent;
+    border: none;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.1s, background-color 0.15s;
-    font-family: system-ui, -apple-system, sans-serif;
-    font-weight: 400;
-    line-height: 1;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0;
 }
 
-.win-btn:hover {
-    background-color: currentColor;
-}
+/* Default State: Flat Colors */
+.btn-neon.close { background: #ff5f57; } 
+.btn-neon.min   { background: #febc2e; }
+.btn-neon.max   { background: #28c840; }
 
-.win-btn:hover::before {
-    color: white;
+/* Hover State: Neon Glow */
+.btn-neon.close:hover { 
+    box-shadow: 0 0 10px #ff5f57, 0 0 20px #ff5f57; 
+    filter: brightness(1.2); 
+    transform: scale(1.1);
 }
-
-.win-btn:active {
-    transform: scale(0.9);
+.btn-neon.min:hover { 
+    box-shadow: 0 0 10px #febc2e, 0 0 20px #febc2e; 
+    filter: brightness(1.2); 
+    transform: scale(1.1);
 }
-
-.btn-close {
-    border-color: #FF5F56;
-    color: #FF5F56;
-}
-
-.btn-close::before {
-    content: '×';
-    font-size: 14px;
-    font-weight: 300;
-}
-
-.btn-close:hover {
-    background-color: #FF5F56;
-}
-
-.btn-close:hover::before {
-    color: #fff;
-}
-
-.btn-min {
-    border-color: #FFBD2E;
-    color: #FFBD2E;
-}
-
-.btn-min::before {
-    content: '−';
-    font-size: 16px;
-    line-height: 0;
-    margin-top: -1px;
-}
-
-.btn-min:hover {
-    background-color: #FFBD2E;
-}
-
-.btn-min:hover::before {
-    color: #4a3d00;
+.btn-neon.max:hover { 
+    box-shadow: 0 0 10px #28c840, 0 0 20px #28c840; 
+    filter: brightness(1.2); 
+    transform: scale(1.1);
 }
 
 /* Hide minimize button on mobile */
 @media (max-width: 767px) {
-    .btn-min {
+    .btn-neon.min {
         display: none;
     }
-}
-
-.btn-max {
-    border-color: #27C93F;
-    color: #27C93F;
-}
-
-.btn-max::before {
-    content: '⤢';
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.btn-max:hover {
-    background-color: #27C93F;
-}
-
-.btn-max:hover::before {
-    color: #fff;
 }
 
 .window-title {

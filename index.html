@@ -896,7 +896,7 @@
                 terminal: {
                     title: "Terminal",
                     content: `
-                    <div class="h-full bg-black/70 backdrop-blur-xl text-white p-4 font-kernel text-sm flex flex-col-reverse md:flex-col overflow-hidden" id="term-container" onclick="document.getElementById('cmd-input').focus()">
+                    <div class="h-full bg-transparent text-white p-4 font-kernel text-sm flex flex-col-reverse md:flex-col overflow-hidden" id="term-container" onclick="document.getElementById('cmd-input').focus()">
                         <div id="term-output" class="flex-1 overflow-y-auto space-y-1 window-content" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
                             <div class="text-gray-400 hidden md:block">OS93 v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
                             <div class="text-gray-500 hidden md:block">Type 'help' for available commands</div>
@@ -1029,10 +1029,10 @@
                 // macOS Header + Content
                 winEl.innerHTML = `
                 <div class="window-header" onmousedown="window.startDrag(event, '${id}')" ondblclick="window.toggleMaximize('${id}')">
-                    <div class="traffic-lights" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-                        <div class="win-btn btn-close" onclick="window.closeWindow('${id}')"></div>
-                        <div class="win-btn btn-min" onclick="window.minimizeWindow('${id}')"></div>
-                        <div class="win-btn btn-max" onclick="window.toggleMaximize('${id}')"></div>
+                    <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                        <button class="btn-neon min" onclick="window.minimizeWindow('${id}')"></button>
+                        <button class="btn-neon max" onclick="window.toggleMaximize('${id}')"></button>
+                        <button class="btn-neon close" onclick="window.closeWindow('${id}')"></button>
                     </div>
                     <span class="window-title">${winConfig.title}</span>
                 </div>
@@ -1175,10 +1175,10 @@
 
                 winEl.innerHTML = `
                     <div class="window-header" onmousedown="window.startDrag(event, '${viewerId}')" ondblclick="window.toggleMaximize('${viewerId}')">
-                        <div class="traffic-lights" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-                            <div class="win-btn btn-close" onclick="window.closeWindow('${viewerId}')"></div>
-                            <div class="win-btn btn-min" onclick="window.minimizeWindow('${viewerId}')"></div>
-                            <div class="win-btn btn-max" onclick="window.toggleMaximize('${viewerId}')"></div>
+                        <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                            <button class="btn-neon min" onclick="window.minimizeWindow('${viewerId}')"></button>
+                            <button class="btn-neon max" onclick="window.toggleMaximize('${viewerId}')"></button>
+                            <button class="btn-neon close" onclick="window.closeWindow('${viewerId}')"></button>
                         </div>
                         <span class="window-title">${viewerConfig.title}</span>
                     </div>
