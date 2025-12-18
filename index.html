@@ -302,7 +302,7 @@
             // --- Vault Data ---
             const vaultData = [
                 { id: 'resume-pdf', title: 'Resume.pdf', desc: 'My professional resume (PDF download)', type: 'doc', category: 'Professional', status: 'ready', action: "window.open('https://pietrouni.com/vault/PietroUni_Resume_2026.pdf', '_blank')" },
-                { id: 'food', title: 'food.md', desc: 'My favorite food spots and recipes', type: 'food', category: 'Lifestyle', status: 'ready', action: "window.openMarkdownViewer('vault/food.md', 'food.md')" },
+                { id: 'food', title: 'food.md', desc: 'My favorite food spots and recipes', type: 'food', category: 'Lifestyle', status: 'ready', action: "window.vaultShowFile('vault/food.md', 'food.md')" },
                 { id: 'music', title: 'music.md', desc: 'Music that moves me', type: 'music', category: 'Creative', status: 'soon', file: 'vault/music.md' },
                 { id: 'books', title: 'books.md', desc: 'Books that shaped my thinking', type: 'book', category: 'Creative', status: 'soon', file: 'vault/books.md' },
                 { id: 'games', title: 'games.md', desc: 'Games I love', type: 'game', category: 'Lifestyle', status: 'soon', file: 'vault/games.md' },
@@ -816,21 +816,26 @@
                     title: "Personal Vault",
                     content: `
                     <div id="vault-app" class="h-full flex flex-col bg-her-paper dark:bg-[#2D1A14]">
-                        <!-- Search & Header -->
+                        <!-- Header with Back Button -->
                         <div class="px-6 py-4 flex items-center justify-between border-b border-her-text/10">
-                            <h2 class="text-lg font-serif font-extrabold text-her-red dark:text-her-red flex items-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                <span class="hidden md:inline">Personal Vault</span>
-                                <span class="md:hidden">Vault</span>
-                            </h2>
-                            <div class="relative">
+                            <div class="flex items-center gap-3">
+                                <button id="vault-back-btn" onclick="window.vaultShowGrid()" class="hidden p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" title="Back to files">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+                                <h2 id="vault-title" class="text-lg font-serif font-extrabold text-her-red dark:text-her-red flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                    <span class="hidden md:inline">Personal Vault</span>
+                                    <span class="md:hidden">Vault</span>
+                                </h2>
+                            </div>
+                            <div id="vault-search" class="relative">
                                 <input type="text" placeholder="Search..." oninput="window.renderVault(this.value)" class="pl-9 pr-4 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-transparent focus:border-her-red outline-none text-sm transition-all w-32 md:w-64">
                                 <svg class="w-4 h-4 absolute left-3 top-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </div>
                         </div>
                         
-                        <!-- Filter Tabs -->
-                        <div class="px-6 py-3 flex gap-2 overflow-x-auto border-b border-her-text/5 no-scrollbar">
+                        <!-- Filter Tabs (hidden when viewing file) -->
+                        <div id="vault-filters" class="px-6 py-3 flex gap-2 overflow-x-auto border-b border-her-text/5 no-scrollbar">
                             <button onclick="window.filterVault('all')" class="vault-tab active px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors bg-her-red text-white flex-shrink-0">All</button>
                             <button onclick="window.filterVault('Professional')" class="vault-tab px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-70 flex-shrink-0">Professional</button>
                             <button onclick="window.filterVault('Lifestyle')" class="vault-tab px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-70 flex-shrink-0">Lifestyle</button>
@@ -838,9 +843,16 @@
                             <button onclick="window.filterVault('Resources')" class="vault-tab px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-70 flex-shrink-0">Resources</button>
                         </div>
                         
-                        <!-- Grid Content -->
+                        <!-- Grid View -->
                         <div id="vault-grid" class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                             <!-- Items Injected Here -->
+                        </div>
+                        
+                        <!-- Content View (hidden by default) -->
+                        <div id="vault-content" class="flex-1 overflow-y-auto p-6 md:p-8 hidden">
+                            <article class="markdown-body prose prose-sm dark:prose-invert max-w-none">
+                                <!-- Markdown content injected here -->
+                            </article>
                         </div>
                     </div>
                 `,
@@ -2946,6 +2958,79 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
                 `;
                     grid.appendChild(card);
                 });
+            }
+
+            // --- Vault Navigation Functions ---
+            window.vaultShowGrid = function() {
+                const grid = document.getElementById('vault-grid');
+                const content = document.getElementById('vault-content');
+                const backBtn = document.getElementById('vault-back-btn');
+                const filters = document.getElementById('vault-filters');
+                const search = document.getElementById('vault-search');
+                const title = document.getElementById('vault-title');
+                
+                if (!grid || !content) return;
+                
+                // Show grid, hide content
+                grid.classList.remove('hidden');
+                content.classList.add('hidden');
+                backBtn.classList.add('hidden');
+                filters.classList.remove('hidden');
+                search.classList.remove('hidden');
+                
+                // Reset title
+                title.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <span class="hidden md:inline">Personal Vault</span>
+                    <span class="md:hidden">Vault</span>
+                `;
+            }
+
+            window.vaultShowFile = async function(filePath, fileName) {
+                const grid = document.getElementById('vault-grid');
+                const content = document.getElementById('vault-content');
+                const backBtn = document.getElementById('vault-back-btn');
+                const filters = document.getElementById('vault-filters');
+                const search = document.getElementById('vault-search');
+                const title = document.getElementById('vault-title');
+                const article = content.querySelector('.markdown-body');
+                
+                if (!grid || !content || !article) return;
+                
+                // Show loading state
+                article.innerHTML = '<div class="text-center p-8 opacity-50">Loading...</div>';
+                
+                // Hide grid, show content
+                grid.classList.add('hidden');
+                content.classList.remove('hidden');
+                backBtn.classList.remove('hidden');
+                filters.classList.add('hidden');
+                search.classList.add('hidden');
+                
+                // Update title to filename
+                title.innerHTML = `<span>${fileName}</span>`;
+                
+                // Fetch and parse markdown
+                try {
+                    const response = await fetch(filePath);
+                    if (!response.ok) throw new Error('File not found');
+                    const markdown = await response.text();
+                    article.innerHTML = marked.parse(markdown);
+                } catch (error) {
+                    const isLocalFile = window.location.protocol === 'file:';
+                    if (isLocalFile) {
+                        article.innerHTML = `
+                            <div class="text-center p-8">
+                                <div class="text-4xl mb-4">📁</div>
+                                <h3 class="text-lg font-bold mb-2">Local Server Required</h3>
+                                <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or deploy to S3.</p>
+                                <code class="text-xs bg-black/10 dark:bg-white/10 px-3 py-2 rounded block">npx serve .</code>
+                            </div>
+                        `;
+                    } else {
+                        article.innerHTML = `<div class="text-red-500 p-4">Error loading file: ${error.message}</div>`;
+                    }
+                }
             }
 
             // --- Fake Monitor Logic ---
