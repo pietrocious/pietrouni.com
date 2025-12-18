@@ -1750,6 +1750,10 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms</div>`;
                         case 'cyberpunk':
                 const termWin = document.getElementById('win-terminal');
                 if (termWin) {
+                    // Trigger Glitch
+                    termWin.classList.add('window-glitch');
+                    setTimeout(() => termWin.classList.remove('window-glitch'), 500);
+
                     const isCyber = termWin.classList.toggle('theme-cyberpunk');
                     const titleEl = termWin.querySelector('.window-title');
                     

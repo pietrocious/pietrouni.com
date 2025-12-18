@@ -949,9 +949,39 @@ html.dark .markdown-body pre {
     color: var(--term-text) !important; /* $ -> Yellow */
 }
 
-.theme-cyberpunk .close {
-    background: rgba(255, 0, 60, 0.2) !important;
+/* Force Font Consistency */
+.theme-cyberpunk * {
+    font-family: var(--term-font) !important;
 }
+
+/* Static Noise Glitch Effect */
+.window-glitch {
+    position: relative;
+    overflow: hidden; /* Ensure noise doesn't spill */
+}
+.window-glitch::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    width: 200%; 
+    height: 200%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 999;
+    animation: static-noise 0.2s steps(4) infinite;
+    mix-blend-mode: overlay;
+}
+
+@keyframes static-noise {
+    0% { transform: translate(0, 0); opacity: 0.2; }
+    25% { transform: translate(-10%, 10%); opacity: 0.25; }
+    50% { transform: translate(5%, -5%); opacity: 0.2; }
+    75% { transform: translate(10%, 5%); opacity: 0.25; }
+    100% { transform: translate(0, 0); opacity: 0.2; }
+}
+
 .theme-cyberpunk .min {
     background: transparent !important;
     border-color: var(--term-text) !important;
