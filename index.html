@@ -104,6 +104,8 @@
         href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <!-- Markdown Parser for Vault Files -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body
@@ -300,15 +302,15 @@
             // --- Vault Data ---
             const vaultData = [
                 { id: 'resume-pdf', title: 'Resume.pdf', desc: 'My professional resume (PDF download)', type: 'doc', category: 'Professional', status: 'ready', action: "window.open('https://s3.us-east-1.amazonaws.com/pietrouni.com/vault/PietroUni_Resume_2026.pdf', '_blank')" },
-                { id: 'food', title: 'food.md', desc: 'My favorite food spots and recipes', type: 'food', category: 'Lifestyle', status: 'ready', action: "window.open('vault/food.md', '_blank')" },
-                { id: 'music', title: 'music.md', desc: 'Music that moves me', type: 'music', category: 'Creative', status: 'ready', action: "window.open('vault/music.md', '_blank')" },
-                { id: 'books', title: 'books.md', desc: 'Books that shaped my thinking', type: 'book', category: 'Creative', status: 'ready', action: "window.open('vault/books.md', '_blank')" },
-                { id: 'games', title: 'games.md', desc: 'Games I love', type: 'game', category: 'Lifestyle', status: 'ready', action: "window.open('vault/games.md', '_blank')" },
-                { id: 'apps', title: 'apps.md', desc: 'Apps and tools I swear by', type: 'app', category: 'Resources', status: 'ready', action: "window.open('vault/apps.md', '_blank')" },
-                { id: 'blogs', title: 'blogs.md', desc: 'Blogs worth reading', type: 'link', category: 'Resources', status: 'ready', action: "window.open('vault/blogs.md', '_blank')" },
-                { id: 'sites', title: 'sites.md', desc: 'Useful websites', type: 'link', category: 'Resources', status: 'ready', action: "window.open('vault/sites.md', '_blank')" },
-                { id: 'videos', title: 'videos.md', desc: 'Videos and channels I follow', type: 'video', category: 'Creative', status: 'ready', action: "window.open('vault/videos.md', '_blank')" },
-                { id: 'travel', title: 'travel.md', desc: 'Travel stories and recommendations', type: 'location', category: 'Lifestyle', status: 'ready', action: "window.open('vault/travel.md', '_blank')" }
+                { id: 'food', title: 'food.md', desc: 'My favorite food spots and recipes', type: 'food', category: 'Lifestyle', status: 'soon', file: 'vault/food.md' },
+                { id: 'music', title: 'music.md', desc: 'Music that moves me', type: 'music', category: 'Creative', status: 'soon', file: 'vault/music.md' },
+                { id: 'books', title: 'books.md', desc: 'Books that shaped my thinking', type: 'book', category: 'Creative', status: 'soon', file: 'vault/books.md' },
+                { id: 'games', title: 'games.md', desc: 'Games I love', type: 'game', category: 'Lifestyle', status: 'soon', file: 'vault/games.md' },
+                { id: 'apps', title: 'apps.md', desc: 'Apps and tools I swear by', type: 'app', category: 'Resources', status: 'soon', file: 'vault/apps.md' },
+                { id: 'blogs', title: 'blogs.md', desc: 'Blogs worth reading', type: 'link', category: 'Resources', status: 'soon', file: 'vault/blogs.md' },
+                { id: 'sites', title: 'sites.md', desc: 'Useful websites', type: 'link', category: 'Resources', status: 'soon', file: 'vault/sites.md' },
+                { id: 'videos', title: 'videos.md', desc: 'Videos and channels I follow', type: 'video', category: 'Creative', status: 'soon', file: 'vault/videos.md' },
+                { id: 'travel', title: 'travel.md', desc: 'Travel stories and recommendations', type: 'location', category: 'Lifestyle', status: 'soon', file: 'vault/travel.md' }
             ];
 
             // --- Terminal State ---
