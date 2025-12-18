@@ -913,181 +913,54 @@
                 monitor: {
                     title: "Monitoring",
                     content: `
-                    <div class="h-full flex flex-col bg-her-paper dark:bg-[#2D1A14] overflow-hidden">
-                        <!-- Tabs -->
-                        <div class="flex border-b border-her-text/10 bg-black/5 dark:bg-white/5 overflow-x-auto">
-                            <button id="tab-infra" onclick="window.switchMonitorTab('infra')" class="px-4 md:px-6 py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-her-red text-her-red bg-white/50 dark:bg-black/20 flex-shrink-0">Infrastructure</button>
-                            <button id="tab-cf" onclick="window.switchMonitorTab('cf')" class="px-4 md:px-6 py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent opacity-60 hover:opacity-100 flex-shrink-0">CloudFront</button>
-                            <button id="tab-bill" onclick="window.switchMonitorTab('bill')" class="px-4 md:px-6 py-3 text-xs font-bold uppercase tracking-wider border-b-2 border-transparent opacity-60 hover:opacity-100 flex-shrink-0">Billing</button>
+                    <div class="h-full flex flex-col items-center justify-center bg-her-paper dark:bg-[#2D1A14] p-8 text-center">
+                        <!-- Work in Progress Icon -->
+                        <div class="w-20 h-20 mb-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                            </svg>
                         </div>
-
-                        <div class="flex-1 relative overflow-y-auto">
-                            <!-- Infrastructure View -->
-                            <div id="mon-view-infra" class="p-6 space-y-6">
-                                <!-- KPI Cards -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="p-4 rounded border border-her-text/10 bg-white/40 dark:bg-white/5">
-                                        <div class="text-[10px] uppercase font-ui font-bold opacity-60 mb-1">24h Requests</div>
-                                        <div class="text-2xl font-mono text-blue-500 font-bold" id="kpi-req">2.5k</div>
-                                        <div class="text-[10px] opacity-50 mt-1 font-ui">CloudFront Hits</div>
-                                    </div>
-                                    <div class="p-4 rounded border border-her-text/10 bg-white/40 dark:bg-white/5">
-                                        <div class="text-[10px] uppercase font-ui font-bold opacity-60 mb-1">Data Transfer</div>
-                                        <div class="text-2xl font-mono text-purple-500 font-bold" id="kpi-data">145 MB</div>
-                                        <div class="text-[10px] opacity-50 mt-1 font-ui">Outbound Traffic</div>
-                                    </div>
-                                    <div class="p-4 rounded border border-her-text/10 bg-white/40 dark:bg-white/5">
-                                        <div class="text-[10px] uppercase font-ui font-bold opacity-60 mb-1">Edge Latency</div>
-                                        <div class="text-2xl font-mono text-green-500 font-bold" id="kpi-lat">24 ms</div>
-                                        <div class="text-[10px] opacity-50 mt-1 font-ui">Global Average</div>
-                                    </div>
-                                </div>
-
-                                <!-- Graph -->
-                                <div class="rounded border border-her-text/10 bg-white/40 dark:bg-white/5 p-4 relative overflow-hidden">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <span class="text-xs font-mono font-bold uppercase tracking-widest">CloudFront Requests / Second</span>
-                                        <span class="text-[10px] font-mono text-green-500 animate-pulse">● Live Traffic</span>
-                                    </div>
-                                    <canvas id="monitor-canvas" class="w-full h-48"></canvas>
-                                    <!-- Scanning Line Effect -->
-                                    <div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-her-red/5 to-transparent animate-[scan_3s_linear_infinite]" style="background-size: 100% 10px;"></div>
-                                </div>
-
-                                <!-- Service Table -->
-                                <div class="rounded border border-her-text/10 bg-white/40 dark:bg-white/5 p-4 text-xs font-mono overflow-x-auto">
-                                    <div class="min-w-[400px]">
-                                        <div class="grid grid-cols-4 gap-4 mb-2 opacity-50 border-b border-her-text/10 pb-2 uppercase font-bold">
-                                            <div>Service</div>
-                                            <div>Region</div>
-                                            <div>Status</div>
-                                            <div>Metric</div>
-                                        </div>
-                                        <div class="space-y-2" id="service-list">
-                                            <div class="grid grid-cols-4 gap-4 items-center">
-                                                <div>CloudFront</div>
-                                                <div class="opacity-60">Global</div>
-                                                <div class="text-green-500">Deployed</div>
-                                                <div class="opacity-60">Hit Ratio: 99%</div>
-                                            </div>
-                                            <div class="grid grid-cols-4 gap-4 items-center">
-                                                <div>S3 (Origin)</div>
-                                                <div class="opacity-60">us-east-1</div>
-                                                <div class="text-green-500">Active</div>
-                                                <div class="opacity-60">Size: 4.2MB</div>
-                                            </div>
-                                            <div class="grid grid-cols-4 gap-4 items-center">
-                                                <div>Route53</div>
-                                                <div class="opacity-60">Global</div>
-                                                <div class="text-green-500">Active</div>
-                                                <div class="opacity-60">TTL: 60s</div>
-                                            </div>
-                                            <div class="grid grid-cols-4 gap-4 items-center">
-                                                <div>ACM (SSL)</div>
-                                                <div class="opacity-60">us-east-1</div>
-                                                <div class="text-green-500">Valid</div>
-                                                <div class="opacity-60">RSA 2048</div>
-                                            </div>
-                                            <div class="grid grid-cols-4 gap-4 items-center">
-                                                <div>WAF</div>
-                                                <div class="opacity-60">Global</div>
-                                                <div class="text-amber-500">Blocking</div>
-                                                <div class="opacity-60">0 Threats</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Scrolling Log -->
-                                <div class="rounded border border-her-text/10 bg-black/80 text-green-400 p-3 text-[10px] font-mono h-24 overflow-hidden relative">
-                                    <div class="absolute top-2 right-2 opacity-50">SYSTEM LOG</div>
-                                    <div id="sys-log" class="space-y-1 mt-6">
-                                        <div>[INFO] Health check passed: us-east-1</div>
-                                        <div>[INFO] Cache invalidation completed</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- CloudFront View -->
-                            <div id="mon-view-cloudfront" class="p-6 hidden">
-                                <h3 class="font-serif font-extrabold text-lg mb-6 text-her-red dark:text-her-red">Traffic Distribution</h3>
-                                <div class="space-y-6">
-                                    <div>
-                                        <div class="flex justify-between text-xs mb-1 font-mono uppercase">
-                                            <span>North America</span>
-                                            <span class="opacity-70">45%</span>
-                                        </div>
-                                        <div class="h-2 bg-black/5 rounded-full overflow-hidden">
-                                            <div class="h-full bg-blue-500 w-[45%]"></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="flex justify-between text-xs mb-1 font-mono uppercase">
-                                            <span>Europe</span>
-                                            <span class="opacity-70">30%</span>
-                                        </div>
-                                        <div class="h-2 bg-black/5 rounded-full overflow-hidden">
-                                            <div class="h-full bg-purple-500 w-[30%]"></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="flex justify-between text-xs mb-1 font-mono uppercase">
-                                            <span>Asia Pacific</span>
-                                            <span class="opacity-70">15%</span>
-                                        </div>
-                                        <div class="h-2 bg-black/5 rounded-full overflow-hidden">
-                                            <div class="h-full bg-orange-500 w-[15%]"></div>
-                                        </div>
-                                    </div>
-                                     <div>
-                                        <div class="flex justify-between text-xs mb-1 font-mono uppercase">
-                                            <span>South America</span>
-                                            <span class="opacity-70">10%</span>
-                                        </div>
-                                        <div class="h-2 bg-black/5 rounded-full overflow-hidden">
-                                            <div class="h-full bg-green-500 w-[10%]"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-8 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded text-xs font-mono">
-                                    <strong class="text-yellow-600 block mb-1">⚠ CACHE PERFORMANCE</strong>
-                                    Edge hit ratio is optimal (99.2%). Low origin fetch rate observed.
-                                </div>
-                            </div>
-
-                            <!-- Billing View -->
-                            <div id="mon-view-billing" class="hidden h-full flex flex-col justify-center items-center p-6 md:p-12 text-center">
-                                <div class="w-32 h-32 rounded-full border-4 border-her-red flex items-center justify-center mb-6">
-                                    <div>
-                                        <div class="text-xs uppercase opacity-60">Est. Cost</div>
-                                        <div class="text-2xl font-bold font-mono">$14.20</div>
-                                    </div>
-                                </div>
-                                <div class="w-full max-w-sm space-y-3 text-sm">
-                                    <div class="flex justify-between border-b border-her-text/10 pb-1">
-                                        <span>Route53 Hosted Zone</span>
-                                        <span class="font-mono opacity-70">$0.50</span>
-                                    </div>
-                                    <div class="flex justify-between border-b border-her-text/10 pb-1">
-                                        <span>S3 Standard Storage</span>
-                                        <span class="font-mono opacity-70">$0.12</span>
-                                    </div>
-                                    <div class="flex justify-between border-b border-her-text/10 pb-1">
-                                        <span>Data Transfer (Out)</span>
-                                        <span class="font-mono opacity-70">$13.58</span>
-                                    </div>
-                                </div>
-                                <p class="mt-8 text-xs opacity-50">Forecast for end of month: $15.00</p>
-                                <div class="w-full max-w-sm mt-2 h-1.5 bg-black/5 rounded-full overflow-hidden">
-                                    <div class="h-full bg-green-500 w-[45%]"></div>
-                                </div>
-                                <div class="text-[10px] mt-1 opacity-40 uppercase tracking-widest">Budget: 45% Used</div>
-                            </div>
+                        
+                        <!-- Title -->
+                        <h2 class="text-2xl font-serif font-extrabold text-her-dark dark:text-her-textLight mb-3">Work in Progress</h2>
+                        
+                        <!-- Description -->
+                        <p class="text-sm opacity-70 max-w-sm mb-6 text-her-text dark:text-her-textLight">
+                            This dashboard will show live AWS infrastructure metrics once connected to CloudWatch.
+                        </p>
+                        
+                        <!-- Coming Soon Badge -->
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Coming Soon</span>
+                        </div>
+                        
+                        <!-- Planned Features -->
+                        <div class="mt-8 text-left max-w-xs">
+                            <div class="text-[10px] uppercase font-bold opacity-40 mb-3 tracking-widest">Planned Features</div>
+                            <ul class="space-y-2 text-xs opacity-60">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1 h-1 rounded-full bg-her-red"></span>
+                                    CloudFront traffic metrics
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1 h-1 rounded-full bg-her-red"></span>
+                                    S3 storage analytics
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1 h-1 rounded-full bg-her-red"></span>
+                                    Real-time billing data
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-1 h-1 rounded-full bg-her-red"></span>
+                                    Edge location performance
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 `,
-                    width: 750,
-                    height: 550
+                    width: 500,
+                    height: 480
                 }
             };
 

@@ -267,9 +267,10 @@ html.dark .window-header {
 
 .traffic-lights {
     display: flex;
+    flex-direction: row-reverse; /* Reverse order: close on far right */
     gap: 8px;
     position: absolute;
-    left: 16px;
+    right: 16px;
     z-index: 10;
 }
 
