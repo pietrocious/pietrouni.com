@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dock Icons Mockups - Pietro Uni</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 40px;
+            color: white;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.6;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+        
+        .section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .icon-row {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .icon-item span {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+        
+        .icon-container {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .icon-container:hover {
+            transform: scale(1.1) translateY(-5px);
+        }
+        
+        .icon-container svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+        }
+        
+        .note {
+            background: rgba(255,200,100,0.1);
+            border-left: 3px solid #f0a500;
+            padding: 15px 20px;
+            border-radius: 0 12px 12px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+        
+        code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎨 Dock Icons Mockups</h1>
+<p style="text-align: center; opacity: 0.5; margin-bottom: 40px;">Colorful SVG options for pietrouni.com</p>
+
+<!-- ========== OPTION 1: Gradient Filled Icons ========== -->
+<div class="section">
+    <h2>Option 1: Gradient Filled Icons</h2>
+    <p style="opacity: 0.7; margin-bottom: 25px; font-size: 14px;">Rich gradients with the icon shape as the filled area. Bold and modern.</p>
+    
+    <div class="icon-row">
+        <!-- README -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-readme-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#60a5fa"/>
+                            <stop offset="100%" style="stop-color:#3b82f6"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="12" cy="8" r="4" fill="url(#grad-readme-1)"/>
+                    <path d="M12 14c-5 0-9 3-9 7h18c0-4-4-7-9-7z" fill="url(#grad-readme-1)"/>
+                </svg>
+            </div>
+            <span>README</span>
+        </div>
+        
+        <!-- Projects -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-projects-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fb923c"/>
+                            <stop offset="100%" style="stop-color:#f97316"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 2l8.66 5v10L12 22 3.34 17V7L12 2z" fill="url(#grad-projects-1)"/>
+                    <path d="M12 8.5l4.5 2.6-4.5 2.6-4.5-2.6L12 8.5z" fill="rgba(255,255,255,0.3)"/>
+                </svg>
+            </div>
+            <span>Projects</span>
+        </div>
+        
+        <!-- Resume -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-resume-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4ade80"/>
+                            <stop offset="100%" style="stop-color:#22c55e"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" fill="url(#grad-resume-1)"/>
+                    <path d="M14 2v6h6" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+                    <circle cx="12" cy="12" r="2.5" fill="white" opacity="0.9"/>
+                    <path d="M8 18h8" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+                </svg>
+            </div>
+            <span>Resume</span>
+        </div>
+        
+        <!-- Vault -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-vault-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#c084fc"/>
+                            <stop offset="100%" style="stop-color:#a855f7"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M20 6h-3V4c0-1.1-.9-2-2-2h-6c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z" fill="url(#grad-vault-1)"/>
+                    <rect x="9" y="4" width="6" height="2" fill="rgba(255,255,255,0.3)"/>
+                    <circle cx="12" cy="14" r="2.5" fill="white" opacity="0.9"/>
+                </svg>
+            </div>
+            <span>Vault</span>
+        </div>
+        
+        <!-- Terminal -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-term-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#374151"/>
+                            <stop offset="100%" style="stop-color:#1f2937"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="2" y="4" width="20" height="16" rx="3" fill="url(#grad-term-1)"/>
+                    <path d="M7 10l3 3-3 3" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M13 16h4" stroke="#4ade80" stroke-width="2" stroke-linecap="round" fill="none"/>
+                </svg>
+            </div>
+            <span>Terminal</span>
+        </div>
+        
+        <!-- Monitor -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-monitor-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f472b6"/>
+                            <stop offset="100%" style="stop-color:#ec4899"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="3" y="3" width="18" height="18" rx="3" fill="url(#grad-monitor-1)"/>
+                    <rect x="6" y="10" width="3" height="8" rx="1" fill="white" opacity="0.9"/>
+                    <rect x="10.5" y="7" width="3" height="11" rx="1" fill="white" opacity="0.7"/>
+                    <rect x="15" y="12" width="3" height="6" rx="1" fill="white" opacity="0.5"/>
+                </svg>
+            </div>
+            <span>Monitor</span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== OPTION 2: Rounded Square App Icons ========== -->
+<div class="section">
+    <h2>Option 2: macOS App Icon Style</h2>
+    <p style="opacity: 0.7; margin-bottom: 25px; font-size: 14px;">Rounded square backgrounds with icons inside. Classic macOS Big Sur aesthetic.</p>
+    
+    <div class="icon-row">
+        <!-- README -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-readme-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#818cf8"/>
+                            <stop offset="100%" style="stop-color:#6366f1"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="1" y="1" width="22" height="22" rx="5" fill="url(#grad-readme-2)"/>
+                    <circle cx="12" cy="9" r="3" fill="white"/>
+                    <path d="M12 13c-3.5 0-6 2-6 4.5h12c0-2.5-2.5-4.5-6-4.5z" fill="white"/>
+                </svg>
+            </div>
+            <span>README</span>
+        </div>
+        
+        <!-- Projects -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-projects-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fbbf24"/>
+                            <stop offset="100%" style="stop-color:#f59e0b"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="1" y="1" width="22" height="22" rx="5" fill="url(#grad-projects-2)"/>
+                    <path d="M12 5l5.5 3.2v6.4L12 17.8l-5.5-3.2V8.2L12 5z" fill="white" opacity="0.95"/>
+                    <path d="M12 10l3 1.7-3 1.7-3-1.7L12 10z" fill="rgba(0,0,0,0.15)"/>
+                </svg>
+            </div>
+            <span>Projects</span>
+        </div>
+        
+        <!-- Resume -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-resume-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#34d399"/>
+                            <stop offset="100%" style="stop-color:#10b981"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="1" y="1" width="22" height="22" rx="5" fill="url(#grad-resume-2)"/>
+                    <rect x="6" y="4" width="10" height="14" rx="1.5" fill="white"/>
+                    <path d="M14 4v4h4" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+                    <circle cx="11" cy="10" r="1.5" fill="#10b981"/>
+                    <rect x="8" y="14" width="6" height="1" rx="0.5" fill="#10b981" opacity="0.6"/>
+                </svg>
+            </div>
+            <span>Resume</span>
+        </div>
+        
+        <!-- Vault -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-vault-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e879f9"/>
+                            <stop offset="100%" style="stop-color:#d946ef"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="1" y="1" width="22" height="22" rx="5" fill="url(#grad-vault-2)"/>
+                    <rect x="5" y="8" width="14" height="10" rx="2" fill="white"/>
+                    <rect x="8" y="5" width="8" height="3" rx="1" fill="white"/>
+                    <circle cx="12" cy="13" r="2" fill="#d946ef"/>
+                    <path d="M12 13v2" stroke="#d946ef" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <span>Vault</span>
+        </div>
+        
+        <!-- Terminal -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-term-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#475569"/>
+                            <stop offset="100%" style="stop-color:#334155"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="1" y="1" width="22" height="22" rx="5" fill="url(#grad-term-2)"/>
+                    <rect x="4" y="5" width="16" height="12" rx="2" fill="#0f172a"/>
+                    <path d="M7 9l2.5 2.5L7 14" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M11 14h5" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <span>Terminal</span>
+        </div>
+        
+        <!-- Monitor -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad-monitor-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fb7185"/>
+                            <stop offset="100%" style="stop-color:#f43f5e"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="1" y="1" width="22" height="22" rx="5" fill="url(#grad-monitor-2)"/>
+                    <rect x="5" y="11" width="3" height="6" rx="1" fill="white"/>
+                    <rect x="9" y="8" width="3" height="9" rx="1" fill="white" opacity="0.85"/>
+                    <rect x="13" y="6" width="3" height="11" rx="1" fill="white" opacity="0.7"/>
+                    <rect x="17" y="10" width="2" height="7" rx="0.5" fill="white" opacity="0.55"/>
+                </svg>
+            </div>
+            <span>Monitor</span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== OPTION 3: Neon/Glow Style ========== -->
+<div class="section">
+    <h2>Option 3: Neon Glow Icons</h2>
+    <p style="opacity: 0.7; margin-bottom: 25px; font-size: 14px;">Subtle glow effects with vibrant outlines. Great for dark mode.</p>
+    
+    <div class="icon-row">
+        <!-- README -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow-blue">
+                            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <circle cx="12" cy="8" r="4" fill="none" stroke="#60a5fa" stroke-width="1.5" filter="url(#glow-blue)"/>
+                    <path d="M12 14c-5 0-9 3-9 7h18c0-4-4-7-9-7z" fill="none" stroke="#60a5fa" stroke-width="1.5" filter="url(#glow-blue)"/>
+                </svg>
+            </div>
+            <span>README</span>
+        </div>
+        
+        <!-- Projects -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow-orange">
+                            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <path d="M12 2l8.66 5v10L12 22 3.34 17V7L12 2z" fill="none" stroke="#fb923c" stroke-width="1.5" filter="url(#glow-orange)"/>
+                    <path d="M12 8.5l4.5 2.6-4.5 2.6-4.5-2.6L12 8.5z" fill="none" stroke="#fb923c" stroke-width="1" filter="url(#glow-orange)"/>
+                </svg>
+            </div>
+            <span>Projects</span>
+        </div>
+        
+        <!-- Resume -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow-green">
+                            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" fill="none" stroke="#4ade80" stroke-width="1.5" filter="url(#glow-green)"/>
+                    <path d="M14 2v6h6" fill="none" stroke="#4ade80" stroke-width="1.5"/>
+                    <circle cx="12" cy="11" r="2" fill="none" stroke="#4ade80" stroke-width="1.5" filter="url(#glow-green)"/>
+                    <path d="M8 17h8" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" filter="url(#glow-green)"/>
+                </svg>
+            </div>
+            <span>Resume</span>
+        </div>
+        
+        <!-- Vault -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow-purple">
+                            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <path d="M20 6h-3V4c0-1.1-.9-2-2-2h-6c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z" fill="none" stroke="#c084fc" stroke-width="1.5" filter="url(#glow-purple)"/>
+                    <rect x="9" y="4" width="6" height="2" fill="none" stroke="#c084fc" stroke-width="1"/>
+                    <circle cx="12" cy="14" r="2" fill="none" stroke="#c084fc" stroke-width="1.5" filter="url(#glow-purple)"/>
+                </svg>
+            </div>
+            <span>Vault</span>
+        </div>
+        
+        <!-- Terminal -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow-terminal">
+                            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="#94a3b8" stroke-width="1.5" filter="url(#glow-terminal)"/>
+                    <path d="M7 10l3 3-3 3" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#glow-terminal)"/>
+                    <path d="M13 16h4" stroke="#4ade80" stroke-width="2" stroke-linecap="round" filter="url(#glow-terminal)"/>
+                </svg>
+            </div>
+            <span>Terminal</span>
+        </div>
+        
+        <!-- Monitor -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow-pink">
+                            <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+                            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                        </filter>
+                    </defs>
+                    <rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="#f472b6" stroke-width="1.5" filter="url(#glow-pink)"/>
+                    <rect x="6" y="10" width="3" height="8" rx="0.5" fill="none" stroke="#f472b6" stroke-width="1.5" filter="url(#glow-pink)"/>
+                    <rect x="10.5" y="7" width="3" height="11" rx="0.5" fill="none" stroke="#f472b6" stroke-width="1.5" filter="url(#glow-pink)"/>
+                    <rect x="15" y="12" width="3" height="6" rx="0.5" fill="none" stroke="#f472b6" stroke-width="1.5" filter="url(#glow-pink)"/>
+                </svg>
+            </div>
+            <span>Monitor</span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== OPTION 4: Duotone/Two-Color ========== -->
+<div class="section">
+    <h2>Option 4: Duotone Style</h2>
+    <p style="opacity: 0.7; margin-bottom: 25px; font-size: 14px;">Two complementary colors for depth and visual interest.</p>
+    
+    <div class="icon-row">
+        <!-- README -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="4" fill="#bfdbfe"/>
+                    <path d="M12 14c-5 0-9 3-9 7h18c0-4-4-7-9-7z" fill="#3b82f6"/>
+                </svg>
+            </div>
+            <span>README</span>
+        </div>
+        
+        <!-- Projects -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2l8.66 5v10L12 22 3.34 17V7L12 2z" fill="#fed7aa"/>
+                    <path d="M12 8.5l4.5 2.6-4.5 2.6-4.5-2.6L12 8.5z" fill="#ea580c"/>
+                </svg>
+            </div>
+            <span>Projects</span>
+        </div>
+        
+        <!-- Resume -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" fill="#bbf7d0"/>
+                    <path d="M14 2l6 6h-6V2z" fill="#22c55e"/>
+                    <circle cx="12" cy="11" r="2" fill="#166534"/>
+                    <path d="M8 17h8" stroke="#166534" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <span>Resume</span>
+        </div>
+        
+        <!-- Vault -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 6h-3V4c0-1.1-.9-2-2-2h-6c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z" fill="#e9d5ff"/>
+                    <rect x="9" y="4" width="6" height="2" fill="#a855f7"/>
+                    <circle cx="12" cy="14" r="3" fill="#7c3aed"/>
+                </svg>
+            </div>
+            <span>Vault</span>
+        </div>
+        
+        <!-- Terminal -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="4" width="20" height="16" rx="2" fill="#334155"/>
+                    <path d="M7 10l3 3-3 3" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M13 16h4" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <span>Terminal</span>
+        </div>
+        
+        <!-- Monitor -->
+        <div class="icon-item">
+            <div class="icon-container">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="2" fill="#fce7f3"/>
+                    <rect x="6" y="10" width="3" height="8" rx="0.5" fill="#ec4899"/>
+                    <rect x="10.5" y="7" width="3" height="11" rx="0.5" fill="#be185d"/>
+                    <rect x="15" y="12" width="3" height="6" rx="0.5" fill="#831843"/>
+                </svg>
+            </div>
+            <span>Monitor</span>
+        </div>
+    </div>
+</div>
+
+<div class="note">
+    <strong>💡 Implementation Notes:</strong><br><br>
+    • Each icon uses unique gradient IDs to avoid conflicts<br>
+    • All icons maintain the same 24x24 viewBox for consistency<br>
+    • Option 1 & 2 work great for both light and dark themes<br>
+    • Option 3 (Neon) looks best on dark backgrounds<br>
+    • Option 4 (Duotone) is versatile and lightweight<br><br>
+    To use: Copy the desired <code>&lt;svg&gt;</code> code and replace your current icons in <code>index.html</code>
+</div>
+
+</body>
+</html>
