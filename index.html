@@ -301,8 +301,8 @@
 
             // --- Vault Data ---
             const vaultData = [
-                { id: 'resume-pdf', title: 'Resume.pdf', desc: 'My professional resume (PDF download)', type: 'doc', category: 'Professional', status: 'ready', action: "window.open('https://pietrouni.com/vault/PietroUni_Resume_2026.pdf', '_blank')" },
-                { id: 'food', title: 'food.md', desc: 'My favorite food spots and recipes', type: 'food', category: 'Lifestyle', status: 'ready', action: "window.vaultShowFile('vault/food.md', 'food.md')" },
+                { id: 'resume-pdf', title: 'Resume.pdf', desc: 'My resume in PDF format', type: 'doc', category: 'Professional', status: 'ready', action: "window.open('https://pietrouni.com/vault/PietroUni_Resume_2026.pdf', '_blank')" },
+                { id: 'food', title: 'food.md', desc: 'My favorite spots and recipes', type: 'food', category: 'Lifestyle', status: 'ready', action: "window.vaultShowFile('vault/food.md', 'food.md')" },
                 { id: 'music', title: 'music.md', desc: 'Music that moves me', type: 'music', category: 'Creative', status: 'soon', file: 'vault/music.md' },
                 { id: 'books', title: 'books.md', desc: 'Books that shaped my thinking', type: 'book', category: 'Creative', status: 'soon', file: 'vault/books.md' },
                 { id: 'games', title: 'games.md', desc: 'Games I love', type: 'game', category: 'Lifestyle', status: 'soon', file: 'vault/games.md' },
@@ -724,7 +724,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
                                     <!-- Terraform AWS Modules -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-bold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
@@ -741,7 +741,7 @@
                                     </div>
 
                                     <!-- pietrouni.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors vault-card-animate" style="animation-delay: 50ms">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-bold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
@@ -769,7 +769,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
                                     <!-- Automation Scripts -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors vault-card-animate" style="animation-delay: 100ms">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-bold text-her-dark dark:text-her-textLight">Automation Scripts</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
@@ -797,7 +797,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
                                     <!-- Placeholder -->
-                                    <div class="p-4 border border-dashed border-her-text/10 bg-white/20 dark:bg-white/5 rounded-lg flex flex-col justify-center items-center h-48 opacity-50">
+                                    <div class="p-4 border border-dashed border-her-text/10 bg-white/20 dark:bg-white/5 rounded-lg flex flex-col justify-center items-center h-48 opacity-50 vault-card-animate" style="animation-delay: 150ms">
                                         <div class="text-xs uppercase font-bold tracking-widest mb-2">More coming soon</div>
                                         <div class="text-[10px] px-2 py-1 rounded bg-black/5 dark:bg-white/10">Planned</div>
                                     </div>
@@ -2907,7 +2907,8 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
 
                     // Render Card
                     const card = document.createElement('div');
-                    card.className = "p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-orange/50 transition-all cursor-pointer group";
+                    card.className = "p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-orange/50 transition-all cursor-pointer group h-36 vault-card-animate";
+                    card.style.animationDelay = `${grid.children.length * 50}ms`;
                     if (item.action) card.setAttribute('onclick', item.action);
 
                     // Icon based on type - Custom Icons for variety
@@ -3031,6 +3032,24 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
                         article.innerHTML = `<div class="text-red-500 p-4">Error loading file: ${error.message}</div>`;
                     }
                 }
+            }
+
+            // --- Vault Filter Function ---
+            window.filterVault = function(category) {
+                // Update active tab styling
+                const tabs = document.querySelectorAll('.vault-tab');
+                tabs.forEach(tab => {
+                    if (tab.innerText.toUpperCase() === category.toUpperCase()) {
+                        tab.classList.add('active', 'bg-her-red', 'text-white');
+                        tab.classList.remove('opacity-70');
+                    } else {
+                        tab.classList.remove('active', 'bg-her-red', 'text-white');
+                        tab.classList.add('opacity-70');
+                    }
+                });
+                
+                // Re-render the vault with the new filter
+                window.renderVault('');
             }
 
             // --- Fake Monitor Logic ---

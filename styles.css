@@ -227,6 +227,23 @@ body {
     pointer-events: none;
 }
 
+/* Vault Card Animation */
+@keyframes vaultCardIn {
+    0% {
+        opacity: 0;
+        transform: translateY(12px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.vault-card-animate {
+    animation: vaultCardIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+}
+
 .window.maximized {
     transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease;
     border-radius: 0;
