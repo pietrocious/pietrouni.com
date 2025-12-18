@@ -300,6 +300,14 @@ html.dark .window {
     color: #EFEBE9;
 }
 
+/* Mobile fullscreen windows */
+@media (max-width: 767px) {
+    .window {
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+}
+
 /* Window Header (macOS Style) */
 .window-header {
     height: 38px;
@@ -330,19 +338,28 @@ html.dark .window-header {
 }
 
 .win-btn {
-    width: 12px;
-    height: 12px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1.5px solid;
+    background: transparent;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.1s;
+    transition: transform 0.1s, background-color 0.15s;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    line-height: 1;
+    padding: 0;
 }
 
 .win-btn:hover {
-    opacity: 0.8;
+    background-color: currentColor;
+}
+
+.win-btn:hover::before {
+    color: white;
 }
 
 .win-btn:active {
@@ -350,18 +367,68 @@ html.dark .window-header {
 }
 
 .btn-close {
+    border-color: #FF5F56;
+    color: #FF5F56;
+}
+
+.btn-close::before {
+    content: '×';
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.btn-close:hover {
     background-color: #FF5F56;
-    border-color: #E0443E;
+}
+
+.btn-close:hover::before {
+    color: #fff;
 }
 
 .btn-min {
+    border-color: #FFBD2E;
+    color: #FFBD2E;
+}
+
+.btn-min::before {
+    content: '−';
+    font-size: 16px;
+    line-height: 0;
+    margin-top: -1px;
+}
+
+.btn-min:hover {
     background-color: #FFBD2E;
-    border-color: #DEA123;
+}
+
+.btn-min:hover::before {
+    color: #4a3d00;
+}
+
+/* Hide minimize button on mobile */
+@media (max-width: 767px) {
+    .btn-min {
+        display: none;
+    }
 }
 
 .btn-max {
+    border-color: #27C93F;
+    color: #27C93F;
+}
+
+.btn-max::before {
+    content: '⤢';
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.btn-max:hover {
     background-color: #27C93F;
-    border-color: #1AAB29;
+}
+
+.btn-max:hover::before {
+    color: #fff;
 }
 
 .window-title {
