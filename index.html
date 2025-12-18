@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>Pietro Uni | Interactive Portfolio</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans:wght@300;400;500;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans:wght@300;400;500;700&family=Rajdhani:wght@500;700&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <meta name="description" content="An OS-inspired interactive portfolio showcasing my journey and projects" />
     
     <!-- Open Graph / Facebook -->
@@ -1758,10 +1758,38 @@ Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms</div>`;
                     const titleEl = termWin.querySelector('.window-title');
                     
                     if (isCyber) {
+                        // Ensure other themes are off
+                        termWin.classList.remove('theme-fallout');
                         if (titleEl) titleEl.innerText = "NET_TERM // V2.0";
                         output.innerHTML += `<div class="text-[#FF003C] font-bold">INITIALIZING NETRUNNER INTERFACE...</div>`;
                         setTimeout(() => { output.innerHTML += `<div class="text-[#FCEE0A]">BREACH PROTOCOL: ACTIVE</div>`; output.scrollTop = output.scrollHeight; }, 200);
                         setTimeout(() => { output.innerHTML += `<div class="text-[#FCEE0A]">Connection secured. Welcome, V.</div>`; output.scrollTop = output.scrollHeight; }, 400);
+                    } else {
+                        if (titleEl) titleEl.innerText = "Terminal";
+                        output.innerHTML += `<div class="text-blue-400">Reverting to standard shell...</div>`;
+                    }
+                } else {
+                    output.innerHTML += `<div class="text-red-500">Error: Terminal window not found.</div>`;
+                }
+                break;
+
+            case 'fallout':
+                const termWinFallout = document.getElementById('win-terminal');
+                if (termWinFallout) {
+                    // Trigger Glitch
+                    termWinFallout.classList.add('window-glitch');
+                    setTimeout(() => termWinFallout.classList.remove('window-glitch'), 500);
+
+                    const isFallout = termWinFallout.classList.toggle('theme-fallout');
+                    const titleEl = termWinFallout.querySelector('.window-title');
+
+                    if (isFallout) {
+                        // Ensure other themes are off
+                        termWinFallout.classList.remove('theme-cyberpunk');
+                        if (titleEl) titleEl.innerText = "ROBCO INDUSTRIES TM";
+                        output.innerHTML += `<div class="text-[#18dc04] font-bold text-lg">WELCOME TO ROBCO OS v8.1</div>`;
+                        setTimeout(() => { output.innerHTML += `<div class="text-[#18dc04]">> LOAD "PIP-BOY_3000"</div>`; output.scrollTop = output.scrollHeight; }, 200);
+                        setTimeout(() => { output.innerHTML += `<div class="text-[#18dc04]">> EXEC</div>`; output.scrollTop = output.scrollHeight; }, 400);
                     } else {
                         if (titleEl) titleEl.innerText = "Terminal";
                         output.innerHTML += `<div class="text-blue-400">Reverting to standard shell...</div>`;

@@ -868,6 +868,83 @@ html.dark .markdown-body pre {
     background: var(--term-text);
 }
 
+
+/* =========================================
+   Fallout Terminal Theme
+   ========================================= */
+.theme-fallout {
+    --term-bg: #0d1a0d;
+    --term-header-bg: #112211;
+    --term-border: #18dc04;
+    --term-text: #18dc04;
+    --term-font: 'Share Tech Mono', monospace;
+
+    background-color: var(--term-bg) !important;
+    border: 2px solid var(--term-border) !important;
+    color: var(--term-text) !important;
+    border-radius: 12px !important;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 0 15px rgba(24, 220, 4, 0.4) !important;
+    
+    /* Screen Vignette */
+    background-image: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.8) 100%) !important;
+}
+
+/* Force Font & Color */
+.theme-fallout * {
+    font-family: var(--term-font) !important;
+    color: var(--term-text) !important;
+    text-shadow: 0 0 3px var(--term-text) !important;
+}
+
+.theme-fallout .window-header {
+    background: var(--term-header-bg) !important;
+    border-bottom: 2px solid var(--term-border) !important;
+    font-family: var(--term-font) !important;
+    text-transform: uppercase;
+    font-size: 20px !important;
+}
+
+.theme-fallout .window-title {
+    color: var(--term-text) !important;
+    font-weight: 400 !important;
+    letter-spacing: 1px;
+}
+
+/* Bigger Input Text */
+.theme-fallout #cmd-input, 
+.theme-fallout #term-content {
+    font-size: 20px !important;
+    letter-spacing: 0.5px;
+}
+
+/* Button Overrides */
+.theme-fallout .controls-neon-flat {
+    gap: 8px;
+}
+.theme-fallout .btn-neon {
+    border-radius: 2px !important;
+    width: 14px;
+    height: 14px;
+    background: transparent !important;
+    border: 1px solid var(--term-border);
+    opacity: 0.8;
+}
+.theme-fallout .btn-neon:hover {
+    background: var(--term-text) !important;
+    box-shadow: 0 0 8px var(--term-text);
+}
+
+/* Prompt Colors (All Green) */
+.theme-fallout #term-prompt-line span,
+.theme-fallout #term-output span {
+    color: var(--term-text) !important;
+}
+
+/* Hide header stripe from cyberpunk if switching */
+.theme-fallout .window-header::before {
+    display: none;
+}
+
 .theme-cyberpunk .window-title {
     color: var(--term-border) !important;
     font-weight: 800 !important;
