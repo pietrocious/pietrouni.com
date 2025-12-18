@@ -1062,11 +1062,10 @@
                 // Remove opening animation class after animation completes
                 setTimeout(() => winEl.classList.remove('window-opening'), 350);
                 
-                // Dock Animation & State
+                // Dock State
                 const dockItem = document.getElementById(`dock-${id}`);
                 if(dockItem) {
-                    dockItem.classList.add('active', 'animate-dock-bounce');
-                    setTimeout(() => dockItem.classList.remove('animate-dock-bounce'), 600);
+                    dockItem.classList.add('active');
                 }
 
                 // App specific logic init
