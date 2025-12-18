@@ -302,7 +302,7 @@
             // --- Vault Data ---
             const vaultData = [
                 { id: 'resume-pdf', title: 'Resume.pdf', desc: 'My professional resume (PDF download)', type: 'doc', category: 'Professional', status: 'ready', action: "window.open('https://s3.us-east-1.amazonaws.com/pietrouni.com/vault/PietroUni_Resume_2026.pdf', '_blank')" },
-                { id: 'food', title: 'food.md', desc: 'My favorite food spots and recipes', type: 'food', category: 'Lifestyle', status: 'soon', file: 'vault/food.md' },
+                { id: 'food', title: 'food.md', desc: 'My favorite food spots and recipes', type: 'food', category: 'Lifestyle', status: 'ready', action: "window.openMarkdownViewer('vault/food.md', 'food.md')" },
                 { id: 'music', title: 'music.md', desc: 'Music that moves me', type: 'music', category: 'Creative', status: 'soon', file: 'vault/music.md' },
                 { id: 'books', title: 'books.md', desc: 'Books that shaped my thinking', type: 'book', category: 'Creative', status: 'soon', file: 'vault/books.md' },
                 { id: 'games', title: 'games.md', desc: 'Games I love', type: 'game', category: 'Lifestyle', status: 'soon', file: 'vault/games.md' },
@@ -1090,6 +1090,104 @@
                 if(dockItem) dockItem.classList.remove('active');
 
                 if (id === 'monitor' && monitorInterval) clearInterval(monitorInterval);
+            }
+
+            // --- Markdown Viewer ---
+            window.openMarkdownViewer = async function(filePath, title) {
+                const viewerId = 'md-viewer-' + title.replace(/[^a-z0-9]/gi, '');
+                
+                // If already open, bring to front
+                if (activeWindows[viewerId]) {
+                    restoreWindow(viewerId);
+                    return;
+                }
+
+                // Fetch and parse markdown
+                let htmlContent = '';
+                try {
+                    const response = await fetch(filePath);
+                    if (!response.ok) throw new Error('File not found');
+                    const markdown = await response.text();
+                    htmlContent = marked.parse(markdown);
+                } catch (error) {
+                    // Check if it's a CORS/local file issue
+                    const isLocalFile = window.location.protocol === 'file:';
+                    if (isLocalFile) {
+                        htmlContent = `
+                            <div class="text-center p-8">
+                                <div class="text-4xl mb-4">📁</div>
+                                <h3 class="text-lg font-bold mb-2 text-her-dark dark:text-her-textLight">Local Server Required</h3>
+                                <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or deploy to S3.</p>
+                                <code class="text-xs bg-black/10 dark:bg-white/10 px-3 py-2 rounded block">npx serve .</code>
+                            </div>
+                        `;
+                    } else {
+                        htmlContent = `<div class="text-red-500 p-4">Error loading file: ${error.message}</div>`;
+                    }
+                }
+
+                // Create window config dynamically
+                const viewerConfig = {
+                    title: title,
+                    content: `
+                        <div class="h-full overflow-y-auto bg-her-paper dark:bg-[#2D1A14] p-6 md:p-8">
+                            <article class="markdown-body prose prose-sm dark:prose-invert max-w-none">
+                                ${htmlContent}
+                            </article>
+                        </div>
+                    `,
+                    width: 700,
+                    height: 600
+                };
+
+                // Use similar logic to openWindow
+                const container = document.getElementById('windows-container');
+                const containerW = container.clientWidth;
+                const containerH = container.clientHeight;
+                const isMobile = window.innerWidth < 768;
+                const dockBuffer = isMobile ? 68 : 120;
+                const maxAvailableHeight = containerH - dockBuffer;
+
+                let finalW = isMobile ? containerW : viewerConfig.width;
+                let finalH = isMobile ? maxAvailableHeight : Math.min(viewerConfig.height, maxAvailableHeight);
+                let leftPos = isMobile ? 0 : Math.max(0, (containerW - finalW) / 2) + Math.floor(Math.random() * 30);
+                let topPos = isMobile ? 0 : Math.max(10, (maxAvailableHeight - finalH) / 2) + Math.floor(Math.random() * 30);
+
+                const winEl = document.createElement('div');
+                winEl.className = 'window absolute flex flex-col active-window window-opening';
+                winEl.id = `win-${viewerId}`;
+                winEl.style.width = `${finalW}px`;
+                winEl.style.height = `${finalH}px`;
+                winEl.style.left = `${leftPos}px`;
+                winEl.style.top = `${topPos}px`;
+                winEl.style.zIndex = ++zIndexCounter;
+
+                winEl.innerHTML = `
+                    <div class="window-header" onmousedown="window.startDrag(event, '${viewerId}')" ondblclick="window.toggleMaximize('${viewerId}')">
+                        <div class="traffic-lights" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                            <div class="win-btn btn-close" onclick="window.closeWindow('${viewerId}')"></div>
+                            <div class="win-btn btn-min" onclick="window.minimizeWindow('${viewerId}')"></div>
+                            <div class="win-btn btn-max" onclick="window.toggleMaximize('${viewerId}')"></div>
+                        </div>
+                        <span class="window-title">${viewerConfig.title}</span>
+                    </div>
+                    <div class="flex-1 relative overflow-hidden">
+                        ${viewerConfig.content}
+                    </div>
+                `;
+
+                winEl.addEventListener('mousedown', () => bringToFront(viewerId));
+                winEl.addEventListener('touchstart', () => bringToFront(viewerId), { passive: true });
+                winEl.onmousemove = (e) => updateWindowCursor(e, winEl);
+                winEl.onmousedown = (e) => {
+                    bringToFront(viewerId);
+                    handleResizeStart(e, winEl, viewerId);
+                };
+                addTouchListeners(winEl, viewerId);
+
+                container.appendChild(winEl);
+                activeWindows[viewerId] = { element: winEl, config: viewerConfig, maximized: false, prevRect: null };
+                setTimeout(() => winEl.classList.remove('window-opening'), 350);
             }
 
             window.minimizeWindow = function (id) {

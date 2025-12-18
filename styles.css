@@ -628,3 +628,119 @@ html.dark .content-link {
 html.dark .content-link:hover {
     border-bottom-color: #4A7C9D;
 }
+
+/* Markdown Body Styling (GitHub-style) */
+.markdown-body {
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #4E342E;
+}
+
+html.dark .markdown-body {
+    color: #EFEBE9;
+}
+
+.markdown-body h1 {
+    font-family: 'Copernicus Trial', serif;
+    font-size: 2em;
+    font-weight: 800;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid rgba(74, 124, 157, 0.2);
+    color: #4A7C9D;
+}
+
+.markdown-body h2 {
+    font-family: 'Copernicus Trial', serif;
+    font-size: 1.5em;
+    font-weight: 800;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.2em;
+    border-bottom: 1px solid rgba(74, 124, 157, 0.1);
+}
+
+.markdown-body h3 {
+    font-family: 'Copernicus Trial', serif;
+    font-size: 1.25em;
+    font-weight: 700;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+}
+
+.markdown-body p {
+    margin-bottom: 1em;
+}
+
+.markdown-body ul, .markdown-body ol {
+    padding-left: 2em;
+    margin-bottom: 1em;
+}
+
+.markdown-body li {
+    margin-bottom: 0.25em;
+}
+
+.markdown-body code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+}
+
+html.dark .markdown-body code {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.markdown-body pre {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 1em;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1em;
+}
+
+html.dark .markdown-body pre {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.markdown-body pre code {
+    background: transparent;
+    padding: 0;
+}
+
+.markdown-body blockquote {
+    border-left: 4px solid #4A7C9D;
+    padding-left: 1em;
+    margin-left: 0;
+    margin-bottom: 1em;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.markdown-body a {
+    color: #4A7C9D;
+    text-decoration: none;
+}
+
+.markdown-body a:hover {
+    text-decoration: underline;
+}
+
+.markdown-body hr {
+    border: none;
+    height: 1px;
+    background: rgba(74, 124, 157, 0.2);
+    margin: 2em 0;
+}
+
+.markdown-body strong {
+    font-weight: 700;
+}
+
+.markdown-body em {
+    font-style: italic;
+    opacity: 0.8;
+}
