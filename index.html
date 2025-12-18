@@ -1140,7 +1140,7 @@
                 }
 
                 const winEl = document.createElement('div');
-                winEl.className = 'window absolute flex flex-col active-window';
+                winEl.className = 'window absolute flex flex-col active-window window-opening';
                 winEl.id = `win-${id}`;
                 winEl.style.width = `${finalW}px`;
                 winEl.style.height = `${finalH}px`;
@@ -1181,6 +1181,9 @@
 
                 activeWindows[id] = { element: winEl, config: winConfig, maximized: false, prevRect: null };
                 
+                // Remove opening animation class after animation completes
+                setTimeout(() => winEl.classList.remove('window-opening'), 350);
+                
                 // Dock Animation & State
                 const dockItem = document.getElementById(`dock-${id}`);
                 if(dockItem) {
@@ -1205,8 +1208,16 @@
 
             window.closeWindow = function (id) {
                 const win = document.getElementById(`win-${id}`);
-                if (win) win.remove();
-                delete activeWindows[id];
+                if (!win) return;
+                
+                // Add closing animation
+                win.classList.add('window-closing');
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    if (win) win.remove();
+                    delete activeWindows[id];
+                }, 250);
                 
                 // Dock State
                 const dockItem = document.getElementById(`dock-${id}`);

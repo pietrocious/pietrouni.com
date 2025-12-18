@@ -179,7 +179,6 @@ body {
 
 /* Cards / Windows (Tactile, not Glass) */
 .window {
-    transition: opacity 0.3s ease, transform 0.3s ease;
     /* Solid paper feel */
     background-color: #FDFBF7;
     box-shadow: 0 10px 30px rgba(62, 39, 35, 0.15);
@@ -193,6 +192,39 @@ body {
     pointer-events: auto;
     touch-action: pan-y;
     /* Allow vertical scrolling, prevent horizontal pan */
+}
+
+/* Window Open Animation */
+@keyframes windowOpen {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Window Close Animation */
+@keyframes windowClose {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+}
+
+.window.window-opening {
+    animation: windowOpen 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.window.window-closing {
+    animation: windowClose 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+    pointer-events: none;
 }
 
 .window.maximized {
