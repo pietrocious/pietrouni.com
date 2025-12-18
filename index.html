@@ -224,11 +224,7 @@
                     <img class="dock-icon" src="icons/org.gnome.tweaks.svg" alt="Projects" aria-hidden="true">
                 </div>
 
-                <!-- Resume (Profile Clipboard) -->
-                <div id="dock-resume" class="dock-item cursor-pointer group" onclick="restoreWindow('resume')" title="Resume">
-                    <span class="dock-label">Resume</span>
-                    <img class="dock-icon" src="icons/oasis-text.svg" alt="Resume" aria-hidden="true">
-                </div>
+
 
                 <!-- Vault (Secure Archive/Briefcase) -->
                 <div id="dock-vault" class="dock-item cursor-pointer group" onclick="restoreWindow('vault')" title="Vault">
@@ -303,7 +299,6 @@
 
             // --- Vault Data ---
             const vaultData = [
-                { id: 'resume-html', title: 'Resume.html', desc: 'My professional resume', type: 'doc', category: 'Professional', status: 'ready', action: "restoreWindow('resume')" },
                 { id: 'food', title: 'food.md', desc: 'My favorite food spots and recipes', type: 'food', category: 'Lifestyle', status: 'soon' },
                 { id: 'music', title: 'music.md', desc: 'Music that moves me', type: 'music', category: 'Creative', status: 'soon' },
                 { id: 'books', title: 'books.md', desc: 'Books that shaped my thinking', type: 'book', category: 'Creative', status: 'soon' },
@@ -813,12 +808,7 @@
                     width: 900,
                     height: 700
                 },
-                resume: {
-                    title: "Resume",
-                    content: `<iframe src="resume.html" loading="lazy" class="w-full h-full border-none bg-white dark:bg-[#1a100c]" onload="this.contentWindow.postMessage({type:'theme-change', theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'}, '*')"></iframe>`,
-                    width: 850,
-                    height: 900
-                },
+
                 vault: {
                     title: "Personal Vault",
                     content: `
