@@ -15,7 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <title>Pietro Uni | Interactive Portfolio</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans:wght@300;400;500;700&family=Rajdhani:wght@500;700&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=BBH+Sans+Hegarty:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
     <meta name="description" content="An OS-inspired interactive portfolio showcasing my journey and projects" />
     
     <!-- Open Graph / Facebook -->
@@ -55,10 +55,11 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        // Resume Fonts
-                        sans: ['"Test Tiempos Text"', 'Georgia', 'serif'],
-                        serif: ['"Copernicus Trial"', 'serif'],
-                        headline: ['"Test Tiempos Headline"', 'serif'],
+                        // Display/Headline Font
+                        sans: ['"BBH Sans Hegarty"', 'sans-serif'],
+                        // Serif Body Font
+                        serif: ['"Lora"', 'serif'],
+                        headline: ['"BBH Sans Hegarty"', 'sans-serif'],
 
                         // System Fonts
                         ui: ['"Noto Sans"', 'sans-serif'],
@@ -66,7 +67,7 @@
                         mono: ['"JetBrains Mono"', 'monospace'],
                     },
                     colors: {
-                        // 'Her' Palette - Warm & Organic
+                        // colour palette
                         her: {
                             red: "#4A7C9D",      // Blue accent color
                             orange: "#5B9AB8",   // Lighter blue
@@ -103,7 +104,7 @@
         }
     </script>
     <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans:wght@300;400;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=BBH+Sans+Hegarty:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans:wght@300;400;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <!-- Markdown Parser for Vault Files -->
@@ -599,12 +600,12 @@
                                 <div class="font-bold opacity-40 mb-2 text-xs uppercase tracking-wider">Typography</div>
                                 <ul class="space-y-3 opacity-80">
                                     <li class="flex flex-col">
-                                        <span class="text-[10px] uppercase opacity-50">Serif (Display)</span>
-                                        <span class="font-serif font-extrabold text-lg">Copernicus Trial</span>
+                                        <span class="text-[10px] uppercase opacity-50">Display/Headline</span>
+                                        <span class="font-headline font-bold text-lg">BBH Sans Hegarty</span>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">Serif (Body)</span>
-                                        <span class="font-sans text-lg">Test Tiempos Text</span>
+                                        <span class="font-serif text-lg">Lora</span>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">System UI</span>
@@ -642,7 +643,7 @@
                         <div class="space-y-4">
                             <!-- My Journey -->
                             <div>
-                                <h2 class="text-lg font-serif font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">My Journey</h2>
+                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">My Journey</h2>
                                 <p class="opacity-90">
                                     I'm an Infrastructure Engineer based in Barcelona with a somewhat winding path through tech. What started as HP printer support in 2014 eventually led me through enterprise help desk work, specialized medical device support, and into the world of enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 companies—the kind of work that teaches you how distributed systems actually break in production.
                                 </p>
@@ -653,16 +654,16 @@
 
                             <!-- What I'm Building -->
                             <div>
-                                <h2 class="text-lg font-serif font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
+                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
                                 <p class="opacity-90 mb-4">
                                     I believe the best way to learn is to build things that actually work. My current focus is creating production-grade infrastructure projects that demonstrate real DevOps capabilities:
                                 </p>
-                                <ul class="list-none space-y-4">
+                                <ul class="list-none space-y-4 font-serif font-normal">
                                     <li class="pl-4 border-l-2 border-her-red">
-                                        <a href="https://github.com/pietrocious/terraform-aws-pietrouni" target="_blank" class="content-link font-bold">Terraform AWS Modules</a> – Complete AWS infrastructure featuring Multi-AZ networking, Auto-scaling, and CloudFront. Built to demonstrate enterprise DevOps practices.
+                                        <a href="https://github.com/pietrocious/terraform-aws-pietrouni" target="_blank" class="content-link font-semibold">Terraform AWS Modules</a> – Complete AWS infrastructure featuring Multi-AZ networking, Auto-scaling, and CloudFront. Built to demonstrate enterprise DevOps practices.
                                     </li>
                                     <li class="pl-4 border-l-2 border-her-red">
-                                        <span class="font-bold">pietrouni.com</span> – This interactive OS-themed portfolio website you're viewing right now. Built with vanilla HTML, CSS, and JavaScript. Open source coming soon.
+                                        <span class="font-semibold">pietrouni.com</span> – This interactive OS-themed portfolio website you're viewing right now. Built with vanilla HTML, CSS, and JavaScript. Open source coming soon.
                                     </li>
                                 </ul>
                                 <p class="mt-4 italic opacity-70">You can see the code behind these projects on my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a>.</p>
@@ -670,7 +671,7 @@
 
                             <!-- Why DevOps -->
                             <div>
-                                <h2 class="text-lg font-serif font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">Why DevOps?</h2>
+                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Why DevOps?</h2>
                                 <p class="opacity-90">
                                     After years of troubleshooting other people's infrastructure, I want to be the one designing and building it. My networking background gives me an edge—I understand how distributed systems communicate, fail, and scale. DevOps lets me leverage that foundation while learning to automate, containerize, and orchestrate at scale.
                                 </p>
@@ -686,11 +687,11 @@
 
                             <!-- Let's Connect -->
                             <div>
-                                <h2 class="text-lg font-serif font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">Let's Connect</h2>
+                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Let's Connect</h2>
                                 <p class="opacity-90">
                                     If you'd like to talk, please reach out:
                                 </p>
-                                <div class="mt-4 flex gap-4 text-sm font-bold tracking-wide">
+                                <div class="mt-4 flex gap-4 text-sm font-ui font-semibold tracking-wide">
                                     <a href="mailto:pietrouni@gmail.com" class="content-link">EMAIL</a>
                                     <span class="opacity-30">/</span>
                                     <a href="https://github.com/pietrocious" target="_blank" class="content-link">GITHUB</a>
@@ -709,10 +710,10 @@
                 projects: {
                     title: "Projects",
                     content: `
-                     <div class="h-full dyn-p font-sans overflow-y-auto window-content selection:bg-her-red selection:text-white p-2">
+                     <div class="h-full dyn-p font-ui overflow-y-auto window-content selection:bg-her-red selection:text-white p-2">
                         <!-- Header -->
                         <div class="mb-6 p-4">
-                            <h1 class="font-serif font-extrabold text-2xl text-her-dark dark:text-her-textLight">Projects</h1>
+                            <h1 class="font-ui font-bold text-2xl text-her-dark dark:text-her-textLight">Projects</h1>
                         </div>
 
                         <div class="space-y-8 p-2">
@@ -728,7 +729,7 @@
                                     <!-- Terraform AWS Modules -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
                                         <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-bold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
                                         </div>
                                         <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">Complete AWS infrastructure featuring Multi-AZ networking, Auto-scaling, and CloudFront. Built to demonstrate enterprise DevOps practices.</p>
@@ -745,7 +746,7 @@
                                     <!-- pietrouni.com -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors vault-card-animate" style="animation-delay: 50ms">
                                         <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-bold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
                                         </div>
                                         <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">I build this interactive OS-themed portfolio website. I will open source the code soon.</p>
@@ -773,7 +774,7 @@
                                     <!-- Automation Scripts -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors vault-card-animate" style="animation-delay: 100ms">
                                         <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-bold text-her-dark dark:text-her-textLight">Automation Scripts</h3>
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Automation Scripts</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
                                         </div>
                                         <p class="text-xs opacity-70 mb-4 h-8 text-her-dark dark:text-her-textLight">PowerShell/bash/Python scripts for Cisco IOS config management and compliance checks.</p>

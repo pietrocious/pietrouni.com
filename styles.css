@@ -1,43 +1,5 @@
-/* Custom Fonts from S3 bucket */
-@font-face {
-    font-family: 'Copernicus Trial';
-    src: url('/fonts/CopernicusTrial-Heavy.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Copernicus Trial';
-    src: url('/fonts/CopernicusTrial-Extrabold.ttf') format('truetype');
-    font-weight: 800;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Test Tiempos Headline';
-    src: url('/fonts/TestTiemposHeadline-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Test Tiempos Headline';
-    src: url('/fonts/TestTiemposHeadline-Semibold.otf') format('opentype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Test Tiempos Text';
-    src: url('/fonts/TestTiemposText-Regular.otf') format('opentype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+/* Fonts: Google Fonts (BBH Sans Hegarty, Lora) + Custom (Fixedsys for terminal) */
+/* Google Fonts loaded via <link> in HTML head */
 
 @font-face {
     font-family: 'Fixedsys';
@@ -672,8 +634,8 @@ canvas {
     background: transparent;
     border-bottom: 2px solid #4A7C9D;
     color: inherit;
-    font-family: 'Copernicus Trial', serif;
-    font-weight: 800;
+    font-family: 'BBH Sans Hegarty', sans-serif;
+    font-weight: 700;
 }
 
 .her-input:focus {
@@ -685,11 +647,11 @@ canvas {
 h1,
 h2,
 h3 {
-    font-family: 'Copernicus Trial', serif;
+    font-family: 'BBH Sans Hegarty', sans-serif;
 }
 
 p {
-    font-family: 'Test Tiempos Text', serif;
+    font-family: 'Lora', serif;
 }
 
 /* Link styling in content */
@@ -725,9 +687,9 @@ html.dark .markdown-body {
 }
 
 .markdown-body h1 {
-    font-family: 'Copernicus Trial', serif;
+    font-family: 'BBH Sans Hegarty', sans-serif;
     font-size: 2em;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 0.5em;
     padding-bottom: 0.3em;
     border-bottom: 1px solid rgba(74, 124, 157, 0.2);
@@ -735,9 +697,9 @@ html.dark .markdown-body {
 }
 
 .markdown-body h2 {
-    font-family: 'Copernicus Trial', serif;
+    font-family: 'BBH Sans Hegarty', sans-serif;
     font-size: 1.5em;
-    font-weight: 800;
+    font-weight: 700;
     margin-top: 1.5em;
     margin-bottom: 0.5em;
     padding-bottom: 0.2em;
@@ -745,9 +707,9 @@ html.dark .markdown-body {
 }
 
 .markdown-body h3 {
-    font-family: 'Copernicus Trial', serif;
+    font-family: 'BBH Sans Hegarty', sans-serif;
     font-size: 1.25em;
-    font-weight: 700;
+    font-weight: 600;
     margin-top: 1.25em;
     margin-bottom: 0.5em;
 }
