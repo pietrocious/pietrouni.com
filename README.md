@@ -31,7 +31,13 @@ This project is more than a static resume; it's a functional "web OS" mockup. It
 
 ### Fonts
 
-Custom fonts (e.g., Fixedsys, Copernicus Trial) are not included in this repository due to licensing. The project falls back to system fonts or Google Fonts where applicable.
+This project uses a combination of Google Fonts and one custom font:
+
+- **BBH Sans Hegarty** (Google Fonts) – Display/headline font
+- **Lora** (Google Fonts) – Serif body text
+- **Noto Sans** (Google Fonts) – System UI font
+- **JetBrains Mono** (Google Fonts) – Code/monospace
+- **Fixedsys** (custom, not included) – Terminal emulator font
 
 ### Icons
 
