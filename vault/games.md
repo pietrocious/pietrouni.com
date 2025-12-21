@@ -1,20 +1,32 @@
 # 🎮 Games
 
-_Games I love_
+I am a huge fan of RPGs mostly but I have played many other genres.
 
----
+These are my absolute favorites (in no particular order):
 
-## Coming Soon
+- Baldur's Gate 3
+- Half-Life 2
+- Half-Life Alyx
+- Fallout: New Vegas
+- Red Read Redemption 2
+- The Witcher 3: Wild Hunt
+- The Elder Scrolls V: Skyrim
+- Cyberpunk 2077
+- Dragon Age: Origins
+- Star Wars Knights of the Old Republic
 
-This page will highlight games that I've enjoyed and why they captivated me.
+Some other games I enjoy:
 
-### Planned Content
-
-- All-time favorite games
-- Current games I'm playing
-- Indie gems worth discovering
-- Games with great engineering/architecture
-
----
-
-_Check back soon for updates!_
+- The entire Halo series
+- Portal 1 and 2
+- The Last of Us Part I & II
+- Disco Elysium
+- Mass Effect Trilogy
+- Team Fortress 2
+- Crusader Kings 3 and the A Game of Thrones Mod
+- Cities: Skylines
+- The Sims 4
+- The Legend of Zelda: Breath of the Wild
+- Persona 5 Royal
+- Stardew Valley
+- Dishonored
