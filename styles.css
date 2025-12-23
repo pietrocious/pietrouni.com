@@ -644,17 +644,17 @@ html.dark .dock-label {
 
 /* Floating Glass Dock */
 .dock-container {
-  background: rgba(244, 235, 217, 0.5);
+  background: rgba(244, 235, 217, 0.3);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 html.dark .dock-container {
-  background: rgba(62, 39, 35, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(62, 39, 35, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
