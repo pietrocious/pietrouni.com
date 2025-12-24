@@ -662,13 +662,13 @@ html.dark .dock-container {
 #menubar {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  background: rgba(244, 235, 217, 0.4);
-  border-bottom: 1px solid rgba(74, 124, 157, 0.1);
+  background: rgba(244, 235, 217, 0.25);
+  border-bottom: 1px solid rgba(74, 124, 157, 0.08);
 }
 
 html.dark #menubar {
-  background: rgba(62, 39, 35, 0.4);
-  border-bottom: 1px solid rgba(74, 124, 157, 0.1);
+  background: rgba(62, 39, 35, 0.2);
+  border-bottom: 1px solid rgba(74, 124, 157, 0.08);
 }
 
 /* Spotlight Search */
