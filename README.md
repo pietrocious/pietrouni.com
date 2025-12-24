@@ -6,7 +6,7 @@ Live demo: [pietrouni.com](https://pietrouni.com)
 
 ## Concept
 
-This project is more than a static resume; it's a functional "web OS" mockup. It features a window management system, a functional terminal, and an interactive "Vault" for explores files and resources, all within a macOS/GNOME-inspired desktop environment.
+This project is more than a static resume; it's a functional ["webtop"](https://en.wikipedia.org/wiki/Web_desktop). It features a window management system, a functional terminal, and an interactive "Vault" for explores files and resources, all within a macOS/GNOME-inspired desktop environment.
 
 ## Tech Stack
 
