@@ -1853,6 +1853,31 @@
           host: "OS93",
         };
 
+        // Quotes for the quote command
+        const quotes = [
+          "If you don't work hard on your own dreams, you'll eventually end up building someone else's.",
+          "The only way to do great work is to love what you do.",
+          "Sometimes the correct path, the bravest path is the least obvious, and also the gentlest.",
+          "If you don't like what is being said, change the conversation.",
+          "Even though success is a reality, it's effects are temporary.",
+          "You don't have to be great to start, but you have to start to be great.",
+          "In the middle of difficulty lies opportunity.",
+          "Every expert was once a beginner who refused to quit.",
+          "The only way to make sense out of change is to plunge into it, move with it, and join the dance.",
+        ];
+
+        // Shuffle-based quote system to avoid repetition
+        let shuffledQuotes = [...quotes];
+        let quoteIndex = 0;
+        function shuffleArray(arr) {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
+        }
+        shuffledQuotes = shuffleArray(shuffledQuotes);
+
         function getTerminalPromptHTML() {
           if (TERMINAL_STATE.mode === "cyberpunk") {
             return `<div><span class="text-[#FF003C] font-bold">V@NET_ARCH</span><span class="text-white">:</span><span class="text-[#FCEE0A]">~/subnets</span><span class="text-[#FF003C]">$</span>`;
@@ -2401,7 +2426,14 @@ ${digTarget}.          300     IN      A       151.101.65.140
               output.innerHTML += `<div class="my-2 text-cyan-400 font-bold text-lg">${timeStr}</div>`;
               break;
             case "quote":
-              output.innerHTML += `<div class="text-purple-300 italic my-2">💬 "The best way to predict the future is to invent it." - Alan Kay</div>`;
+              // get next quote from shuffled array
+              const currentQuote = shuffledQuotes[quoteIndex];
+              quoteIndex++;
+              if (quoteIndex >= shuffledQuotes.length) {
+                quoteIndex = 0;
+                shuffledQuotes = shuffleArray([...quotes]); // Reshuffle when all shown
+              }
+              output.innerHTML += `<div class="text-purple-300 italic my-2">💬 ${currentQuote}</div>`;
               break;
             case "neofetch":
               const info = `
