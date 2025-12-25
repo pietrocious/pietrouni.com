@@ -640,7 +640,7 @@
           "The only way to make sense out of change is to plunge into it, move with it, and join the dance.",
         ];
 
-        // Shuffle-based quote system to avoid repetition
+        // shuffle quotes
         let shuffledQuotes = [...quotes];
         let quoteIndex = 0;
         function shuffleArray(arr) {
@@ -737,7 +737,7 @@
 
         initTheme();
 
-        // spotlight (cmd+k)
+        // spotlight (ctrl+k)
         window.toggleSpotlight = function () {
           const spot = document.getElementById("spotlight");
           const box = document.getElementById("spotlight-box");
@@ -1853,31 +1853,6 @@
           host: "OS93",
         };
 
-        // Quotes for the quote command
-        const quotes = [
-          "If you don't work hard on your own dreams, you'll eventually end up building someone else's.",
-          "The only way to do great work is to love what you do.",
-          "Sometimes the correct path, the bravest path is the least obvious, and also the gentlest.",
-          "If you don't like what is being said, change the conversation.",
-          "Even though success is a reality, it's effects are temporary.",
-          "You don't have to be great to start, but you have to start to be great.",
-          "In the middle of difficulty lies opportunity.",
-          "Every expert was once a beginner who refused to quit.",
-          "The only way to make sense out of change is to plunge into it, move with it, and join the dance.",
-        ];
-
-        // Shuffle-based quote system to avoid repetition
-        let shuffledQuotes = [...quotes];
-        let quoteIndex = 0;
-        function shuffleArray(arr) {
-          for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-          }
-          return arr;
-        }
-        shuffledQuotes = shuffleArray(shuffledQuotes);
-
         function getTerminalPromptHTML() {
           if (TERMINAL_STATE.mode === "cyberpunk") {
             return `<div><span class="text-[#FF003C] font-bold">V@NET_ARCH</span><span class="text-white">:</span><span class="text-[#FCEE0A]">~/subnets</span><span class="text-[#FF003C]">$</span>`;
@@ -2097,7 +2072,7 @@
                                 <div>open [app], about, projects, resume</div>
                                 
                                 <div class="text-blue-400 font-bold text-xs uppercase mt-2">Network & DevOps</div>
-                                <div>traceroute, dig, curl, docker, terraform, cisco</div>
+                                <div>traceroute, dig, curl, docker, terraform, ssh, cisco</div>
                                 
                                 <div class="text-blue-400 font-bold text-xs uppercase mt-2">Utilities</div>
                                 <div>calc, uptime, clock, version, quote</div>
