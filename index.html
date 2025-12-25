@@ -2898,7 +2898,109 @@ ${digTarget}.          300     IN      A       151.101.65.140
               runHack();
               break;
             case "hlx":
-              output.innerHTML += `<div class="text-orange-500 font-bold text-2xl my-2 tracking-[1em]">λ</div><div class="text-gray-400 text-xs">Confirmed.</div>`;
+              // Half-Life 3 / HLX Easter Egg
+              inputEl.disabled = true;
+
+              const hlxMessages = [
+                {
+                  text: '<span class="text-green-400">Connecting to Valve servers...</span>',
+                  delay: 0,
+                },
+                {
+                  text: '<span class="text-green-400">Authenticating: ████████████ 100%</span>',
+                  delay: 800,
+                },
+                {
+                  text: '<span class="text-yellow-400">Loading HLX assets: 1... 2... 2.5... 2.75... 2.9... 2.99... 2.999...</span>',
+                  delay: 1600,
+                },
+                { text: "", delay: 2400 }, // Lambda will be inserted here
+                {
+                  text: '<span class="text-gray-400 italic">"The right man in the wrong place can make all the difference in the world..."</span>',
+                  delay: 4500,
+                },
+                {
+                  text: '<span class="text-gray-500 text-xs">                                                              - G-Man</span>',
+                  delay: 5000,
+                },
+                { text: "", delay: 5800 },
+                {
+                  text: '<span class="text-red-500 font-bold">ERROR: Unable to count to 3. This is a known Valve limitation.</span>',
+                  delay: 6300,
+                },
+              ];
+
+              // Lambda ASCII art with glitch effect
+              const lambdaArt = `
+<pre class="hlx-lambda text-orange-500 font-bold my-2" style="text-shadow: 0 0 10px rgba(255,165,0,0.5);">
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣤⣴⣦⣤⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⠿⠿⠿⠿⣿⣿⣿⣿⣶⣤⡀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⣠⣾⣿⣿⡿⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⢿⣿⣿⣶⡀⠀⠀⠀⠀
+⠀⠀⠀⣴⣿⣿⠟⠁⠀⠀⠀⣶⣶⣶⣶⡆⠀⠀⠀⠀⠀⠀⠈⠻⣿⣿⣦⠀⠀⠀
+⠀⠀⣼⣿⣿⠋⠀⠀⠀⠀⠀⠛⠛⢻⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠙⣿⣿⣧⠀⠀
+⠀⢸⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⡇⠀
+⠀⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⠀
+⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⡟⢹⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⣹⣿⣿⠀
+⠀⣿⣿⣷⠀⠀⠀⠀⠀⠀⣰⣿⣿⠏⠀⠀⢻⣿⣿⡄⠀⠀⠀⠀⠀⠀⣿⣿⡿⠀
+⠀⢸⣿⣿⡆⠀⠀⠀⠀⣴⣿⡿⠃⠀⠀⠀⠈⢿⣿⣷⣤⣤⡆⠀⠀⣰⣿⣿⠇⠀
+⠀⠀⢻⣿⣿⣄⠀⠀⠾⠿⠿⠁⠀⠀⠀⠀⠀⠘⣿⣿⡿⠿⠛⠀⣰⣿⣿⡟⠀⠀
+⠀⠀⠀⠻⣿⣿⣧⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⣿⠏⠀⠀⠀
+⠀⠀⠀⠀⠈⠻⣿⣿⣷⣤⣄⡀⠀⠀⠀⠀⠀⠀⢀⣠⣴⣾⣿⣿⠟⠁⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠈⠛⠿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠛⠛⠛⠛⠛⠛⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+</pre>`;
+
+              let hlxIndex = 0;
+
+              function showNextHlx() {
+                if (hlxIndex >= hlxMessages.length) {
+                  inputEl.disabled = false;
+                  inputEl.focus();
+                  // Start glitch effect on lambda
+                  const lambdaEl = output.querySelector(".hlx-lambda");
+                  if (lambdaEl) {
+                    let glitchCount = 0;
+                    const glitchInterval = setInterval(() => {
+                      if (glitchCount > 10) {
+                        clearInterval(glitchInterval);
+                        lambdaEl.style.transform = "none";
+                        lambdaEl.style.opacity = "1";
+                        return;
+                      }
+                      const offsetX = (Math.random() - 0.5) * 4;
+                      const offsetY = (Math.random() - 0.5) * 2;
+                      const skew = (Math.random() - 0.5) * 3;
+                      lambdaEl.style.transform = `translate(${offsetX}px, ${offsetY}px) skewX(${skew}deg)`;
+                      lambdaEl.style.opacity =
+                        Math.random() > 0.3 ? "1" : "0.7";
+                      // Color glitch
+                      lambdaEl.style.color =
+                        Math.random() > 0.8 ? "#ff6b6b" : "#f97316";
+                      glitchCount++;
+                    }, 100);
+                  }
+                  return;
+                }
+
+                const hlxMsg = hlxMessages[hlxIndex];
+                const nextDelay =
+                  hlxIndex < hlxMessages.length - 1
+                    ? hlxMessages[hlxIndex + 1].delay - hlxMsg.delay
+                    : 500;
+
+                if (hlxIndex === 3) {
+                  // Insert lambda art
+                  output.innerHTML += lambdaArt;
+                } else if (hlxMsg.text) {
+                  output.innerHTML += `<div>${hlxMsg.text}</div>`;
+                }
+
+                output.scrollTop = output.scrollHeight;
+                hlxIndex++;
+                setTimeout(showNextHlx, nextDelay);
+              }
+
+              showNextHlx();
               break;
             case "about":
               window.openWindow("about");
