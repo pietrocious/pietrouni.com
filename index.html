@@ -23,7 +23,7 @@
     <title>Pietro Uni | Interactive Portfolio</title>
 
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans:wght@300;400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans:wght@300;400;500;700&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
       rel="stylesheet"
     />
     <meta
@@ -1869,6 +1869,79 @@
         window.handleCyberpunkCommand = null;
         window.handleFalloutCommand = null;
 
+        // Command lists for autocomplete
+        const OS93_COMMANDS = [
+          "help",
+          "help-fun",
+          "clear",
+          "whoami",
+          "pwd",
+          "ls",
+          "ll",
+          "cd",
+          "mkdir",
+          "touch",
+          "rmdir",
+          "cat",
+          "open",
+          "calc",
+          "guess",
+          "traceroute",
+          "tracert",
+          "dig",
+          "curl",
+          "docker",
+          "terraform",
+          "cisco",
+          "ssh",
+          "version",
+          "uptime",
+          "clock",
+          "quote",
+          "neofetch",
+          "ascii",
+          "cowsay",
+          "figlet",
+          "flip",
+          "rps",
+          "8ball",
+          "sudo",
+          "rm",
+          "exit",
+          "pietro",
+          "matrix",
+          "hack",
+          "about",
+          "contact",
+          "projects",
+          "resume",
+          "hlx",
+          "fallout",
+          "cyberpunk",
+          "rain",
+          "sl",
+          "noclip",
+        ];
+        const CYBERPUNK_COMMANDS = [
+          "help",
+          "scan",
+          "breach",
+          "daemons",
+          "disconnect",
+          "exit",
+        ];
+        const FALLOUT_COMMANDS = [
+          "help",
+          "stats",
+          "inv",
+          "radio",
+          "exit",
+          "disconnect",
+        ];
+
+        let tabCompletionIndex = 0;
+        let lastTabInput = "";
+
         window.handleTerminalCommand = function (e) {
           const inputEl = document.getElementById("cmd-input");
           const output = document.getElementById("term-output");
@@ -1900,6 +1973,59 @@
                   : "";
             }
             return;
+          }
+
+          // Tab Autocomplete
+          if (e.key === "Tab") {
+            e.preventDefault();
+            const currentInput = inputEl.value.toLowerCase().trim();
+
+            if (!currentInput) return;
+
+            // Get commands for current mode
+            let commands;
+            if (TERMINAL_STATE.mode === "cyberpunk") {
+              commands = CYBERPUNK_COMMANDS;
+            } else if (TERMINAL_STATE.mode === "fallout") {
+              commands = FALLOUT_COMMANDS;
+            } else {
+              commands = OS93_COMMANDS;
+            }
+
+            // Find matching commands
+            const matches = commands.filter((cmd) =>
+              cmd.startsWith(currentInput)
+            );
+
+            if (matches.length === 0) return;
+
+            if (matches.length === 1) {
+              // Single match - complete it
+              inputEl.value = matches[0];
+              tabCompletionIndex = 0;
+              lastTabInput = "";
+            } else {
+              // Multiple matches - cycle through them
+              if (lastTabInput !== currentInput) {
+                // New input, reset cycle
+                tabCompletionIndex = 0;
+                lastTabInput = currentInput;
+                // Show available completions
+                output.innerHTML += `<div class="text-gray-400 text-xs my-1">${matches.join(
+                  "  "
+                )}</div>`;
+                output.scrollTop = output.scrollHeight;
+              }
+              inputEl.value = matches[tabCompletionIndex];
+              tabCompletionIndex = (tabCompletionIndex + 1) % matches.length;
+            }
+            return;
+          }
+
+          // Reset tab completion on other key presses
+          if (e.key !== "Tab") {
+            lastTabInput = "";
+            tabCompletionIndex = 0;
           }
 
           if (e.key === "Enter") {
@@ -2018,7 +2144,8 @@
                 TERMINAL_STATE.mode = "cyberpunk";
                 TERMINAL_STATE.user = "V";
 
-                output.innerHTML += `<div class="text-[#FF003C] font-bold">INITIALIZING NETRUNNER INTERFACE...</div>`;
+                // Clear terminal and show welcome
+                output.innerHTML = `<div class="text-[#FF003C] font-bold">INITIALIZING NETRUNNER INTERFACE...</div>`;
                 setTimeout(() => {
                   output.innerHTML += `<div class="text-[#FCEE0A]">BREACH PROTOCOL: ACTIVE</div>`;
                   output.scrollTop = output.scrollHeight;
@@ -2049,7 +2176,8 @@
                 TERMINAL_STATE.mode = "fallout";
                 TERMINAL_STATE.user = "VAULT_DWELLER";
 
-                output.innerHTML += `<div class="text-[#18dc04] font-bold text-lg">WELCOME TO ROBCO OS v8.1</div>`;
+                // Clear terminal and show welcome
+                output.innerHTML = `<div class="text-[#18dc04] font-bold text-lg">WELCOME TO ROBCO OS v8.1</div>`;
                 setTimeout(() => {
                   output.innerHTML += `<div class="text-[#18dc04]">> LOAD "PIP-BOY_3000"</div>`;
                   output.scrollTop = output.scrollHeight;
@@ -3074,7 +3202,8 @@ ${digTarget}.          300     IN      A       151.101.65.140
               if (titleEl) titleEl.innerText = "Terminal";
               TERMINAL_STATE.mode = "os93";
               TERMINAL_STATE.user = "guest";
-              output.innerHTML += `<div class="text-blue-400">Disconnected from NET_ARCH. Returning to OS93...</div>`;
+              // Clear terminal and show goodbye
+              output.innerHTML = `<div class="text-blue-400">Disconnected from NET_ARCH. Returning to OS93...</div>`;
               break;
             default:
               output.innerHTML += `<div class="text-[#FF003C]">ERROR: UNRECOGNIZED PROTOCOL</div>`;
@@ -3133,7 +3262,8 @@ ${digTarget}.          300     IN      A       151.101.65.140
               if (titleEl) titleEl.innerText = "Terminal";
               TERMINAL_STATE.mode = "os93";
               TERMINAL_STATE.user = "guest";
-              output.innerHTML += `<div class="text-blue-400">RobCo Terminal Shutdown. Goodbye.</div>`;
+              // Clear terminal and show goodbye
+              output.innerHTML = `<div class="text-blue-400">RobCo Terminal Shutdown. Goodbye.</div>`;
               break;
             default:
               output.innerHTML += `<div class="text-[#18dc04]">Syntax Error. Please consult your Overseer.</div>`;
