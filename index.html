@@ -2853,7 +2853,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
                     delay: 3000,
                   },
                   {
-                    text: '<span class="text-green-400 font-bold text-lg"> jk 😂 this is a website, silly.</span>',
+                    text: '<span class="text-green-400 font-bold text-lg"> jk this is just a website, silly 😂</span>',
                     delay: 4000,
                   },
                 ];
@@ -2885,7 +2885,26 @@ ${digTarget}.          300     IN      A       151.101.65.140
               break;
             case "pietro":
               const pietroLogo = ` ██████╗ ██╗███████╗████████╗██████╗  ██████╗ \n ██╔══██╗██║██╔════╝╚══██╔══╝██╔══██╗██╔═══██╗\n ██████╔╝██║█████╗     ██║   ██████╔╝██║   ██║\n ██╔═══╝ ██║██╔══╝     ██║   ██╔══██╗██║   ██║\n ██║     ██║███████╗   ██║   ██║  ██║╚██████╔╝\n ╚═╝     ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝`;
-              const pietroInfo = `<span class="text-purple-400 font-bold">pietro@OS93</span>\n<span class="text-gray-500">──────────────────────────────</span>\n<span class="text-her-red">Role</span>: Infrastructure Engineer\n<span class="text-her-red">Location</span>: Barcelona\n<span class="text-her-red">Languages</span>: Spanish, English, Italian\n<span class="text-her-red">Stack</span>: AWS, Terraform, Docker, K8s, Python\n<span class="text-gray-500">──────────────────────────────</span>`;
+              // Calculate uptime from birthdate (June 13, 1993 at 1:00 AM)
+              const birthDate = new Date(1993, 5, 13, 1, 0, 0); // Month is 0-indexed
+              const nowTime = new Date();
+              let years = nowTime.getFullYear() - birthDate.getFullYear();
+              const lastBday = new Date(nowTime.getFullYear(), 5, 13, 1, 0, 0);
+              if (nowTime < lastBday) years--;
+              const currentBday = new Date(
+                nowTime.getFullYear() - (nowTime < lastBday ? 1 : 0),
+                5,
+                13,
+                1,
+                0,
+                0
+              );
+              const diffMs = nowTime - currentBday;
+              const daysDiff = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+              const hours = nowTime.getHours();
+              const minutes = nowTime.getMinutes();
+              const uptime = `${years} years, ${daysDiff} days, ${hours}h ${minutes}m`;
+              const pietroInfo = `<span class="text-purple-400 font-bold">pietro@OS93</span>\n<span class="text-gray-500">──────────────────────────────</span>\n<span class="text-her-red">Resolution</span>: 5120x1440\n<span class="text-her-red">CPU</span>: Intel(R) Core(TM) i9-14900 @ 1.997GHz\n<span class="text-her-red">GPU</span>: NVIDIA GeForce RTX 4090\n<span class="text-her-red">Uptime</span>: ${uptime}\n<span class="text-gray-500">──────────────────────────────</span>\n<span class="text-her-red">Role</span>: Infrastructure Engineer\n<span class="text-her-red">Location</span>: Barcelona\n<span class="text-her-red">Languages</span>: Spanish, English, Italian\n<span class="text-her-red">Stack</span>: AWS, Terraform, Docker, K8s, Python\n<span class="text-gray-500">──────────────────────────────</span>`;
               output.innerHTML += `<div class="flex gap-4 my-2 font-mono text-xs"><pre class="text-purple-400 hidden sm:block">${pietroLogo}</pre><pre>${pietroInfo}</pre></div>`;
               break;
             case "matrix":
