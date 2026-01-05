@@ -28,8 +28,15 @@
     />
     <meta
       name="description"
-      content="An OS-inspired interactive portfolio showcasing my journey and projects"
+      content="Explore Pietro Uni's interactive OS-style portfolio. Discover DevOps and cloud infrastructure projects, technical skills, and professional experience in a unique desktop environment."
     />
+    <link rel="canonical" href="https://pietrouni.com/" />
+    <meta name="author" content="Pietro Uni" />
+    <meta
+      name="keywords"
+      content="Pietro Uni, DevOps, Infrastructure, Cloud, Portfolio, AWS, Terraform, Kubernetes, Site Reliability Engineer"
+    />
+    <meta name="robots" content="index, follow" />
 
     <!-- og tags -->
     <meta property="og:type" content="website" />
@@ -51,6 +58,23 @@
     />
     <meta name="twitter:image" content="https://pietrouni.com/og-image.jpg" />
 
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Pietro Uni",
+        "url": "https://pietrouni.com",
+        "jobTitle": "DevOps Engineer",
+        "description": "DevOps and Cloud Infrastructure specialist with expertise in AWS, Terraform, and Kubernetes",
+        "image": "https://pietrouni.com/og-image.jpg",
+        "sameAs": [
+          "https://github.com/pietrocious",
+          "https://linkedin.com/in/pietrouni"
+        ]
+      }
+    </script>
+
     <link
       rel="icon"
       type="image/png"
@@ -67,8 +91,16 @@
     <link rel="manifest" href="/assets/favicon/site.webmanifest" />
 
     <!-- Theme color for mobile browser chrome -->
-    <meta name="theme-color" content="#F4EBD9" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#3E2723" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="theme-color"
+      content="#F4EBD9"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#3E2723"
+      media="(prefers-color-scheme: dark)"
+    />
 
     <!-- preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -310,7 +342,12 @@
               onkeydown="if(event.key==='Enter') executeSearchResult()"
             />
           </div>
-          <div id="spotlight-results" class="max-h-60 overflow-y-auto" role="listbox" aria-label="Search results">
+          <div
+            id="spotlight-results"
+            class="max-h-60 overflow-y-auto"
+            role="listbox"
+            aria-label="Search results"
+          >
             <!-- Results injected here -->
           </div>
           <div
@@ -879,7 +916,10 @@
             div.setAttribute("aria-selected", idx === 0 ? "true" : "false");
             if (res.action) {
               div.setAttribute("onclick", res.action);
-              div.setAttribute("onkeydown", `if(event.key==='Enter'){${res.action}}`);
+              div.setAttribute(
+                "onkeydown",
+                `if(event.key==='Enter'){${res.action}}`
+              );
             }
 
             div.innerHTML = `
