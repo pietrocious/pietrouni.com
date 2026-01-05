@@ -66,6 +66,10 @@
     />
     <link rel="manifest" href="/assets/favicon/site.webmanifest" />
 
+    <!-- Theme color for mobile browser chrome -->
+    <meta name="theme-color" content="#F4EBD9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#3E2723" media="(prefers-color-scheme: dark)" />
+
     <!-- preconnects -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -168,6 +172,7 @@
             onclick="toggleSpotlight()"
             class="opacity-70 hover:opacity-100 transition-opacity focus:outline-none flex items-center gap-1 group"
             title="Search (Ctrl+K)"
+            aria-label="Open search (Ctrl+K)"
           >
             <svg
               class="w-4 h-4 fill-current"
@@ -189,6 +194,7 @@
             onclick="openWindow('sysinfo')"
             class="opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
             title="About This Page"
+            aria-label="About this page"
           >
             <svg
               class="w-4 h-4 fill-current"
@@ -206,6 +212,7 @@
             onclick="cycleWallpaper()"
             class="opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
             title="Switch Wallpaper"
+            aria-label="Switch wallpaper"
           >
             <svg
               class="w-4 h-4 fill-current"
@@ -223,6 +230,7 @@
             onclick="toggleTheme()"
             class="opacity-70 hover:opacity-100 transition-opacity focus:outline-none"
             title="Toggle Theme"
+            aria-label="Toggle dark/light theme"
           >
             <!-- Moon Icon (Show when Light, Hide when Dark) -->
             <svg
@@ -274,6 +282,9 @@
         id="spotlight"
         class="absolute inset-0 z-[6000] hidden flex-col items-center pt-[20vh]"
         onclick="if(event.target.id === 'spotlight') toggleSpotlight()"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search applications and files"
       >
         <div
           class="w-full max-w-lg bg-her-paper dark:bg-[#3E2723] rounded-xl shadow-2xl overflow-hidden border border-her-red/20 transform transition-all duration-300 scale-95 opacity-0"
@@ -299,7 +310,7 @@
               onkeydown="if(event.key==='Enter') executeSearchResult()"
             />
           </div>
-          <div id="spotlight-results" class="max-h-60 overflow-y-auto">
+          <div id="spotlight-results" class="max-h-60 overflow-y-auto" role="listbox" aria-label="Search results">
             <!-- Results injected here -->
           </div>
           <div
@@ -343,6 +354,8 @@
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('projects')"
             title="Projects"
+            role="button"
+            aria-label="Open Projects"
           >
             <span class="dock-label">Projects</span>
             <img
@@ -359,6 +372,8 @@
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('vault')"
             title="Vault"
+            role="button"
+            aria-label="Open Vault"
           >
             <span class="dock-label">Vault</span>
             <img
@@ -375,6 +390,8 @@
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('terminal')"
             title="Terminal"
+            role="button"
+            aria-label="Open Terminal"
           >
             <span class="dock-label">Terminal</span>
             <img
@@ -391,6 +408,8 @@
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('monitor')"
             title="Monitoring"
+            role="button"
+            aria-label="Open Monitoring"
           >
             <span class="dock-label">Monitoring</span>
             <img
@@ -762,6 +781,35 @@
           }
         };
 
+        // Focus trapping for spotlight
+        function trapFocusInSpotlight(e) {
+          const spot = document.getElementById("spotlight");
+          if (spot.classList.contains("hidden")) return;
+
+          const spotlightBox = document.getElementById("spotlight-box");
+          const focusableElements = spotlightBox.querySelectorAll(
+            'input, button, [tabindex]:not([tabindex="-1"]), .spotlight-result'
+          );
+          const firstFocusable = focusableElements[0];
+          const lastFocusable = focusableElements[focusableElements.length - 1];
+
+          if (e.key === "Tab") {
+            if (e.shiftKey) {
+              // Shift + Tab
+              if (document.activeElement === firstFocusable) {
+                e.preventDefault();
+                lastFocusable?.focus();
+              }
+            } else {
+              // Tab
+              if (document.activeElement === lastFocusable) {
+                e.preventDefault();
+                firstFocusable?.focus();
+              }
+            }
+          }
+        }
+
         document.addEventListener("keydown", (e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "k") {
             e.preventDefault();
@@ -773,6 +821,8 @@
           ) {
             window.toggleSpotlight();
           }
+          // Trap focus in spotlight when open
+          trapFocusInSpotlight(e);
         });
 
         window.handleSearch = function (query) {
@@ -824,7 +874,13 @@
             div.className = `spotlight-result p-3 flex items-center gap-3 border-b border-her-red/5 last:border-0 ${
               idx === 0 ? "selected" : ""
             }`;
-            if (res.action) div.setAttribute("onclick", res.action);
+            div.setAttribute("tabindex", "0");
+            div.setAttribute("role", "option");
+            div.setAttribute("aria-selected", idx === 0 ? "true" : "false");
+            if (res.action) {
+              div.setAttribute("onclick", res.action);
+              div.setAttribute("onkeydown", `if(event.key==='Enter'){${res.action}}`);
+            }
 
             div.innerHTML = `
                     ${res.icon}
@@ -1303,6 +1359,8 @@
           winEl.className =
             "window absolute flex flex-col active-window window-opening";
           winEl.id = `win-${id}`;
+          winEl.setAttribute("role", "dialog");
+          winEl.setAttribute("aria-labelledby", `win-title-${id}`);
           winEl.style.width = `${finalW}px`;
           winEl.style.height = heightStyle;
           winEl.style.left = `${leftPos}px`;
@@ -1313,11 +1371,11 @@
           winEl.innerHTML = `
                 <div class="window-header" onmousedown="window.startDrag(event, '${id}')" ondblclick="window.toggleMaximize('${id}')">
                     <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-                        <button class="btn-neon min" onclick="window.minimizeWindow('${id}')"></button>
-                        <button class="btn-neon max" onclick="window.toggleMaximize('${id}')"></button>
-                        <button class="btn-neon close" onclick="window.closeWindow('${id}')"></button>
+                        <button class="btn-neon min" onclick="window.minimizeWindow('${id}')" aria-label="Minimize window"></button>
+                        <button class="btn-neon max" onclick="window.toggleMaximize('${id}')" aria-label="Maximize window"></button>
+                        <button class="btn-neon close" onclick="window.closeWindow('${id}')" aria-label="Close window"></button>
                     </div>
-                    <span class="window-title">${winConfig.title}</span>
+                    <span class="window-title" id="win-title-${id}">${winConfig.title}</span>
                 </div>
                 <div class="flex-1 relative overflow-hidden">
                     ${winConfig.content}
@@ -1471,6 +1529,8 @@
           winEl.className =
             "window absolute flex flex-col active-window window-opening";
           winEl.id = `win-${viewerId}`;
+          winEl.setAttribute("role", "dialog");
+          winEl.setAttribute("aria-labelledby", `win-title-${viewerId}`);
           winEl.style.width = `${finalW}px`;
           winEl.style.height = `${finalH}px`;
           winEl.style.left = `${leftPos}px`;
@@ -1480,11 +1540,11 @@
           winEl.innerHTML = `
                     <div class="window-header" onmousedown="window.startDrag(event, '${viewerId}')" ondblclick="window.toggleMaximize('${viewerId}')">
                         <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-                            <button class="btn-neon min" onclick="window.minimizeWindow('${viewerId}')"></button>
-                            <button class="btn-neon max" onclick="window.toggleMaximize('${viewerId}')"></button>
-                            <button class="btn-neon close" onclick="window.closeWindow('${viewerId}')"></button>
+                            <button class="btn-neon min" onclick="window.minimizeWindow('${viewerId}')" aria-label="Minimize window"></button>
+                            <button class="btn-neon max" onclick="window.toggleMaximize('${viewerId}')" aria-label="Maximize window"></button>
+                            <button class="btn-neon close" onclick="window.closeWindow('${viewerId}')" aria-label="Close window"></button>
                         </div>
-                        <span class="window-title">${viewerConfig.title}</span>
+                        <span class="window-title" id="win-title-${viewerId}">${viewerConfig.title}</span>
                     </div>
                     <div class="flex-1 relative overflow-hidden">
                         ${viewerConfig.content}

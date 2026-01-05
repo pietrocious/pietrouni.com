@@ -1177,3 +1177,51 @@ html.dark .markdown-body pre {
   background-size: 100% 2px, 3px 100%;
   pointer-events: none;
 }
+
+/* =========================================
+   Accessibility: Reduced Motion Support
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable specific animated backgrounds */
+  .her-bg,
+  .her-bg-dark,
+  .sonoma-bg,
+  .sonoma-bg-dark,
+  .sequoia-bg,
+  .sequoia-bg-dark,
+  .ventura-bg,
+  .ventura-bg-dark {
+    animation: none !important;
+  }
+
+  /* Disable dock hover effects */
+  .dock-item:hover {
+    transform: none !important;
+  }
+
+  /* Disable window animations */
+  .window.window-opening,
+  .window.window-closing {
+    animation: none !important;
+  }
+
+  /* Disable vault card animations */
+  .vault-card-animate {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Disable glitch effects */
+  .window-glitch::before {
+    animation: none !important;
+  }
+}
