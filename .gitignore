@@ -10,6 +10,5 @@ $RECYCLE.BIN/
 
 # npm and vite files
 node_modules/
-dist/
 .vite/
 .claude/

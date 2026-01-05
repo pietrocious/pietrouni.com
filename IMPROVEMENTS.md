@@ -10,12 +10,18 @@ This document tracks potential improvements for the pietrouni.com portfolio.
 - [x] Fix calculator security vulnerability
 - [x] Add global error handlers
 - [x] HTML reduced from 3,731 to 463 lines
+- [x] **Convert Tailwind to build-time** (was 300KB+ CDN → 48KB tree-shaken)
+  - Created `tailwind.config.js` with custom theme
+  - Created `postcss.config.js` for Vite integration
+  - Added `@theme` directive in `styles.css` for Tailwind v4
+  - Removed CDN script and inline config (~55 lines from HTML)
 
 ## Next Steps
 
 ### High Priority
 
 1. **Split main.js into ES6 modules**
+
    ```
    src/
    ├── main.js           (entry point)
@@ -33,6 +39,7 @@ This document tracks potential improvements for the pietrouni.com portfolio.
    ```
 
 2. **Add TypeScript**
+
    ```bash
    npm install -D typescript
    ```
@@ -44,11 +51,8 @@ This document tracks potential improvements for the pietrouni.com portfolio.
 
 ### Medium Priority
 
-4. **Convert Tailwind to build-time**
-   - Already installed: `tailwindcss`, `@tailwindcss/postcss`
-   - Need to configure PostCSS and update styles
-
 5. **Add Service Worker for PWA**
+
    - Enable offline functionality
    - Add to home screen support
 
@@ -60,6 +64,7 @@ This document tracks potential improvements for the pietrouni.com portfolio.
 ### Low Priority
 
 7. **Add SEO files**
+
    - `robots.txt`
    - `sitemap.xml`
    - JSON-LD structured data
