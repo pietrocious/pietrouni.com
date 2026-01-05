@@ -1,6 +1,53 @@
 /* Tailwind CSS v4 */
 @import "tailwindcss";
 
+/* Custom Theme Configuration */
+@theme {
+  /* Color Palette */
+  --color-her-red: #4a7c9d;
+  --color-her-orange: #5b9ab8;
+  --color-her-cream: #f4ebd9;
+  --color-her-paper: #fdfbf7;
+  --color-her-dark: #3e2723;
+  --color-her-darker: #2d1a14;
+  --color-her-text: #4e342e;
+  --color-her-textLight: #efebe9;
+
+  /* Font Families */
+  --font-sans: "Playfair Display", serif;
+  --font-serif: "Lora", serif;
+  --font-headline: "Playfair Display", serif;
+  --font-ui: "Noto Sans", sans-serif;
+  --font-kernel: "Fixedsys", monospace;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Animations */
+  --animate-gradient-x: gradient-x 30s ease infinite;
+  --animate-dock-bounce: dockBounce 0.5s ease;
+}
+
+@keyframes gradient-x {
+  0%,
+  100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+@keyframes dockBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 /* Fonts: Google Fonts (Playfair Display, Lora) + Custom (Fixedsys for terminal) */
 /* Google Fonts loaded via <link> in HTML head */
 
