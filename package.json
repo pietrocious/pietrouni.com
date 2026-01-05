@@ -1,0 +1,20 @@
+{
+  "name": "pietrouni.com",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "An OS-inspired interactive portfolio showcasing DevOps and Infrastructure projects. Built with a focus on rich aesthetics, interactivity, and a premium design.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "Pietro Uni",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^7.3.0"
+  },
+  "dependencies": {
+    "marked": "^17.0.1"
+  }
+}
