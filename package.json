@@ -12,6 +12,8 @@
   "author": "Pietro Uni",
   "license": "ISC",
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "tailwindcss": "^4.1.18",
     "vite": "^7.3.0"
   },
   "dependencies": {
