@@ -2256,7 +2256,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
             return;
           }
           terminalHistory.push(input);
-          setTerminalHistoryIndex(-1);
+          terminalHistoryIndex = -1;
 
           const args = input.split(" ");
           const cmd = args[0].toLowerCase();
@@ -2311,7 +2311,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
             return;
           }
           terminalHistory.push(input);
-          setTerminalHistoryIndex(-1);
+          terminalHistoryIndex = -1;
 
           const args = input.split(" ");
           const cmd = args[0].toLowerCase();
