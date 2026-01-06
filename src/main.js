@@ -1315,7 +1315,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const parts = currentPath.split("/");
                 if (parts.length > 2) {
                   parts.pop();
-                  currentPath = parts.join("/");
+                  setCurrentPath(parts.join("/"));
                 }
               } else {
                 if (
@@ -1323,10 +1323,9 @@ document.addEventListener("DOMContentLoaded", () => {
                   dirObj[target] &&
                   typeof dirObj[target] === "object"
                 ) {
-                  currentPath =
-                    currentPath === "/"
-                      ? `/${target}`
-                      : `${currentPath}/${target}`;
+                  setCurrentPath(currentPath === "/"
+                    ? `/${target}`
+                    : `${currentPath}/${target}`);
                 } else {
                   output.innerHTML += `<div class="text-red-400">cd: no such directory: ${target}</div>`;
                 }
