@@ -1,6 +1,8 @@
 /* Tailwind CSS v4 */
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Custom Theme Configuration */
 @theme {
   /* Color Palette */
