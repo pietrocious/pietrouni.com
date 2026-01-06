@@ -2495,7 +2495,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
                 `;
         };
 
-        window.vaultShowFile = async function (filePath, fileName) {
+        window.vaultShowFile = function (fileName) {
           const grid = document.getElementById("vault-grid");
           const content = document.getElementById("vault-content");
           const backBtn = document.getElementById("vault-back-btn");
