@@ -1,8 +1,8 @@
 import { marked } from 'marked';
 
 // config - static data
-import { vaultData, fileSystem, asciiAlpha, OS93_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config.js';
-import { getVaultContent } from './vault.js';
+import { vaultData, fileSystem, asciiAlpha, OS93_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
+import { getVaultContent } from './vault';
 
 // state - shared app state with setters for mutations
 import {
@@ -12,13 +12,13 @@ import {
   shuffledQuotes, quoteIndex, setQuoteIndex, reshuffleQuotes, TERMINAL_STATE,
   activeWallpaperIndex, setActiveWallpaperIndex, monitorInterval, setMonitorInterval,
   tabCompletionIndex, setTabCompletionIndex, lastTabInput, setLastTabInput
-} from './state.js';
+} from './state';
 
 // window management
 import {
   bringToFront, closeWindow, minimizeWindow, restoreWindow, toggleMaximize,
   startDrag, addTouchListeners, updateWindowCursor, handleResizeStart, initWindowEventListeners
-} from './windows/manager.js';
+} from './windows/manager';
 
 // Global error handlers for better debugging and stability
 window.addEventListener('error', (event) => {

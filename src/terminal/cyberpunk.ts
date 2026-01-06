@@ -1,9 +1,9 @@
-// terminal/cyberpunk.js - netrunner mode commands
+// terminal/cyberpunk.ts - netrunner mode commands
 // v's got chrome to install
 
-import { getTerminalPromptHTML, TERMINAL_STATE, pushTerminalHistory, setTerminalHistoryIndex } from './core.js';
+import { getTerminalPromptHTML, TERMINAL_STATE, pushTerminalHistory, setTerminalHistoryIndex } from './core';
 
-export function handleCyberpunkCommand(input, output, inputEl) {
+export function handleCyberpunkCommand(input: string, output: HTMLElement, inputEl: HTMLInputElement): void {
   output.innerHTML += `${getTerminalPromptHTML()} ${input}</div>`;
 
   if (!input) {
@@ -37,7 +37,7 @@ export function handleCyberpunkCommand(input, output, inputEl) {
         600
       );
       break;
-    case "breach":
+    case "breach": {
       const breachTarget = args[1] || "unknown";
       output.innerHTML += `<div class="text-[#FCEE0A]">INITIATING BREACH PROTOCOL...</div>`;
       setTimeout(() => {
@@ -51,6 +51,7 @@ export function handleCyberpunkCommand(input, output, inputEl) {
         output.scrollTop = output.scrollHeight;
       }, 1200);
       break;
+    }
     case "daemons":
       output.innerHTML += `<div class="text-[#FCEE0A]">ACTIVE DAEMONS:</div>
                 <div class="ml-4 text-green-400">[ICEPICK] - Reduces ICE resistance</div>
@@ -58,18 +59,21 @@ export function handleCyberpunkCommand(input, output, inputEl) {
                 <div class="ml-4 text-red-400">[DATAMINE_V3] - Extracts eddies</div>`;
       break;
     case "disconnect":
-    case "exit":
+    case "exit": {
       const termWin = document.getElementById("win-terminal");
-      termWin.classList.remove("theme-cyberpunk");
-      termWin.classList.add("window-glitch");
-      setTimeout(() => termWin.classList.remove("window-glitch"), 500);
-      const titleEl = termWin.querySelector(".window-title");
-      if (titleEl) titleEl.innerText = "Terminal";
+      if (termWin) {
+        termWin.classList.remove("theme-cyberpunk");
+        termWin.classList.add("window-glitch");
+        setTimeout(() => termWin.classList.remove("window-glitch"), 500);
+        const titleEl = termWin.querySelector(".window-title");
+        if (titleEl) titleEl.textContent = "Terminal";
+      }
       TERMINAL_STATE.mode = "os93";
       TERMINAL_STATE.user = "guest";
       // Clear terminal and show goodbye
       output.innerHTML = `<div class="text-blue-400">Disconnected from NET_ARCH. Returning to OS93...</div>`;
       break;
+    }
     default:
       output.innerHTML += `<div class="text-[#FF003C]">ERROR: UNRECOGNIZED PROTOCOL</div>`;
   }

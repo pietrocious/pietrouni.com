@@ -1,24 +1,24 @@
-// windows/manager.js - handles all window operations
+// windows/manager.ts - handles all window operations
 // dragging, resizing, minimize/maximize, z-index stuff
 
-import { activeWindows, incrementZIndex, setMonitorInterval, monitorInterval } from '../state.js';
+import { activeWindows, incrementZIndex, setMonitorInterval, monitorInterval } from '../state';
 
 // drag state - keep these local since they're only used here
 let isDragging = false;
 let dragOffset = { x: 0, y: 0 };
-let dragId = null;
+let dragId: string | null = null;
 
 // resize state
-let resizeDir = null;
+let resizeDir: string | null = null;
 let isResizing = false;
-let resizeWin = null;
-let startResizeRect = null;
-let startResizePos = null;
+let resizeWin: HTMLElement | null = null;
+let startResizeRect: { left: number; top: number; width: number; height: number } | null = null;
+let startResizePos: { x: number; y: number } | null = null;
 
 // bring a window to front and mark it as active
-export function bringToFront(id) {
+export function bringToFront(id: string): void {
   if (activeWindows[id]) {
-    activeWindows[id].element.style.zIndex = incrementZIndex();
+    activeWindows[id].element.style.zIndex = String(incrementZIndex());
     // update styling for all windows
     document.querySelectorAll('.window').forEach(w => w.classList.remove('active-window'));
     activeWindows[id].element.classList.add('active-window');
@@ -26,7 +26,7 @@ export function bringToFront(id) {
 }
 
 // close window with animation
-export function closeWindow(id) {
+export function closeWindow(id: string): void {
   const win = document.getElementById(`win-${id}`);
   if (!win) return;
 
@@ -51,7 +51,7 @@ export function closeWindow(id) {
 }
 
 // minimize window with fancy scale animation towards dock
-export function minimizeWindow(id) {
+export function minimizeWindow(id: string): void {
   const winObj = activeWindows[id];
   if (!winObj) return;
 
@@ -97,7 +97,7 @@ export function minimizeWindow(id) {
 }
 
 // restore window from minimized state
-export function restoreWindow(id, openWindowFn) {
+export function restoreWindow(id: string, openWindowFn: (id: string) => void): void {
   if (!activeWindows[id]) {
     // window doesnt exist yet, open it
     openWindowFn(id);
@@ -123,7 +123,7 @@ export function restoreWindow(id, openWindowFn) {
 }
 
 // toggle maximize/restore window
-export function toggleMaximize(id) {
+export function toggleMaximize(id: string): void {
   const winObj = activeWindows[id];
   if (!winObj) return;
 
@@ -153,24 +153,26 @@ export function toggleMaximize(id) {
     // restore from maximized
     el.classList.remove('maximized');
     const prev = winObj.prevRect;
-    el.style.left = prev.left;
-    el.style.top = prev.top;
-    el.style.width = prev.width;
-    el.style.height = prev.height;
+    if (prev) {
+      el.style.left = prev.left;
+      el.style.top = prev.top;
+      el.style.width = prev.width;
+      el.style.height = prev.height;
+    }
     winObj.maximized = false;
   }
 }
 
 // start dragging a window
-export function startDrag(e, id) {
+export function startDrag(e: MouseEvent | TouchEvent, id: string): void {
   if (activeWindows[id].maximized) return; // cant drag maximized windows
 
   const win = activeWindows[id].element;
   const rect = win.getBoundingClientRect();
 
   // normalize touch/mouse events
-  const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-  const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+  const clientX = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
+  const clientY = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY;
 
   // resize zone check - prevent drag if clicking near top edge for resize
   if (!e.type.includes('touch') && clientY - rect.top < 10) return;
@@ -185,13 +187,13 @@ export function startDrag(e, id) {
 }
 
 // handle drag movement
-function handleMove(e) {
+function handleMove(e: MouseEvent | TouchEvent): void {
   if (isDragging && dragId) {
     e.preventDefault();
     const win = activeWindows[dragId].element;
 
-    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    const clientX = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
+    const clientY = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY;
 
     // constrain to viewport
     const container = win.offsetParent || document.body;
@@ -208,7 +210,7 @@ function handleMove(e) {
 }
 
 // end drag operation
-function handleEnd() {
+function handleEnd(): void {
   if (isDragging && dragId) {
     activeWindows[dragId].element.classList.remove('dragging');
   }
@@ -217,17 +219,17 @@ function handleEnd() {
 }
 
 // add touch listeners to window for mobile dragging
-export function addTouchListeners(winEl, id) {
+export function addTouchListeners(winEl: HTMLElement, id: string): void {
   const header = winEl.querySelector('.window-header');
   if (!header) return;
 
-  header.addEventListener('touchstart', (e) => startDrag(e, id), { passive: false });
-  window.addEventListener('touchmove', (e) => handleMove(e), { passive: false });
+  header.addEventListener('touchstart', (e) => startDrag(e as TouchEvent, id), { passive: false });
+  window.addEventListener('touchmove', (e) => handleMove(e as TouchEvent), { passive: false });
   window.addEventListener('touchend', () => handleEnd());
 }
 
 // update cursor based on position for resize hints
-export function updateWindowCursor(e, win) {
+export function updateWindowCursor(e: MouseEvent, win: HTMLElement): void {
   if (isResizing) return;
   const rect = win.getBoundingClientRect();
   const border = 10; // detection area
@@ -248,7 +250,7 @@ export function updateWindowCursor(e, win) {
 }
 
 // get resize direction based on mouse position
-function getResizeDir(e, win) {
+function getResizeDir(e: MouseEvent, win: HTMLElement): string {
   const rect = win.getBoundingClientRect();
   const border = 10;
   const x = e.clientX - rect.left;
@@ -263,7 +265,7 @@ function getResizeDir(e, win) {
 }
 
 // start resize operation
-export function handleResizeStart(e, win, id) {
+export function handleResizeStart(e: MouseEvent, win: HTMLElement, id: string): void {
   const dir = getResizeDir(e, win);
   if (!dir) return; // not on edge
 
@@ -286,14 +288,14 @@ export function handleResizeStart(e, win, id) {
 
 // init event listeners for dragging and resizing
 // call this once on app load
-export function initWindowEventListeners() {
+export function initWindowEventListeners(): void {
   // mouse move for dragging
   window.addEventListener('mousemove', (e) => handleMove(e));
   window.addEventListener('mouseup', () => handleEnd());
 
   // mouse move for resizing
   window.addEventListener('mousemove', (e) => {
-    if (!isResizing || !resizeWin) return;
+    if (!isResizing || !resizeWin || !startResizeRect || !startResizePos) return;
 
     const dx = e.clientX - startResizePos.x;
     const dy = e.clientY - startResizePos.y;
@@ -302,18 +304,18 @@ export function initWindowEventListeners() {
     const minW = 300;
     const minH = 200;
 
-    if (resizeDir.includes('e')) {
+    if (resizeDir?.includes('e')) {
       resizeWin.style.width = `${Math.max(minW, rect.width + dx)}px`;
     }
-    if (resizeDir.includes('s')) {
+    if (resizeDir?.includes('s')) {
       resizeWin.style.height = `${Math.max(minH, rect.height + dy)}px`;
     }
-    if (resizeDir.includes('w')) {
+    if (resizeDir?.includes('w')) {
       const newW = Math.max(minW, rect.width - dx);
       resizeWin.style.width = `${newW}px`;
       resizeWin.style.left = `${rect.left + (rect.width - newW)}px`;
     }
-    if (resizeDir.includes('n')) {
+    if (resizeDir?.includes('n')) {
       const newH = Math.max(minH, rect.height - dy);
       resizeWin.style.height = `${newH}px`;
       resizeWin.style.top = `${rect.top + (rect.height - newH)}px`;

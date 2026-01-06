@@ -1,9 +1,9 @@
-// terminal/fallout.js - patrolling the mojave almost makes you wish for a nuclear winter
+// terminal/fallout.ts - patrolling the mojave almost makes you wish for a nuclear winter
 // robco industries (tm)
 
-import { getTerminalPromptHTML, TERMINAL_STATE, pushTerminalHistory, setTerminalHistoryIndex } from './core.js';
+import { getTerminalPromptHTML, TERMINAL_STATE, pushTerminalHistory, setTerminalHistoryIndex } from './core';
 
-export function handleFalloutCommand(input, output, inputEl) {
+export function handleFalloutCommand(input: string, output: HTMLElement, inputEl: HTMLInputElement): void {
   output.innerHTML += `${getTerminalPromptHTML()} ${input}</div>`;
 
   if (!input) {
@@ -52,18 +52,21 @@ export function handleFalloutCommand(input, output, inputEl) {
                 </div>`;
       break;
     case "exit":
-    case "disconnect":
+    case "disconnect": {
       const termWin = document.getElementById("win-terminal");
-      termWin.classList.remove("theme-fallout");
-      termWin.classList.add("window-glitch");
-      setTimeout(() => termWin.classList.remove("window-glitch"), 500);
-      const titleEl = termWin.querySelector(".window-title");
-      if (titleEl) titleEl.innerText = "Terminal";
+      if (termWin) {
+        termWin.classList.remove("theme-fallout");
+        termWin.classList.add("window-glitch");
+        setTimeout(() => termWin.classList.remove("window-glitch"), 500);
+        const titleEl = termWin.querySelector(".window-title");
+        if (titleEl) titleEl.textContent = "Terminal";
+      }
       TERMINAL_STATE.mode = "os93";
       TERMINAL_STATE.user = "guest";
       // Clear terminal and show goodbye
       output.innerHTML = `<div class="text-blue-400">RobCo Terminal Shutdown. Goodbye.</div>`;
       break;
+    }
     default:
       output.innerHTML += `<div class="text-[#18dc04]">Syntax Error. Please consult your Overseer.</div>`;
   }

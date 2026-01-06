@@ -1,8 +1,10 @@
-// config.js - static data that doesnt change during runtime
+// config.ts - static data that doesnt change during runtime
 // vault items, filesystem, command lists, ascii art, etc
 
+import type { VaultItem, FileSystemNode } from './types';
+
 // vault items - what shows up in the vault app
-export const vaultData = [
+export const vaultData: VaultItem[] = [
   {
     id: "resume-pdf",
     title: "resume.pdf",
@@ -96,13 +98,11 @@ export const vaultData = [
 ];
 
 // fake filesystem for terminal
-export const fileSystem = {
+export const fileSystem: { root: FileSystemNode } = {
   root: {
     home: {
       guest: {
-        vault: {
-          /* items are in Vault app */
-        },
+        vault: {},
         projects: {
           "pietrouni.com": "FILE",
           "terraform-modules": "FILE",
@@ -128,7 +128,7 @@ export const fileSystem = {
 };
 
 // ascii art alphabet for the ascii command
-export const asciiAlpha = {
+export const asciiAlpha: Record<string, string[]> = {
   A: ["  A  ", " A A ", "AAAAA", "A   A", "A   A"],
   B: ["BBBB ", "B   B", "BBBB ", "B   B", "BBBB "],
   C: [" CCC ", "C    ", "C    ", "C    ", " CCC "],
@@ -169,7 +169,7 @@ export const asciiAlpha = {
 };
 
 // command lists for tab autocomplete
-export const OS93_COMMANDS = [
+export const OS93_COMMANDS: string[] = [
   "help",
   "help-fun",
   "clear",
@@ -222,7 +222,7 @@ export const OS93_COMMANDS = [
   "noclip",
 ];
 
-export const CYBERPUNK_COMMANDS = [
+export const CYBERPUNK_COMMANDS: string[] = [
   "help",
   "scan",
   "breach",
@@ -231,7 +231,7 @@ export const CYBERPUNK_COMMANDS = [
   "exit",
 ];
 
-export const FALLOUT_COMMANDS = [
+export const FALLOUT_COMMANDS: string[] = [
   "help",
   "stats",
   "inv",

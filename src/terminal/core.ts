@@ -1,24 +1,25 @@
-// terminal/core.js - shared terminal functionality
+// terminal/core.ts - shared terminal functionality
 // handles prompts, history navigation, tab completion, and command routing
 
-import { fileSystem, OS93_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from '../config.js';
+import { fileSystem, OS93_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from '../config';
 import {
   TERMINAL_STATE,
   terminalHistory, pushTerminalHistory,
   terminalHistoryIndex, setTerminalHistoryIndex,
   tabCompletionIndex, setTabCompletionIndex,
   lastTabInput, setLastTabInput
-} from '../state.js';
+} from '../state';
+import type { FileSystemNode } from '../types';
 
 // filesystem helper
-export function resolvePath(path) {
+export function resolvePath(path: string): FileSystemNode | null {
   const parts = path.split("/").filter((p) => p);
-  let current = fileSystem["root"];
+  let current: FileSystemNode = fileSystem["root"];
 
-  for (let part of parts) {
+  for (const part of parts) {
     if (part === "root") continue;
     if (current[part] && typeof current[part] === "object") {
-      current = current[part];
+      current = current[part] as FileSystemNode;
     } else {
       return null;
     }
@@ -27,7 +28,7 @@ export function resolvePath(path) {
 }
 
 // mode-specific prompts
-export function getTerminalPromptHTML() {
+export function getTerminalPromptHTML(): string {
   if (TERMINAL_STATE.mode === "cyberpunk") {
     return `<div><span class="text-[#FF003C] font-bold">V@NET_ARCH</span><span class="text-white">:</span><span class="text-[#FCEE0A]">~/subnets</span><span class="text-[#FF003C]">$</span>`;
   }
@@ -39,9 +40,11 @@ export function getTerminalPromptHTML() {
 }
 
 // main input handler - routes to mode-specific handlers
-export function handleTerminalCommand(e) {
-  const inputEl = document.getElementById("cmd-input");
+export function handleTerminalCommand(e: KeyboardEvent): void {
+  const inputEl = document.getElementById("cmd-input") as HTMLInputElement | null;
   const output = document.getElementById("term-output");
+
+  if (!inputEl || !output) return;
 
   // History Navigation (Shared)
   if (e.key === "ArrowUp") {
@@ -80,7 +83,7 @@ export function handleTerminalCommand(e) {
     if (!currentInput) return;
 
     // Get commands for current mode
-    let commands;
+    let commands: string[];
     if (TERMINAL_STATE.mode === "cyberpunk") {
       commands = CYBERPUNK_COMMANDS;
     } else if (TERMINAL_STATE.mode === "fallout") {
@@ -126,7 +129,7 @@ export function handleTerminalCommand(e) {
   }
 
   if (e.key === "Enter") {
-    const input = e.target.value.trim();
+    const input = (e.target as HTMLInputElement).value.trim();
 
     // Specific Router
     if (TERMINAL_STATE.mode === "cyberpunk") {

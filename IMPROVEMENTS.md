@@ -27,40 +27,44 @@ This document tracks potential improvements for the pietrouni.com portfolio.
   - Created `robots.txt` with sitemap reference and crawl-delay
   - Created `sitemap.xml` with proper schema
   - Added JSON-LD structured data in `index.html`
+- [x] **Add TypeScript**
+  - Created `tsconfig.json` with strict mode and ES2022 target
+  - Added type definitions in `src/types.d.ts`
+  - Converted all 9 JavaScript files to TypeScript (`.ts`)
+  - Gradual typing approach allows incremental type safety improvements
+- [x] **Add Vitest for testing**
+  - Created `vitest.config.ts` with jsdom environment
+  - Added test scripts to `package.json` (`test`, `test:run`, `test:coverage`)
+  - Created initial test suites for `state`, `config`, and `terminal/core` modules
+  - 32 tests passing across 3 test files
 
 ## Next Steps
 
-### High Priority
-
-1. **Add TypeScript**
-
-   ```bash
-   npm install -D typescript
-   ```
-
-2. **Add Vitest for testing**
-   ```bash
-   npm install -D vitest
-   ```
-
 ### Medium Priority
 
-3. **Add Service Worker for PWA**
+1. **Add Service Worker for PWA**
 
    - Enable offline functionality
    - Add to home screen support
 
 ### Low Priority
 
-4. **Performance optimization**
+2. **Performance optimization**
    - Lazy load non-critical resources
    - Image optimization
    - Code splitting
 
+3. **Expand test coverage**
+   - Add tests for window management
+   - Add integration tests for terminal commands
+   - Add E2E tests with Playwright
+
 ## Commands
 
 ```bash
-npm run dev      # Development server with HMR
-npm run build    # Production build to dist/
-npm run preview  # Preview production build
+npm run dev        # Development server with HMR
+npm run build      # Production build to dist/
+npm run preview    # Preview production build
+npm run test       # Run tests in watch mode
+npm run test:run   # Run tests once
 ```
