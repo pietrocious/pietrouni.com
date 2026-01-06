@@ -2620,7 +2620,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
             "[INFO] CloudFront cache refresh",
           ];
 
-          monitorInterval = setInterval(() => {
+          setMonitorInterval(setInterval(() => {
             // Update Graph Data
             dataPoints.shift();
             errorPoints.shift();
@@ -2691,7 +2691,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
               if (logContainer.children.length > 5)
                 logContainer.lastChild.remove();
             }
-          }, 1000);
+          }, 1000));
         }
 
         // Initial site Launch
