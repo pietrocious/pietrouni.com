@@ -15,61 +15,44 @@ This document tracks potential improvements for the pietrouni.com portfolio.
   - Created `postcss.config.js` for Vite integration
   - Added `@theme` directive in `styles.css` for Tailwind v4
   - Removed CDN script and inline config (~55 lines from HTML)
+- [x] **Split main.js into ES6 modules**
+  - Refactored monolithic `main.js` into modular components in `src/`
+  - Created dynamic module loader and specialized modules (terminal, windows, etc.)
+- [x] **Improve accessibility**
+  - Added comprehensive ARIA labels to all interactive elements
+  - Implemented `role` attributes (dialog, listbox, navigation, button)
+  - Added `aria-modal` and `aria-hidden` for proper screen reader support
+  - Keyboard navigation support via proper semantic markup
+- [x] **Add SEO files**
+  - Created `robots.txt` with sitemap reference and crawl-delay
+  - Created `sitemap.xml` with proper schema
+  - Added JSON-LD structured data in `index.html`
 
 ## Next Steps
 
 ### High Priority
 
-1. **Split main.js into ES6 modules**
-
-   ```
-   src/
-   ├── main.js           (entry point)
-   ├── state.js          (centralized state)
-   ├── windows/
-   │   ├── manager.js
-   │   └── config.js
-   ├── terminal/
-   │   ├── core.js
-   │   ├── os93.js
-   │   ├── cyberpunk.js
-   │   └── fallout.js
-   ├── vault.js
-   └── spotlight.js
-   ```
-
-2. **Add TypeScript**
+1. **Add TypeScript**
 
    ```bash
    npm install -D typescript
    ```
 
-3. **Add Vitest for testing**
+2. **Add Vitest for testing**
    ```bash
    npm install -D vitest
    ```
 
 ### Medium Priority
 
-5. **Add Service Worker for PWA**
+3. **Add Service Worker for PWA**
 
    - Enable offline functionality
    - Add to home screen support
 
-6. **Improve accessibility**
-   - Complete ARIA labels
-   - Keyboard navigation
-   - Screen reader support
-
 ### Low Priority
 
-7. **Add SEO files**
-
-   - `robots.txt`
-   - `sitemap.xml`
-   - JSON-LD structured data
-
-8. **Performance optimization**
+4. **Performance optimization**
    - Lazy load non-critical resources
    - Image optimization
    - Code splitting
