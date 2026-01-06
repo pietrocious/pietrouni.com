@@ -12,3 +12,4 @@ $RECYCLE.BIN/
 node_modules/
 .vite/
 .claude/
+dist/
