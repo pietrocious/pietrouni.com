@@ -19,7 +19,7 @@ export const vaultData = [
     type: "food",
     category: "Lifestyle",
     status: "ready",
-    action: "window.vaultShowFile('vault/food.md', 'food.md')",
+    action: "window.vaultShowFile('food.md')",
   },
   {
     id: "music",
@@ -28,7 +28,7 @@ export const vaultData = [
     type: "music",
     category: "Creative",
     status: "soon",
-    file: "vault/music.md",
+    action: "window.vaultShowFile('music.md')",
   },
   {
     id: "books",
@@ -37,7 +37,7 @@ export const vaultData = [
     type: "book",
     category: "Creative",
     status: "soon",
-    file: "vault/books.md",
+    action: "window.vaultShowFile('books.md')",
   },
   {
     id: "games",
@@ -46,7 +46,7 @@ export const vaultData = [
     type: "game",
     category: "Lifestyle",
     status: "ready",
-    action: "window.vaultShowFile('vault/games.md', 'games.md')",
+    action: "window.vaultShowFile('games.md')",
   },
   {
     id: "apps",
@@ -55,7 +55,7 @@ export const vaultData = [
     type: "app",
     category: "Resources",
     status: "soon",
-    file: "vault/apps.md",
+    action: "window.vaultShowFile('apps.md')",
   },
   {
     id: "blogs",
@@ -64,7 +64,7 @@ export const vaultData = [
     type: "link",
     category: "Resources",
     status: "soon",
-    file: "vault/blogs.md",
+    action: "window.vaultShowFile('blogs.md')",
   },
   {
     id: "sites",
@@ -73,7 +73,7 @@ export const vaultData = [
     type: "link",
     category: "Resources",
     status: "soon",
-    file: "vault/sites.md",
+    action: "window.vaultShowFile('sites.md')",
   },
   {
     id: "videos",
@@ -82,7 +82,7 @@ export const vaultData = [
     type: "video",
     category: "Creative",
     status: "soon",
-    file: "vault/videos.md",
+    action: "window.vaultShowFile('videos.md')",
   },
   {
     id: "travel",
@@ -91,7 +91,7 @@ export const vaultData = [
     type: "location",
     category: "Lifestyle",
     status: "soon",
-    file: "vault/travel.md",
+    action: "window.vaultShowFile('travel.md')",
   },
 ];
 

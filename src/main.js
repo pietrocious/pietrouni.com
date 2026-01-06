@@ -2,6 +2,7 @@ import { marked } from 'marked';
 
 // config - static data
 import { vaultData, fileSystem, asciiAlpha, OS93_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config.js';
+import { getVaultContent } from './vault.js';
 
 // state - shared app state with setters for mutations
 import {
@@ -2520,25 +2521,13 @@ ${digTarget}.          300     IN      A       151.101.65.140
           title.innerHTML = `<span>${fileName}</span>`;
 
           // Fetch and parse markdown
-          try {
-            const response = await fetch(filePath);
-            if (!response.ok) throw new Error("File not found");
-            const markdown = await response.text();
+          // Fetch and parse markdown
+          const markdown = getVaultContent(fileName);
+          
+          if (markdown) {
             article.innerHTML = marked.parse(markdown);
-          } catch (error) {
-            const isLocalFile = window.location.protocol === "file:";
-            if (isLocalFile) {
-              article.innerHTML = `
-                            <div class="text-center p-8">
-                                <div class="text-4xl mb-4">📁</div>
-                                <h3 class="text-lg font-bold mb-2">Local Server Required</h3>
-                                <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or deploy to S3.</p>
-                                <code class="text-xs bg-black/10 dark:bg-white/10 px-3 py-2 rounded block">npx serve .</code>
-                            </div>
-                        `;
-            } else {
-              article.innerHTML = `<div class="text-red-500 p-4">Error loading file: ${error.message}</div>`;
-            }
+          } else {
+             article.innerHTML = `<div class="text-red-500 p-4">Error loading file: File not found in bundle</div>`;
           }
         };
 
