@@ -1,15 +1,10 @@
-## OS Files
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# OSX
+# misc
 .DS_Store
+*.pem
 
-# npm and vite files
+# dependencies
 node_modules/
 .vite/
-.claude/
 dist/
