@@ -8,7 +8,7 @@ import {
   activeWindows, incrementZIndex, wallpapers, allWallpaperClasses,
   currentPath, setCurrentPath, terminalHistory, pushTerminalHistory,
   terminalHistoryIndex, setTerminalHistoryIndex, guessGame, ciscoMode, terraformMode,
-  shuffledQuotes, quoteIndex, setQuoteIndex, TERMINAL_STATE,
+  shuffledQuotes, quoteIndex, setQuoteIndex, reshuffleQuotes, TERMINAL_STATE,
   activeWallpaperIndex, setActiveWallpaperIndex, monitorInterval, setMonitorInterval,
   tabCompletionIndex, setTabCompletionIndex, lastTabInput, setLastTabInput
 } from './state.js';
@@ -1603,10 +1603,10 @@ ${digTarget}.          300     IN      A       151.101.65.140
             case "quote":
               // get next quote from shuffled array
               const currentQuote = shuffledQuotes[quoteIndex];
-              quoteIndex++;
+              setQuoteIndex(quoteIndex + 1);
               if (quoteIndex >= shuffledQuotes.length) {
-                quoteIndex = 0;
-                shuffledQuotes = shuffleArray([...quotes]); // Reshuffle when all shown
+                setQuoteIndex(0);
+                reshuffleQuotes(); // Reshuffle when all shown
               }
               output.innerHTML += `<div class="text-purple-300 italic my-2">💬 ${currentQuote}</div>`;
               break;
