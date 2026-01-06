@@ -1,5 +1,24 @@
 import { marked } from 'marked';
 
+// config - static data
+import { vaultData, fileSystem, asciiAlpha, OS93_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config.js';
+
+// state - shared app state with setters for mutations
+import {
+  activeWindows, incrementZIndex, wallpapers, allWallpaperClasses,
+  currentPath, setCurrentPath, terminalHistory, pushTerminalHistory,
+  terminalHistoryIndex, setTerminalHistoryIndex, guessGame, ciscoMode, terraformMode,
+  shuffledQuotes, quoteIndex, setQuoteIndex, TERMINAL_STATE,
+  activeWallpaperIndex, setActiveWallpaperIndex, monitorInterval, setMonitorInterval,
+  tabCompletionIndex, setTabCompletionIndex, lastTabInput, setLastTabInput
+} from './state.js';
+
+// window management
+import {
+  bringToFront, closeWindow, minimizeWindow, restoreWindow, toggleMaximize,
+  startDrag, addTouchListeners, updateWindowCursor, handleResizeStart, initWindowEventListeners
+} from './windows/manager.js';
+
 // Global error handlers for better debugging and stability
 window.addEventListener('error', (event) => {
   console.error('[Portfolio Error]', event.message, 'at', event.filename, ':', event.lineno);
@@ -10,38 +29,18 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-        // config
-        const config = {
-          // Config simplified as boot is removed
-        };
+        // config object (kept for potential future use)
+        const config = {};
 
-        // state
-        let zIndexCounter = 100;
-        let activeWindows = {}; // Stores { element, config, state }
-        let monitorInterval = null;
-        let activeWallpaperIndex = 0;
+        // expose window manager functions globally for HTML onclick handlers
+        window.closeWindow = closeWindow;
+        window.minimizeWindow = minimizeWindow;
+        window.restoreWindow = (id) => restoreWindow(id, window.openWindow);
+        window.toggleMaximize = toggleMaximize;
+        window.startDrag = startDrag;
 
-        // wallpapers - named after macos versions because why not
-        const wallpapers = [
-          // Sonoma Flow - Organic Flowing Blobs (Default)
-          { type: "class", light: "sonoma-bg", dark: "sonoma-bg-dark" },
-          // Sequoia Gradient - Rich Layered Diagonals
-          { type: "class", light: "sequoia-bg", dark: "sequoia-bg-dark" },
-          // Ventura Waves - Smooth Flowing Layers
-          { type: "class", light: "ventura-bg", dark: "ventura-bg-dark" },
-        ];
-
-        // List of all wallpaper classes for cleanup
-        const allWallpaperClasses = [
-          "her-bg",
-          "her-bg-dark",
-          "sonoma-bg",
-          "sonoma-bg-dark",
-          "sequoia-bg",
-          "sequoia-bg-dark",
-          "ventura-bg",
-          "ventura-bg-dark",
-        ];
+        // initialize window event listeners (drag, resize)
+        initWindowEventListeners();
 
         function applyWallpaper() {
           const isDark = document.documentElement.classList.contains("dark");
@@ -58,203 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
             desktop.style.background = isDark ? wp.dark : wp.light;
           }
         }
-
-        // vault stuff
-        const vaultData = [
-          {
-            id: "resume-pdf",
-            title: "resume.pdf",
-            desc: "My resume in PDF format",
-            type: "doc",
-            category: "Professional",
-            status: "ready",
-            action:
-              "window.open('https://pietrouni.com/vault/PietroUni_Resume_2026.pdf', '_blank')",
-          },
-          {
-            id: "food",
-            title: "food.md",
-            desc: "My favorite spots and recipes",
-            type: "food",
-            category: "Lifestyle",
-            status: "ready",
-            action: "window.vaultShowFile('vault/food.md', 'food.md')",
-          },
-          {
-            id: "music",
-            title: "music.md",
-            desc: "Music that moves me",
-            type: "music",
-            category: "Creative",
-            status: "soon",
-            file: "vault/music.md",
-          },
-          {
-            id: "books",
-            title: "books.md",
-            desc: "Books that shaped my thinking",
-            type: "book",
-            category: "Creative",
-            status: "soon",
-            file: "vault/books.md",
-          },
-          {
-            id: "games",
-            title: "games.md",
-            desc: "Games I love",
-            type: "game",
-            category: "Lifestyle",
-            status: "ready",
-            action: "window.vaultShowFile('vault/games.md', 'games.md')",
-          },
-          {
-            id: "apps",
-            title: "apps.md",
-            desc: "Apps and tools I swear by",
-            type: "app",
-            category: "Resources",
-            status: "soon",
-            file: "vault/apps.md",
-          },
-          {
-            id: "blogs",
-            title: "blogs.md",
-            desc: "Blogs worth reading",
-            type: "link",
-            category: "Resources",
-            status: "soon",
-            file: "vault/blogs.md",
-          },
-          {
-            id: "sites",
-            title: "sites.md",
-            desc: "Useful websites",
-            type: "link",
-            category: "Resources",
-            status: "soon",
-            file: "vault/sites.md",
-          },
-          {
-            id: "videos",
-            title: "videos.md",
-            desc: "Videos and channels I follow",
-            type: "video",
-            category: "Creative",
-            status: "soon",
-            file: "vault/videos.md",
-          },
-          {
-            id: "travel",
-            title: "travel.md",
-            desc: "Travel stories and recommendations",
-            type: "location",
-            category: "Lifestyle",
-            status: "soon",
-            file: "vault/travel.md",
-          },
-        ];
-
-        // terminal state
-        let currentPath = "/home/guest";
-        let terminalHistory = [];
-        let terminalHistoryIndex = -1;
-        let guessGame = { active: false, target: 0, attempts: 0 };
-        let ciscoMode = { active: false };
-        let terraformMode = { active: false };
-        const fileSystem = {
-          root: {
-            home: {
-              guest: {
-                vault: {
-                  /* Conceptual, items are in Vault app */
-                },
-                projects: {
-                  "pietrouni.com": "FILE",
-                  "terraform-modules": "FILE",
-                  "network-automation": "FILE",
-                },
-                photos: {
-                  "vacation.jpg": "FILE",
-                  "setup.png": "FILE",
-                },
-                experiments: {
-                  "prototype-1.html": "FILE",
-                  "test-render.html": "FILE",
-                },
-                "readme.md": "FILE",
-                "todo.txt": "FILE",
-                ".config": "FILE",
-                ".secrets": "FILE",
-              },
-            },
-            bin: {},
-            etc: {},
-          },
-        };
-
-        const asciiAlpha = {
-          A: ["  A  ", " A A ", "AAAAA", "A   A", "A   A"],
-          B: ["BBBB ", "B   B", "BBBB ", "B   B", "BBBB "],
-          C: [" CCC ", "C    ", "C    ", "C    ", " CCC "],
-          D: ["DDDD ", "D   D", "D   D", "D   D", "DDDD "],
-          E: ["EEEEE", "E    ", "EEEEE", "E    ", "EEEEE"],
-          F: ["FFFFF", "F    ", "FFFF ", "F    ", "F    "],
-          G: [" GGG ", "G    ", "G  GG", "G   G", " GGG "],
-          H: ["H   H", "H   H", "HHHHH", "H   H", "H   H"],
-          I: [" III ", "  I  ", "  I  ", "  I  ", " III "],
-          J: ["JJJJJ", "  J  ", "  J  ", "J J  ", " J   "],
-          K: ["K   K", "K  K ", "KKK  ", "K  K ", "K   K"],
-          L: ["L    ", "L    ", "L    ", "L    ", "LLLLL"],
-          M: ["M   M", "MM MM", "M M M", "M   M", "M   M"],
-          N: ["N   N", "NN  N", "N N N", "N  NN", "N   N"],
-          O: [" OOO ", "O   O", "O   O", "O   O", " OOO "],
-          P: ["PPPP ", "P   P", "PPPP ", "P    ", "P    "],
-          Q: [" QQQ ", "Q   Q", "Q   Q", "Q  Q ", " QQ Q"],
-          R: ["RRRR ", "R   R", "RRRR ", "R  R ", "R   R"],
-          S: [" SSS ", "S    ", " SSS ", "    S", "SSSS "],
-          T: ["TTTTT", "  T  ", "  T  ", "  T  ", "  T  "],
-          U: ["U   U", "U   U", "U   U", "U   U", " UUU "],
-          V: ["V   V", "V   V", "V   V", " V V ", "  V  "],
-          W: ["W   W", "W   W", "W W W", "WW WW", "W   W"],
-          X: ["X   X", " X X ", "  X  ", " X X ", "X   X"],
-          Y: ["Y   Y", " Y Y ", "  Y  ", "  Y  ", "  Y  "],
-          Z: ["ZZZZZ", "   Z ", "  Z  ", " Z   ", "ZZZZZ"],
-          0: [" 000 ", "0  00", "0 0 0", "00  0", " 000 "],
-          1: ["  1  ", " 11  ", "  1  ", "  1  ", "11111"],
-          2: [" 222 ", "2   2", "   2 ", "  2  ", "22222"],
-          3: ["33333", "    3", "  33 ", "    3", "33333"],
-          4: ["   4 ", "  44 ", " 4 4 ", "44444", "   4 "],
-          5: ["55555", "5    ", "5555 ", "    5", "5555 "],
-          6: [" 666 ", "6    ", "6666 ", "6   6", " 666 "],
-          7: ["77777", "    7", "   7 ", "  7  ", " 7   "],
-          8: [" 888 ", "8   8", " 888 ", "8   8", " 888 "],
-          9: [" 999 ", "9   9", " 9999", "    9", " 999 "],
-          " ": ["     ", "     ", "     ", "     ", "     "],
-        };
-
-        const quotes = [
-          "If you don’t work hard on your own dreams, you’ll eventually end up building someone else’s.",
-          "The only way to do great work is to love what you do.",
-          "Sometimes the correct path, the bravest path is the least obvious, and also the gentlest.",
-          "If you don't like what is being said, change the conversation.",
-          "Even though success is a reality, it's effects are temporary.",
-          "You don't have to be great to start, but you have to start to be great.",
-          "In the middle of difficulty lies opportunity.",
-          "Every expert was once a beginner who refused to quit.",
-          "The only way to make sense out of change is to plunge into it, move with it, and join the dance.",
-        ];
-
-        // shuffle quotes
-        let shuffledQuotes = [...quotes];
-        let quoteIndex = 0;
-        function shuffleArray(arr) {
-          for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-          }
-          return arr;
-        }
-        shuffledQuotes = shuffleArray(shuffledQuotes);
 
         // theme + wallpaper
         function initTheme() {
@@ -297,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         window.cycleWallpaper = function () {
-          activeWallpaperIndex = (activeWallpaperIndex + 1) % wallpapers.length;
+          setActiveWallpaperIndex((activeWallpaperIndex + 1) % wallpapers.length);
           applyWallpaper();
         };
 
@@ -953,7 +755,7 @@ document.addEventListener("DOMContentLoaded", () => {
           winEl.style.height = heightStyle;
           winEl.style.left = `${leftPos}px`;
           winEl.style.top = `${topPos}px`;
-          winEl.style.zIndex = ++zIndexCounter;
+          winEl.style.zIndex = incrementZIndex();
 
           // macOS Header + Content
           winEl.innerHTML = `
@@ -1023,26 +825,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         };
 
-        window.closeWindow = function (id) {
-          const win = document.getElementById(`win-${id}`);
-          if (!win) return;
 
-          // Add closing animation
-          win.classList.add("window-closing");
-
-          // Remove after animation completes
-          setTimeout(() => {
-            if (win) win.remove();
-            delete activeWindows[id];
-          }, 250);
-
-          // Dock State
-          const dockItem = document.getElementById(`dock-${id}`);
-          if (dockItem) dockItem.classList.remove("active");
-
-          if (id === "monitor" && monitorInterval)
-            clearInterval(monitorInterval);
-        };
 
         // md viewer
         window.openMarkdownViewer = async function (filePath, title) {
@@ -1160,309 +943,17 @@ document.addEventListener("DOMContentLoaded", () => {
           setTimeout(() => winEl.classList.remove("window-opening"), 350);
         };
 
-        window.minimizeWindow = function (id) {
-          const winObj = activeWindows[id];
-          if (!winObj) return;
 
-          const el = winObj.element;
-          const dockItem = document.getElementById(`dock-${id}`);
 
-          // Calculate Transform Origin for "Scale" effect towards dock
-          let originX = "50%";
-          let originY = "100%";
 
-          if (dockItem) {
-            const dockRect = dockItem.getBoundingClientRect();
-            const winRect = el.getBoundingClientRect();
 
-            // Destination is center of dock icon
-            const destX = dockRect.left + dockRect.width / 2;
-            const destY = dockRect.top + dockRect.height / 2;
 
-            // Origin relative to window top-left
-            const relX = destX - winRect.left;
-            const relY = destY - winRect.top;
 
-            originX = `${relX}px`;
-            originY = `${relY}px`;
-          } else {
-            // Fallback to center bottom
-            const winRect = el.getBoundingClientRect();
-            const destX = window.innerWidth / 2;
-            const destY = window.innerHeight;
-            originX = `${destX - winRect.left}px`;
-            originY = `${destY - winRect.top}px`;
-          }
 
-          // Smooth Transition
-          el.style.transition =
-            "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease";
-          el.style.transformOrigin = `${originX} ${originY}`;
 
-          // Trigger Reflow
-          el.offsetHeight;
 
-          el.classList.add("minimized");
-          el.classList.remove("active-window");
-        };
 
-        window.restoreWindow = function (id) {
-          if (!activeWindows[id]) {
-            window.openWindow(id);
-            return;
-          }
-          const winObj = activeWindows[id];
-          const el = winObj.element;
 
-          // Restore Transition
-          el.style.transition =
-            "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease";
-
-          el.classList.remove("minimized");
-          bringToFront(id);
-
-          // Cleanup inline styles after animation
-          setTimeout(() => {
-            if (!el.classList.contains("minimized")) {
-              el.style.transition = "";
-              el.style.transformOrigin = "";
-            }
-          }, 450);
-        };
-
-        window.toggleMaximize = function (id) {
-          const winObj = activeWindows[id];
-          if (!winObj) return;
-
-          const el = winObj.element;
-
-          if (!winObj.maximized) {
-            // Save state
-            winObj.prevRect = {
-              left: el.style.left,
-              top: el.style.top,
-              width: el.style.width,
-              height: el.style.height,
-            };
-
-            // Maximize (Top 0 relative to windows-container which starts below Menu Bar)
-            el.classList.add("maximized");
-            el.style.left = "0px";
-            el.style.top = "0px";
-            el.style.width = "100%";
-
-            const isMobile = window.innerWidth < 768;
-            // On Mobile maximize full height, on desktop leave room for dock
-            el.style.height = isMobile
-              ? "calc(100vh - 85px)"
-              : "calc(100% - 90px)";
-
-            winObj.maximized = true;
-          } else {
-            // Restore
-            el.classList.remove("maximized");
-            const prev = winObj.prevRect;
-            el.style.left = prev.left;
-            el.style.top = prev.top;
-            el.style.width = prev.width;
-            el.style.height = prev.height;
-            winObj.maximized = false;
-          }
-        };
-
-        function bringToFront(id) {
-          if (activeWindows[id]) {
-            activeWindows[id].element.style.zIndex = ++zIndexCounter;
-            // Update styling
-            document
-              .querySelectorAll(".window")
-              .forEach((w) => w.classList.remove("active-window"));
-            activeWindows[id].element.classList.add("active-window");
-          }
-        }
-
-        // dragging
-        let isDragging = false;
-        let dragOffset = { x: 0, y: 0 };
-        let dragId = null;
-
-        window.startDrag = function (e, id) {
-          if (activeWindows[id].maximized) return; // Prevent drag if maximized
-
-          const win = activeWindows[id].element;
-          const rect = win.getBoundingClientRect();
-
-          // Normalize touch/mouse events
-          const clientX = e.type.includes("touch")
-            ? e.touches[0].clientX
-            : e.clientX;
-          const clientY = e.type.includes("touch")
-            ? e.touches[0].clientY
-            : e.clientY;
-
-          // Resize Zone Check (Top 10px) - prevent drag if clicking near top edge to allow resize (Desktop only mostly)
-          if (!e.type.includes("touch") && clientY - rect.top < 10) return;
-
-          isDragging = true;
-          dragId = id;
-          dragOffset.x = clientX - rect.left;
-          dragOffset.y = clientY - rect.top;
-          win.classList.add("dragging");
-          bringToFront(id);
-          if (e.stopPropagation) e.stopPropagation();
-        };
-
-        window.addEventListener("mousemove", (e) => handleMove(e));
-        window.addEventListener("mouseup", () => handleEnd());
-
-        function handleMove(e) {
-          if (isDragging && dragId) {
-            e.preventDefault();
-            const win = activeWindows[dragId].element;
-
-            const clientX = e.type.includes("touch")
-              ? e.touches[0].clientX
-              : e.clientX;
-            const clientY = e.type.includes("touch")
-              ? e.touches[0].clientY
-              : e.clientY;
-
-            // Constrain to viewport (approx)
-            // Constrain to viewport (approx)
-            const container = win.offsetParent || document.body;
-            const containerRect = container.getBoundingClientRect();
-            let newX = clientX - dragOffset.x - containerRect.left;
-            let newY = clientY - dragOffset.y - containerRect.top;
-
-            // Keep header accessible
-            if (newY < 0) newY = 0;
-
-            win.style.left = `${newX}px`;
-            win.style.top = `${newY}px`;
-          }
-        }
-
-        function handleEnd() {
-          if (isDragging && dragId) {
-            activeWindows[dragId].element.classList.remove("dragging");
-          }
-          isDragging = false;
-          dragId = null;
-        }
-
-        function addTouchListeners(winEl, id) {
-          const header = winEl.querySelector(".window-header");
-          if (!header) return;
-
-          header.addEventListener(
-            "touchstart",
-            (e) => window.startDrag(e, id),
-            { passive: false }
-          );
-          window.addEventListener("touchmove", (e) => handleMove(e), {
-            passive: false,
-          });
-          window.addEventListener("touchend", () => handleEnd());
-        }
-
-        // resizing
-        let resizeDir = null;
-        let isResizing = false;
-        let resizeWin = null;
-        let startResizeRect = null;
-        let startResizePos = null;
-
-        function updateWindowCursor(e, win) {
-          if (isResizing) return;
-          const rect = win.getBoundingClientRect();
-          const border = 10; // Detection area
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-
-          let cursor = "";
-          if (y < border && x < border) cursor = "nw-resize";
-          else if (y < border && x > rect.width - border) cursor = "ne-resize";
-          else if (y > rect.height - border && x < border) cursor = "sw-resize";
-          else if (y > rect.height - border && x > rect.width - border)
-            cursor = "se-resize";
-          else if (y < border) cursor = "n-resize";
-          else if (y > rect.height - border) cursor = "s-resize";
-          else if (x < border) cursor = "w-resize";
-          else if (x > rect.width - border) cursor = "e-resize";
-
-          win.style.cursor = cursor || "default";
-        }
-
-        function getResizeDir(e, win) {
-          const rect = win.getBoundingClientRect();
-          const border = 10;
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-
-          let dir = "";
-          if (y < border) dir += "n";
-          if (y > rect.height - border) dir += "s";
-          if (x < border) dir += "w";
-          if (x > rect.width - border) dir += "e";
-          return dir;
-        }
-
-        function handleResizeStart(e, win, id) {
-          const dir = getResizeDir(e, win);
-          if (!dir) return; // Not on edge
-
-          if (activeWindows[id].maximized) return;
-
-          e.preventDefault();
-          isResizing = true;
-          resizeWin = win;
-          resizeDir = dir;
-          win.classList.add("resizing");
-
-          startResizeRect = {
-            left: win.offsetLeft,
-            top: win.offsetTop,
-            width: win.offsetWidth,
-            height: win.offsetHeight,
-          };
-          startResizePos = { x: e.clientX, y: e.clientY };
-        }
-
-        window.addEventListener("mousemove", (e) => {
-          if (!isResizing || !resizeWin) return;
-
-          const dx = e.clientX - startResizePos.x;
-          const dy = e.clientY - startResizePos.y;
-          const rect = startResizeRect;
-
-          const minW = 300;
-          const minH = 200;
-
-          if (resizeDir.includes("e")) {
-            resizeWin.style.width = `${Math.max(minW, rect.width + dx)}px`;
-          }
-          if (resizeDir.includes("s")) {
-            resizeWin.style.height = `${Math.max(minH, rect.height + dy)}px`;
-          }
-          if (resizeDir.includes("w")) {
-            const newW = Math.max(minW, rect.width - dx);
-            resizeWin.style.width = `${newW}px`;
-            resizeWin.style.left = `${rect.left + (rect.width - newW)}px`;
-          }
-          if (resizeDir.includes("n")) {
-            const newH = Math.max(minH, rect.height - dy);
-            resizeWin.style.height = `${newH}px`;
-            resizeWin.style.top = `${rect.top + (rect.height - newH)}px`;
-          }
-        });
-
-        window.addEventListener("mouseup", () => {
-          if (isResizing && resizeWin) {
-            resizeWin.classList.remove("resizing");
-          }
-          isResizing = false;
-          resizeWin = null;
-        });
 
         // clock
         function updateClock() {
@@ -1494,12 +985,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return current;
         }
 
-        // the terminal does different stuff based on mode
-        const TERMINAL_STATE = {
-          mode: "os93", // 'os93', 'cyberpunk', 'fallout'
-          user: "guest",
-          host: "OS93",
-        };
+
 
         function getTerminalPromptHTML() {
           if (TERMINAL_STATE.mode === "cyberpunk") {
@@ -1517,78 +1003,6 @@ document.addEventListener("DOMContentLoaded", () => {
         window.handleCyberpunkCommand = null;
         window.handleFalloutCommand = null;
 
-        // Command lists for autocomplete
-        const OS93_COMMANDS = [
-          "help",
-          "help-fun",
-          "clear",
-          "whoami",
-          "pwd",
-          "ls",
-          "ll",
-          "cd",
-          "mkdir",
-          "touch",
-          "rmdir",
-          "cat",
-          "open",
-          "calc",
-          "guess",
-          "traceroute",
-          "tracert",
-          "dig",
-          "curl",
-          "docker",
-          "terraform",
-          "cisco",
-          "ssh",
-          "version",
-          "uptime",
-          "clock",
-          "quote",
-          "neofetch",
-          "ascii",
-          "cowsay",
-          "figlet",
-          "flip",
-          "rps",
-          "8ball",
-          "sudo",
-          "rm",
-          "exit",
-          "pietro",
-          "matrix",
-          "hack",
-          "about",
-          "contact",
-          "projects",
-          "resume",
-          "hlx",
-          "fallout",
-          "cyberpunk",
-          "rain",
-          "sl",
-          "noclip",
-        ];
-        const CYBERPUNK_COMMANDS = [
-          "help",
-          "scan",
-          "breach",
-          "daemons",
-          "disconnect",
-          "exit",
-        ];
-        const FALLOUT_COMMANDS = [
-          "help",
-          "stats",
-          "inv",
-          "radio",
-          "exit",
-          "disconnect",
-        ];
-
-        let tabCompletionIndex = 0;
-        let lastTabInput = "";
 
         window.handleTerminalCommand = function (e) {
           const inputEl = document.getElementById("cmd-input");
@@ -1601,7 +1015,7 @@ document.addEventListener("DOMContentLoaded", () => {
               terminalHistory.length > 0 &&
               terminalHistoryIndex < terminalHistory.length - 1
             ) {
-              terminalHistoryIndex++;
+              setTerminalHistoryIndex(terminalHistoryIndex + 1);
               inputEl.value =
                 terminalHistory[
                   terminalHistory.length - 1 - terminalHistoryIndex
@@ -1612,7 +1026,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (e.key === "ArrowDown") {
             e.preventDefault();
             if (terminalHistoryIndex > -1) {
-              terminalHistoryIndex--;
+              setTerminalHistoryIndex(terminalHistoryIndex - 1);
               inputEl.value =
                 terminalHistoryIndex >= 0
                   ? terminalHistory[
@@ -1650,14 +1064,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (matches.length === 1) {
               // Single match - complete it
               inputEl.value = matches[0];
-              tabCompletionIndex = 0;
-              lastTabInput = "";
+              setTabCompletionIndex(0);
+              setLastTabInput("");
             } else {
               // Multiple matches - cycle through them
               if (lastTabInput !== currentInput) {
                 // New input, reset cycle
-                tabCompletionIndex = 0;
-                lastTabInput = currentInput;
+                setTabCompletionIndex(0);
+                setLastTabInput(currentInput);
                 // Show available completions
                 output.innerHTML += `<div class="text-gray-400 text-xs my-1">${matches.join(
                   "  "
@@ -1665,15 +1079,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 output.scrollTop = output.scrollHeight;
               }
               inputEl.value = matches[tabCompletionIndex];
-              tabCompletionIndex = (tabCompletionIndex + 1) % matches.length;
+              setTabCompletionIndex((tabCompletionIndex + 1) % matches.length);
             }
             return;
           }
 
           // Reset tab completion on other key presses
           if (e.key !== "Tab") {
-            lastTabInput = "";
-            tabCompletionIndex = 0;
+            setLastTabInput("");
+            setTabCompletionIndex(0);
           }
 
           if (e.key === "Enter") {
@@ -1766,8 +1180,8 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
           // Standard Commands
-          terminalHistory.push(input);
-          terminalHistoryIndex = -1;
+          pushTerminalHistory(input);
+          setTerminalHistoryIndex(-1);
 
           const args = input.split(" ");
           const cmd = args[0].toLowerCase();
