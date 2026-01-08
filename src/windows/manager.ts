@@ -186,27 +186,83 @@ export function startDrag(e: MouseEvent | TouchEvent, id: string): void {
   if (e.stopPropagation) e.stopPropagation();
 }
 
-// handle drag movement
+// handle drag movement, rAF state for smooth animation
+let rafId: number | null = null;
+let pendingMove: { clientX: number; clientY: number } | null = null;
+let pendingResize: { clientX: number; clientY: number } | null = null;
+
+// throttle for cursor updates
+let cursorThrottleId: number | null = null;
+
+// handle drag movement with rAF batching
 function handleMove(e: MouseEvent | TouchEvent): void {
-  if (isDragging && dragId) {
-    e.preventDefault();
-    const win = activeWindows[dragId].element;
+  if (!isDragging || !dragId) return;
+  e.preventDefault();
+  
+  const clientX = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
+  const clientY = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY;
+  
+  pendingMove = { clientX, clientY };
+  
+  if (rafId) return; // skip if rAF already scheduled
+  
+  rafId = requestAnimationFrame(() => {
+    if (pendingMove && dragId && activeWindows[dragId]) {
+      const win = activeWindows[dragId].element;
+      const container = win.offsetParent || document.body;
+      const containerRect = container.getBoundingClientRect();
+      
+      let newX = pendingMove.clientX - dragOffset.x - containerRect.left;
+      let newY = pendingMove.clientY - dragOffset.y - containerRect.top;
+      
+      // keep header accessible - dont let it go above 0
+      if (newY < 0) newY = 0;
+      
+      win.style.left = `${newX}px`;
+      win.style.top = `${newY}px`;
+    }
+    rafId = null;
+    pendingMove = null;
+  });
+}
 
-    const clientX = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
-    const clientY = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY;
-
-    // constrain to viewport
-    const container = win.offsetParent || document.body;
-    const containerRect = container.getBoundingClientRect();
-    let newX = clientX - dragOffset.x - containerRect.left;
-    let newY = clientY - dragOffset.y - containerRect.top;
-
-    // keep header accessible - dont let it go above 0
-    if (newY < 0) newY = 0;
-
-    win.style.left = `${newX}px`;
-    win.style.top = `${newY}px`;
-  }
+// handle resize with rAF batching
+function handleResize(e: MouseEvent): void {
+  if (!isResizing || !resizeWin || !startResizeRect || !startResizePos) return;
+  
+  pendingResize = { clientX: e.clientX, clientY: e.clientY };
+  
+  if (rafId) return; // reuse same rAF guard
+  
+  rafId = requestAnimationFrame(() => {
+    if (pendingResize && resizeWin && startResizeRect && startResizePos && resizeDir) {
+      const dx = pendingResize.clientX - startResizePos.x;
+      const dy = pendingResize.clientY - startResizePos.y;
+      const rect = startResizeRect;
+      
+      const minW = 300;
+      const minH = 200;
+      
+      if (resizeDir.includes('e')) {
+        resizeWin.style.width = `${Math.max(minW, rect.width + dx)}px`;
+      }
+      if (resizeDir.includes('s')) {
+        resizeWin.style.height = `${Math.max(minH, rect.height + dy)}px`;
+      }
+      if (resizeDir.includes('w')) {
+        const newW = Math.max(minW, rect.width - dx);
+        resizeWin.style.width = `${newW}px`;
+        resizeWin.style.left = `${rect.left + (rect.width - newW)}px`;
+      }
+      if (resizeDir.includes('n')) {
+        const newH = Math.max(minH, rect.height - dy);
+        resizeWin.style.height = `${newH}px`;
+        resizeWin.style.top = `${rect.top + (rect.height - newH)}px`;
+      }
+    }
+    rafId = null;
+    pendingResize = null;
+  });
 }
 
 // end drag operation
@@ -216,6 +272,14 @@ function handleEnd(): void {
   }
   isDragging = false;
   dragId = null;
+  
+  // cancel any pending rAF
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+  pendingMove = null;
+  pendingResize = null;
 }
 
 // add touch listeners to window for mobile dragging
@@ -228,9 +292,13 @@ export function addTouchListeners(winEl: HTMLElement, id: string): void {
   window.addEventListener('touchend', () => handleEnd());
 }
 
-// update cursor based on position for resize hints
+// update cursor based on position for resize hints (throttled)
 export function updateWindowCursor(e: MouseEvent, win: HTMLElement): void {
-  if (isResizing) return;
+  if (isResizing || isDragging) return;
+  if (cursorThrottleId) return; // skip if throttled
+  
+  cursorThrottleId = window.setTimeout(() => { cursorThrottleId = null; }, 50);
+  
   const rect = win.getBoundingClientRect();
   const border = 10; // detection area
   const x = e.clientX - rect.left;
@@ -289,41 +357,19 @@ export function handleResizeStart(e: MouseEvent, win: HTMLElement, id: string): 
 // init event listeners for dragging and resizing
 // call this once on app load
 export function initWindowEventListeners(): void {
-  // mouse move for dragging
-  window.addEventListener('mousemove', (e) => handleMove(e));
-  window.addEventListener('mouseup', () => handleEnd());
-
-  // mouse move for resizing
+  // single consolidated mousemove handler for both drag and resize
   window.addEventListener('mousemove', (e) => {
-    if (!isResizing || !resizeWin || !startResizeRect || !startResizePos) return;
-
-    const dx = e.clientX - startResizePos.x;
-    const dy = e.clientY - startResizePos.y;
-    const rect = startResizeRect;
-
-    const minW = 300;
-    const minH = 200;
-
-    if (resizeDir?.includes('e')) {
-      resizeWin.style.width = `${Math.max(minW, rect.width + dx)}px`;
-    }
-    if (resizeDir?.includes('s')) {
-      resizeWin.style.height = `${Math.max(minH, rect.height + dy)}px`;
-    }
-    if (resizeDir?.includes('w')) {
-      const newW = Math.max(minW, rect.width - dx);
-      resizeWin.style.width = `${newW}px`;
-      resizeWin.style.left = `${rect.left + (rect.width - newW)}px`;
-    }
-    if (resizeDir?.includes('n')) {
-      const newH = Math.max(minH, rect.height - dy);
-      resizeWin.style.height = `${newH}px`;
-      resizeWin.style.top = `${rect.top + (rect.height - newH)}px`;
+    if (isDragging) {
+      handleMove(e);
+    } else if (isResizing) {
+      handleResize(e);
     }
   });
-
-  // mouse up for resize end
+  
+  // single mouseup handler for both
   window.addEventListener('mouseup', () => {
+    handleEnd();
+    
     if (isResizing && resizeWin) {
       resizeWin.classList.remove('resizing');
     }
@@ -331,3 +377,4 @@ export function initWindowEventListeners(): void {
     resizeWin = null;
   });
 }
+

@@ -545,10 +545,14 @@ html.dark .window.active-window {
   transition: none;
   opacity: 0.95;
   box-shadow: 0 30px 60px rgba(62, 39, 35, 0.2);
+  will-change: left, top;
+  transform: translateZ(0);
 }
 
 .window.resizing {
   transition: none;
+  will-change: width, height, left, top;
+  transform: translateZ(0);
 }
 
 .window.dragging iframe,
