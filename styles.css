@@ -97,21 +97,25 @@ body {
   animation: herGradient 20s ease infinite;
 }
 
-/* ===== Minimalist Scrollbar ===== */
-/* Firefox */
+/* ===== macOS-Style Hover-Reveal Scrollbar ===== */
+/* Firefox - scrollbar hidden by default, appears on hover */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-color: transparent transparent;
 }
 
-html.dark * {
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+*:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
 
-/* Chrome, Safari, Edge */
+html.dark *:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+/* Chrome, Safari, Edge - hover-reveal scrollbar */
 *::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 *::-webkit-scrollbar-track {
@@ -119,20 +123,36 @@ html.dark * {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.3s ease;
 }
 
-*::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.35);
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
 }
 
-html.dark *::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+*:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
 }
 
-html.dark *::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.35);
+/* Hide scrollbar arrows/buttons */
+*::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html.dark *:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+html.dark *:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* ===== Apple-Style Animated Wallpapers ===== */
@@ -561,12 +581,48 @@ html.dark .window.active-window {
 }
 
 .window-content {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: transparent transparent; /* Hidden by default */
+  transition: scrollbar-color 0.3s ease;
 }
 
-html.dark .window-content {
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+.window-content:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* Show on hover */
+}
+
+/* Chrome/Safari/Edge - hover reveal scrollbar */
+.window-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.window-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.window-content::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.window-content:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.window-content:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Hide scrollbar arrows/buttons */
+.window-content::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+html.dark .window-content:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
 /* Dock - Refined Design */
@@ -744,23 +800,7 @@ html.dark #menubar {
   border-left: 3px solid #4a7c9d;
 }
 
-/* Custom Scrollbar - Blue */
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #4a7c9d;
-  border-radius: 4px;
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: #4a7c9d;
-}
+/* Scrollbar styles consolidated in global section above (lines 100-155) */
 
 canvas {
   image-rendering: auto;
