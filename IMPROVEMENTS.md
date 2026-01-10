@@ -33,23 +33,27 @@ This document tracks potential improvements for the pietrouni.com portfolio.
   - Converted all 9 JavaScript files to TypeScript (`.ts`)
   - Gradual typing approach allows incremental type safety improvements
 - [x] **Add Vitest for testing**
+
   - Created `vitest.config.ts` with jsdom environment
   - Added test scripts to `package.json` (`test`, `test:run`, `test:coverage`)
   - Created initial test suites for `state`, `config`, and `terminal/core` modules
   - 32 tests passing across 3 test files
 
+- [x] **Add Service Worker for PWA**
+  - Created `public/sw.js` with cache-first strategy for offline support
+  - Updated `site.webmanifest` with proper PWA fields (name, start_url, scope, icons)
+  - Added service worker registration in `main.ts`
+  - Caches shell assets, Google Fonts, and static assets
+  - Version-based cache busting with automatic cleanup
+
 ## Next Steps
 
 ### Medium Priority
 
-1. **Add Service Worker for PWA**
-
-   - Enable offline functionality
-   - Add to home screen support
-
 ### Low Priority
 
 2. **Performance optimization**
+
    - Lazy load non-critical resources
    - Image optimization
    - Code splitting

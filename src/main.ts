@@ -2688,3 +2688,16 @@ ${digTarget}.          300     IN      A       151.101.65.140
           window.openWindow("about");
         }, 100);
       });
+
+// register service worker for pwa
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('[SW] Registration successful, scope:', registration.scope);
+      })
+      .catch((error) => {
+        console.error('[SW] Registration failed:', error);
+      });
+  });
+}
