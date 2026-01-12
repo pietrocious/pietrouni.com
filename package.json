@@ -2,7 +2,7 @@
   "name": "pietrouni.com",
   "version": "1.0.0",
   "type": "module",
-  "description": "An OS-inspired interactive portfolio showcasing DevOps and Infrastructure projects. Built with a focus on rich aesthetics, interactivity, and a premium design.",
+  "description": "An OS-inspired interactive portfolio showcasing DevOps and Infrastructure projects.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
