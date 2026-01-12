@@ -303,9 +303,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <div class="font-bold opacity-40 mb-2 text-xs uppercase tracking-wider">Built with</div>
                                 <ul class="space-y-1 opacity-80">
-                                    <li>• HTML5 & Vanilla JavaScript</li>
-                                    <li>• Tailwind CSS (CDN)</li>
-                                    <li>• HTML5 Canvas (Animations)</li>
+                                    <li>• HTML5 & TypeScript</li>
+                                    <li>• Tailwind CSS v4</li>
+                                    <li>• Vite (Build Tool)</li>
                                     <li>• Neuwaita Icons (SVGs)</li>
                                 </ul>
                             </div>
@@ -336,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         <div class="mt-6 text-center text-xs opacity-60 font-mono">
                             Built by Pietro Uni<br>
-                            © 2025 All rights reserved
+                            © 2026 All rights reserved
                         </div>
 
                         <div class="mt-4 flex justify-center">
