@@ -4,24 +4,23 @@ an OS-inspired interactive portfolio showcasing my profile and my DevOps and Inf
 
 live demo: [pietrouni.com](https://pietrouni.com)
 
-## Concept
+## concept
 
-this project is meant to be more than a simple static resume and be a functional ["webtop"](https://en.wikipedia.org/wiki/Web_desktop). Featuring a window management system, a functional terminal, and an interactive "Vault" for explores files and resources, all within a macOS/GNOME-inspired hybrid desktop environment
+this project is meant to be more than a simple static resume and be a functional ["webtop"](https://en.wikipedia.org/wiki/Web_desktop). featuring a window management system, a functional terminal, and an interactive "vault" for exploring files and resources, all within a macOS/GNOME-inspired hybrid desktop environment
 
 this project started as a single HTML file with vanilla JavaScript, CSS, and Tailwind v3 via CDN. it has since evolved to use Vite, TypeScript, and Tailwind v4. I'm pretty happy with the results after this big upgrade
 
-## Tech Stack
+## tech stack
 
-- **Core:** HTML5, TypeScript
-- **Build:** Vite
-- **Styling:** Tailwind CSS v4, custom CSS (glassmorphism, animations)
-- **Markdown:** marked.js
-- **Features:**
-  - **Window Management:** draggable, resizable window system
-  - **Terminal Emulator:** custom shell with command history, filesystem simulation, and fun commands
-  - **Spotlight Search:** global search (Ctrl+K) for apps and vault items
-  - **Vault:** markdown-based content files
-  - **Dynamic Theme:** system-aware dark mode and multiple wallpapers
+- **core:** HTML5, TypeScript
+- **build:** Vite
+- **styling:** Tailwind CSS v4, custom CSS (glassmorphism, animations)
+- **features:**
+  - **window management:** draggable, resizable window system
+  - **terminal emulator:** custom shell with command history, filesystem simulation, and fun commands
+  - **spotlight search:** global search (Ctrl+K) for apps and vault items
+  - **vault:** markdown-based content files
+  - **dynamic theme:** system-aware dark mode and multiple wallpapers
 
 ## project structure
 
@@ -40,22 +39,22 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
 └── vault/              # markdown content files for the vault app
 ```
 
-## Licensing & Credits
+## credits
 
-### Fonts
+### fonts
 
-This project uses a combination of Google Fonts and one custom font:
+this project uses a combination of Google Fonts and one custom font:
 
-- **Playfair Display** (Google Fonts) – Display/headline font
-- **Lora** (Google Fonts) – Serif body text
-- **Noto Sans** (Google Fonts) – System UI font
-- **JetBrains Mono** (Google Fonts) – Code/monospace
-- **Fixedsys** (custom, not included) – Terminal emulator font
+- **Playfair Display** (Google Fonts) – display/headline font
+- **Lora** (Google Fonts) – serif body text
+- **Noto Sans** (Google Fonts) – system UI font
+- **JetBrains Mono** (Google Fonts) – code/monospace
+- **Fixedsys** (custom, not included) – terminal emulator font
 
-### Icons
+### icons
 
-Dock icons are from the [Neuwaita](https://github.com/RusticBard/Neuwaita) icon theme by [RusticBard](https://github.com/RusticBard), a beautiful take on the Adwaita theme for GNOME. Licensed under GPL-3.0.
+dock icons are from the [Neuwaita](https://github.com/RusticBard/Neuwaita) icon theme by [RusticBard](https://github.com/RusticBard), a beautiful take on the Adwaita theme for GNOME
 
-### Tailwind CSS
+### tailwind css
 
-[Tailwind CSS](https://tailwindcss.com/) by Tailwind Labs. Licensed under MIT.
+[Tailwind CSS](https://tailwindcss.com/) by Tailwind Labs
