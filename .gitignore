@@ -8,6 +8,3 @@
 node_modules/
 .vite/
 dist/
-
-# private files (resume, etc)
-private/

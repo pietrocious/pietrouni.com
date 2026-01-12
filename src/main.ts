@@ -522,6 +522,12 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                             </div>
 
+                            <!-- Footer Message -->
+                            <div class="mt-8 text-center text-sm opacity-50 text-her-dark dark:text-her-textLight">
+                                <p class="font-semibold">More projects and categories will be added soon</p>
+                                <p class="text-xs mt-1">Including research papers, open source contributions, and experimental projects</p>
+                            </div>
+
                         </div>
                      </div>
                 `,

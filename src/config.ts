@@ -13,7 +13,7 @@ export const vaultData: VaultItem[] = [
     category: "Professional",
     status: "ready",
     action:
-      "window.open('https://pietrouni.com/private/PietroUni_Resume_2026.pdf', '_blank')",
+      "window.open('https://pietrouni.com/vault/PietroUni_Resume_2026.pdf', '_blank')",
   },
   {
     id: "food",
