@@ -491,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">psbp-scripts</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Scripts</span>
                                         </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">PowerShell, bash and Python scripts for network automation, home lab automation and experiments like wifi-keys to extract all wifi passwords.</p>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">PowerShell, bash and Python scripts for network automation, home lab automation and experiments like a wifi-keys ps1 script to extract all wifi passwords.</p>
                                         <div class="flex flex-wrap gap-1.5 mb-4">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">POWERSHELL</span>
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">BASH</span>
