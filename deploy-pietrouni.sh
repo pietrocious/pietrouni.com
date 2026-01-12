@@ -14,7 +14,8 @@ npm run build
 
 echo "==> Syncing to S3..."
 aws s3 sync dist/ s3://${BUCKET}/ \
-  --delete
+  --delete \
+  --exclude "vault/*"
 
 echo "==> Invalidating CloudFront cache..."
 aws cloudfront create-invalidation \
