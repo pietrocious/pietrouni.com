@@ -352,7 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
             content: `
                     <div class="h-full p-6 font-sans text-sm overflow-y-auto window-content selection:bg-her-red selection:text-white transition-colors">
                         <!-- Header -->
-                        <h1 class="text-4xl font-serif font-extrabold text-her-red dark:text-her-red tracking-tight mb-4">Hi, I'm Pietro 👋</h1>
+                        <h1 class="text-4xl font-serif font-extrabold text-her-red dark:text-her-red tracking-tight mb-4">Hi, I'm Pietro</h1>
                         
                         <div class="space-y-4">
                             <!-- My Journey -->
