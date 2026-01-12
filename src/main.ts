@@ -377,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <a href="https://github.com/pietrocious/terraform-aws-pietrouni" target="_blank" class="content-link font-semibold">Terraform AWS Modules</a> – Complete AWS infrastructure featuring Multi-AZ networking, Auto-scaling, and CloudFront. Built to demonstrate enterprise DevOps practices.
                                     </li>
                                     <li class="pl-4 border-l-2 border-her-red">
-                                        <span class="font-semibold">pietrouni.com</span> – This interactive OS-themed portfolio website you're viewing right now. Built with vanilla HTML, CSS, and JavaScript. Open source coming soon.
+                                        <a href="https://github.com/pietrocious/pietrouni.com" target="_blank" class="content-link font-semibold">pietrouni.com</a> – This interactive OS-themed portfolio website you're viewing right now. Built with HTML, TypeScript, and Tailwind CSS.
                                     </li>
                                 </ul>
                                 <p class="mt-4 italic opacity-70">You can see the code behind these projects on my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a>.</p>
@@ -458,19 +458,19 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </div>
 
                                     <!-- pietrouni.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors vault-card-animate" style="animation-delay: 50ms">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Portfolio</span>
                                         </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">I build this interactive OS-themed portfolio website. I will open source the code soon.</p>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">This interactive OS-themed portfolio website. Built with HTML, TypeScript, and Tailwind CSS.</p>
                                         <div class="flex flex-wrap gap-1.5 mb-4">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">HTML</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CSS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">JAVASCRIPT</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TAILWIND</span>
                                         </div>
-                                        <div class="flex gap-3 text-xs opacity-50">
-                                            <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg> Coming soon</span>
+                                        <div class="flex gap-3 text-xs opacity-60">
+                                            <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg> GitHub</span>
                                         </div>
                                     </div>
 

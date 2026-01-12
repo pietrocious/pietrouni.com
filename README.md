@@ -1,5 +1,7 @@
 # pietrouni.com
 
+![CI/CD](https://github.com/pietrocious/pietrouni.com/actions/workflows/production.yml/badge.svg)
+
 an OS-inspired interactive portfolio showcasing my profile and my DevOps and Infrastructure projects
 
 live demo: [pietrouni.com](https://pietrouni.com)
