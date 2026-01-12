@@ -1,7 +1,7 @@
 // config.ts - static data that doesnt change during runtime
 // vault items, filesystem, command lists, ascii art, etc
 
-import type { VaultItem, FileSystemNode } from './types';
+import type { VaultItem, FileSystemNode } from "./types";
 
 // vault items - what shows up in the vault app
 export const vaultData: VaultItem[] = [
@@ -12,7 +12,8 @@ export const vaultData: VaultItem[] = [
     type: "doc",
     category: "Professional",
     status: "ready",
-    action: "window.open('https://pietrouni.com/vault/PietroUni_Resume_2026.pdf', '_blank')",
+    action:
+      "window.open('https://pietrouni.com/private/PietroUni_Resume_2026.pdf', '_blank')",
   },
   {
     id: "food",

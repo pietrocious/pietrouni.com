@@ -1,31 +1,40 @@
-# Interactive OS-themed Portfolio
+# pietrouni.com
 
-An OS-inspired interactive portfolio showcasing DevOps and Infrastructure projects. Built with a focus on rich aesthetics, interactivity, and a premium design.
+an OS-inspired interactive portfolio showcasing my profile and my DevOps and Infrastructure projects
 
-Live demo: [pietrouni.com](https://pietrouni.com)
+live demo: [pietrouni.com](https://pietrouni.com)
 
 ## Concept
 
-This project is more than a static resume; it's a functional ["webtop"](https://en.wikipedia.org/wiki/Web_desktop). It features a window management system, a functional terminal, and an interactive "Vault" for explores files and resources, all within a macOS/GNOME-inspired desktop environment.
+this project is meant to be more than a simple static resume and be a functional ["webtop"](https://en.wikipedia.org/wiki/Web_desktop). Featuring a window management system, a functional terminal, and an interactive "Vault" for explores files and resources, all within a macOS/GNOME-inspired hybrid desktop environment
 
 ## Tech Stack
 
-- **Core:** HTML5, Vanilla JavaScript
+- **Core:** HTML5, TypeScript
 - **Styling:** Tailwind CSS (via CDN), Custom CSS (Glassmorphism, Animations)
 - **Features:**
   - **Window Management:** Independent, draggable, and resizable window system.
-  - **Terminal Emulator:** Custom-built shell with command history, file system simulation, and fun utility commands.
-  - **Spotlight Search:** Global search functionality (Cmd+K) for quick access to apps and vault items.
-  - **Vault & Markdown:** Markdown-based content rendering for "files" stored in the vault.
-  - **Dynamic Theme:** System-aware dark mode and multiple wallpaper sets.
+  - **Terminal Emulator:** Custom-built shell with command history, file system simulation, and some utility and fun commands
+  - **Spotlight Search:** Global search functionality (Ctrl+K) for quick access to apps and vault items
+  - **Vault & Markdown:** Markdown-based content rendering for "files" stored in the vault
+  - **Dynamic Theme:** System-aware dark mode and multiple wallpaper sets
 
-## Project Structure
+## project structure
 
-- `index.html`: The main entry point containing the desktop environment, window templates, and core logic.
-- `styles.css`: Custom animations, glassmorphism effects, and layout refinements.
-- `vault/`: Markdown and PDF files displayed within the portfolio's "Vault" application.
-- `icons/`: Custom SVGs for the dock and system UI.
-- `experiments/`: Isolated UI/UX experiments (e.g., Arch Linux TWM theme).
+```
+├── index.html          # main entry point, desktop environment and window templates
+├── styles.css          # custom animations, glassmorphism, wallpapers
+├── src/
+│   ├── main.ts         # core app logic, window definitions, terminal commands
+│   ├── config.ts       # static data (vault items, filesystem, commands)
+│   ├── state.ts        # shared app state (windows, terminal, wallpapers)
+│   ├── terminal/       # terminal theme modules (os93, cyberpunk, fallout)
+│   └── windows/        # window management (drag, resize, minimize)
+├── assets/
+│   ├── icons/          # dock and UI icons (Neuwaita theme)
+│   └── favicon/        # site favicon
+└── vault/              # markdown content files for the vault app
+```
 
 ## Licensing & Credits
 

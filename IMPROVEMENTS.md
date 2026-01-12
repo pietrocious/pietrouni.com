@@ -2,7 +2,7 @@
 
 This document tracks potential improvements for the pietrouni.com portfolio.
 
-## Completed (This Session)
+## Completed
 
 - [x] Set up Vite build system
 - [x] Extract JavaScript to `src/main.js` (3,288 lines)
