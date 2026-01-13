@@ -1,7 +1,7 @@
 import { marked } from 'marked';
 
 // config - static data
-import { vaultData, fileSystem, asciiAlpha, OS93_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
+import { vaultData, fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
 import { getVaultContent } from './vault';
 
 // state - shared app state with setters for mutations
@@ -292,10 +292,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // windows
         const windows = {
           sysinfo: {
-            title: "About OS93",
+            title: "About pietrOS",
             content: `
                      <div class="h-full flex flex-col bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight p-6 select-none font-ui">
-                        <h1 class="text-xl font-bold mb-1 font-serif">About OS93</h1>
+                        <h1 class="text-xl font-bold mb-1 font-serif">About pietrOS</h1>
                         <div class="text-xs opacity-60 mb-4 font-mono">Version 1.4 (Jade-Jonze)</div>
                         <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-4"></div>
 
@@ -621,15 +621,15 @@ document.addEventListener("DOMContentLoaded", () => {
             content: `
                     <div class="h-full bg-transparent text-white p-4 font-kernel text-sm flex flex-col overflow-hidden" id="term-container" onclick="document.getElementById('cmd-input').focus()">
                         <div id="term-output" class="flex-1 overflow-y-auto space-y-1 window-content" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
-                            <div class="text-gray-400 hidden md:block">OS93 v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
+                            <div class="text-gray-400 hidden md:block">pietrOS v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
                             <div class="text-gray-500 hidden md:block">Type 'help' for available commands</div>
                             <div class="text-gray-500 mb-4 hidden md:block">...and 'help-fun' for fun commands!</div>
                         </div>
                         <div class="md:border-t border-white/20 md:pt-2">
-                            <div class="text-gray-400 text-xs md:hidden">OS93 v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
+                            <div class="text-gray-400 text-xs md:hidden">pietrOS v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
                             <div class="text-gray-500 text-xs mb-2 md:hidden">Type 'help' or 'help-fun' for available commands</div>
                             <div class="flex items-center gap-2 text-white">
-                                <span id="term-prompt" class="text-green-400 font-semibold whitespace-nowrap">guest@OS93</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>
+                                <span id="term-prompt" class="text-green-400 font-semibold whitespace-nowrap">guest@pietrOS</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>
                                 <input id="cmd-input" type="text" class="flex-1 bg-transparent border-none outline-none text-white font-kernel focus:ring-0 min-w-0" autocomplete="off" onkeydown="window.handleTerminalCommand(event)">
                             </div>
                         </div>
@@ -1001,12 +1001,12 @@ document.addEventListener("DOMContentLoaded", () => {
           if (TERMINAL_STATE.mode === "fallout") {
             return `<div><span class="text-[#18dc04] font-bold">VAULT_DWELLER@PIPBOY</span> <span class="text-[#18dc04]">></span>`;
           }
-          // Default OS93
+          // Default pietrOS
           return `<div><span class="text-green-400 font-semibold">${TERMINAL_STATE.user}@${TERMINAL_STATE.host}</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>`;
         }
 
         // Forward declaration of handlers
-        window.handleOS93Command = null;
+        window.handlePietrOSCommand = null;
         window.handleCyberpunkCommand = null;
         window.handleFalloutCommand = null;
 
@@ -1058,7 +1058,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (TERMINAL_STATE.mode === "fallout") {
               commands = FALLOUT_COMMANDS;
             } else {
-              commands = OS93_COMMANDS;
+              commands = PIETROS_COMMANDS;
             }
 
             // Find matching commands
@@ -1106,13 +1106,13 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (TERMINAL_STATE.mode === "fallout") {
               window.handleFalloutCommand(input, output, inputEl);
             } else {
-              window.handleOS93Command(input, output, inputEl);
+              window.handlePietrOSCommand(input, output, inputEl);
             }
           }
         };
 
         // normal mode commands
-        window.handleOS93Command = function (input, output, inputEl) {
+        window.handlePietrOSCommand = function (input, output, inputEl) {
           // Echo
           output.innerHTML += `${getTerminalPromptHTML()} ${input}</div>`;
 
@@ -2297,10 +2297,10 @@ ${digTarget}.          300     IN      A       151.101.65.140
               setTimeout(() => termWin.classList.remove("window-glitch"), 500);
               const titleEl = termWin.querySelector(".window-title");
               if (titleEl) titleEl.innerText = "Terminal";
-              TERMINAL_STATE.mode = "os93";
+              TERMINAL_STATE.mode = "pietros";
               TERMINAL_STATE.user = "guest";
               // Clear terminal and show goodbye
-              output.innerHTML = `<div class="text-blue-400">Disconnected from NET_ARCH. Returning to OS93...</div>`;
+              output.innerHTML = `<div class="text-blue-400">Disconnected from NET_ARCH. Returning to pietrOS...</div>`;
               break;
             default:
               output.innerHTML += `<div class="text-[#FF003C]">ERROR: UNRECOGNIZED PROTOCOL</div>`;
@@ -2357,7 +2357,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
               setTimeout(() => termWin.classList.remove("window-glitch"), 500);
               const titleEl = termWin.querySelector(".window-title");
               if (titleEl) titleEl.innerText = "Terminal";
-              TERMINAL_STATE.mode = "os93";
+              TERMINAL_STATE.mode = "pietros";
               TERMINAL_STATE.user = "guest";
               // Clear terminal and show goodbye
               output.innerHTML = `<div class="text-blue-400">RobCo Terminal Shutdown. Goodbye.</div>`;

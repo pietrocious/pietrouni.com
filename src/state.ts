@@ -68,9 +68,9 @@ export let quoteIndex = 0;
 
 // terminal mode state
 export const TERMINAL_STATE: TerminalState = {
-  mode: "os93",
+  mode: "pietros",
   user: "guest",
-  host: "OS93",
+  host: "pietrOS",
 };
 
 // tab completion for terminal

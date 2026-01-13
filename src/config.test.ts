@@ -3,7 +3,7 @@ import {
   vaultData,
   fileSystem,
   asciiAlpha,
-  OS93_COMMANDS,
+  PIETROS_COMMANDS,
   CYBERPUNK_COMMANDS,
   FALLOUT_COMMANDS,
 } from './config';
@@ -61,11 +61,11 @@ describe('config module', () => {
   });
 
   describe('command lists', () => {
-    it('should have OS93 commands', () => {
-      expect(OS93_COMMANDS.length).toBeGreaterThan(0);
-      expect(OS93_COMMANDS).toContain('help');
-      expect(OS93_COMMANDS).toContain('clear');
-      expect(OS93_COMMANDS).toContain('ls');
+    it('should have pietrOS commands', () => {
+      expect(PIETROS_COMMANDS.length).toBeGreaterThan(0);
+      expect(PIETROS_COMMANDS).toContain('help');
+      expect(PIETROS_COMMANDS).toContain('clear');
+      expect(PIETROS_COMMANDS).toContain('ls');
     });
 
     it('should have cyberpunk commands', () => {

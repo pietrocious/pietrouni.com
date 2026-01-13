@@ -1,7 +1,7 @@
 // terminal/core.ts - shared terminal functionality
 // handles prompts, history navigation, tab completion, and command routing
 
-import { fileSystem, OS93_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from '../config';
+import { fileSystem, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from '../config';
 import {
   TERMINAL_STATE,
   terminalHistory, pushTerminalHistory,
@@ -35,7 +35,7 @@ export function getTerminalPromptHTML(): string {
   if (TERMINAL_STATE.mode === "fallout") {
     return `<div><span class="text-[#18dc04] font-bold">VAULT_DWELLER@PIPBOY</span> <span class="text-[#18dc04]">></span>`;
   }
-  // Default OS93
+  // Default pietrOS
   return `<div><span class="text-green-400 font-semibold">${TERMINAL_STATE.user}@${TERMINAL_STATE.host}</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>`;
 }
 
@@ -89,7 +89,7 @@ export function handleTerminalCommand(e: KeyboardEvent): void {
     } else if (TERMINAL_STATE.mode === "fallout") {
       commands = FALLOUT_COMMANDS;
     } else {
-      commands = OS93_COMMANDS;
+      commands = PIETROS_COMMANDS;
     }
 
     // Find matching commands
@@ -137,7 +137,7 @@ export function handleTerminalCommand(e: KeyboardEvent): void {
     } else if (TERMINAL_STATE.mode === "fallout") {
       window.handleFalloutCommand(input, output, inputEl);
     } else {
-      window.handleOS93Command(input, output, inputEl);
+      window.handlePietrOSCommand(input, output, inputEl);
     }
   }
 }

@@ -18,7 +18,7 @@ declare global {
     vaultShowFile: (filename: string) => void;
 
     // Terminal command handlers
-    handleOS93Command: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
+    handlePietrOSCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
     handleCyberpunkCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
     handleFalloutCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
   }
@@ -58,7 +58,7 @@ export interface WindowConfig {
 
 // Terminal mode state
 export interface TerminalState {
-  mode: 'os93' | 'cyberpunk' | 'fallout';
+  mode: 'pietros' | 'cyberpunk' | 'fallout';
   user: string;
   host: string;
 }

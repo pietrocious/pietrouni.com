@@ -152,7 +152,7 @@ export const asciiAlpha: Record<string, string[]> = {
 };
 
 // command lists for tab autocomplete
-export const OS93_COMMANDS: string[] = [
+export const PIETROS_COMMANDS: string[] = [
   "help",
   "help-fun",
   "clear",

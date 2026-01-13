@@ -32,15 +32,15 @@ describe('terminal/core module', () => {
   describe('getTerminalPromptHTML', () => {
     beforeEach(() => {
       // Reset to default state
-      TERMINAL_STATE.mode = 'os93';
+      TERMINAL_STATE.mode = 'pietros';
       TERMINAL_STATE.user = 'guest';
-      TERMINAL_STATE.host = 'OS93';
+      TERMINAL_STATE.host = 'pietrOS';
     });
 
-    it('should return OS93 prompt by default', () => {
+    it('should return pietrOS prompt by default', () => {
       const prompt = getTerminalPromptHTML();
       expect(prompt).toContain('guest');
-      expect(prompt).toContain('OS93');
+      expect(prompt).toContain('pietrOS');
     });
 
     it('should return cyberpunk prompt when in cyberpunk mode', () => {
@@ -65,8 +65,8 @@ describe('terminal/core module', () => {
       TERMINAL_STATE.mode = 'fallout';
       expect(TERMINAL_STATE.mode).toBe('fallout');
 
-      TERMINAL_STATE.mode = 'os93';
-      expect(TERMINAL_STATE.mode).toBe('os93');
+      TERMINAL_STATE.mode = 'pietros';
+      expect(TERMINAL_STATE.mode).toBe('pietros');
     });
 
     it('should allow user changes', () => {

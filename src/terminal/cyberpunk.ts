@@ -68,10 +68,10 @@ export function handleCyberpunkCommand(input: string, output: HTMLElement, input
         const titleEl = termWin.querySelector(".window-title");
         if (titleEl) titleEl.textContent = "Terminal";
       }
-      TERMINAL_STATE.mode = "os93";
+      TERMINAL_STATE.mode = "pietros";
       TERMINAL_STATE.user = "guest";
       // Clear terminal and show goodbye
-      output.innerHTML = `<div class="text-blue-400">Disconnected from NET_ARCH. Returning to OS93...</div>`;
+      output.innerHTML = `<div class="text-blue-400">Disconnected from NET_ARCH. Returning to pietrOS...</div>`;
       break;
     }
     default:

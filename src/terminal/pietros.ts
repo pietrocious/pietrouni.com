@@ -1,4 +1,4 @@
-// terminal/os93.ts - main os93 command handler
+// terminal/pietros.ts - main pietros command handler
 // this is the big one - all 50+ commands
 
 import { getTerminalPromptHTML, resolvePath, TERMINAL_STATE, pushTerminalHistory, setTerminalHistoryIndex } from './core';
@@ -20,7 +20,7 @@ function getDirObj(): FileSystemNode | null {
 }
 
 // the main handler - takes windows reference for 'open' command
-export function handleOS93Command(
+export function handlePietrOSCommand(
   input: string,
   output: HTMLElement,
   inputEl: HTMLInputElement,
@@ -63,7 +63,7 @@ export function handleOS93Command(
       ciscoMode.active = false;
       if (prompt) {
         prompt.outerHTML =
-          '<span id="term-prompt" class="text-green-400 font-semibold">guest@OS93</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>';
+          '<span id="term-prompt" class="text-green-400 font-semibold">guest@pietrOS</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>';
       }
       output.innerHTML += `<div class="text-gray-500">[Connection to CORE-RTR-01 closed]</div>`;
     } else if (ciscoCmd === "?" || ciscoCmd === "help") {
@@ -501,7 +501,7 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
     }
 
     case "version":
-      output.innerHTML += `<div class="my-2"><div class="text-her-red font-bold mb-2">📋 OS93 Version History</div><div class="font-mono text-xs space-y-1"><div class="flex gap-4"><span class="text-gray-500">1.0</span><span class="text-red-400">Scarlet-Samantha</span></div><div class="flex gap-4"><span class="text-gray-500">1.1</span><span class="text-teal-400">Teal-Twombly</span></div><div class="flex gap-4"><span class="text-gray-500">1.2</span><span class="text-orange-400">Coral-Catherine</span></div><div class="flex gap-4"><span class="text-gray-500">1.3</span><span class="text-amber-700">Walnut-Watts</span></div><div class="flex gap-4"><span class="text-green-400 font-bold">1.4</span><span class="text-emerald-400 font-bold">Jade-Jonze</span><span class="text-gray-400">Current ✔</span></div></div></div>`;
+      output.innerHTML += `<div class="my-2"><div class="text-her-red font-bold mb-2">📋 pietrOS Version History</div><div class="font-mono text-xs space-y-1"><div class="flex gap-4"><span class="text-gray-500">1.0</span><span class="text-red-400">Scarlet-Samantha</span></div><div class="flex gap-4"><span class="text-gray-500">1.1</span><span class="text-teal-400">Teal-Twombly</span></div><div class="flex gap-4"><span class="text-gray-500">1.2</span><span class="text-orange-400">Coral-Catherine</span></div><div class="flex gap-4"><span class="text-gray-500">1.3</span><span class="text-amber-700">Walnut-Watts</span></div><div class="flex gap-4"><span class="text-green-400 font-bold">1.4</span><span class="text-emerald-400 font-bold">Jade-Jonze</span><span class="text-gray-400">Current ✔</span></div></div></div>`;
       break;
 
     case "uptime":
@@ -528,9 +528,9 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
 
     case "neofetch": {
       const info = `
-<span class="text-blue-400">guest@OS93</span>
+<span class="text-blue-400">guest@pietrOS</span>
 --------------------
-<span class="text-her-red">OS</span>: OS93 Version 1.4 (Jade-Jonze)
+<span class="text-her-red">OS</span>: pietrOS Version 1.4 (Jade-Jonze)
 <span class="text-her-red">Host</span>: Browser Virtual Machine
 <span class="text-her-red">Kernel</span>: Linux micro-kernel 6.8.0-45
 <span class="text-her-red">Uptime</span>: ${Math.floor(performance.now() / 60000)} mins
@@ -776,7 +776,7 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
       const hours = nowTime.getHours();
       const minutes = nowTime.getMinutes();
       const uptime = `${years} years, ${daysDiff} days, ${hours}h ${minutes}m`;
-      const pietroInfo = `<span class="text-purple-400 font-bold">pietro@OS93</span>
+      const pietroInfo = `<span class="text-purple-400 font-bold">pietro@pietrOS</span>
 <span class="text-gray-500">──────────────────────────────</span>
 <span class="text-her-red">Resolution</span>: 5120x1440
 <span class="text-her-red">CPU</span>: Intel(R) Core(TM) i9-14900 @ 1.997GHz

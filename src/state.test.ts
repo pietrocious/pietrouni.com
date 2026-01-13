@@ -79,8 +79,8 @@ describe('state module', () => {
   });
 
   describe('TERMINAL_STATE', () => {
-    it('should have default mode as os93', () => {
-      expect(TERMINAL_STATE.mode).toBe('os93');
+    it('should have default mode as pietros', () => {
+      expect(TERMINAL_STATE.mode).toBe('pietros');
     });
 
     it('should have user and host properties', () => {
