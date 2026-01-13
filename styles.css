@@ -458,7 +458,7 @@ html.dark .window-header {
   display: flex;
   gap: 10px;
   position: absolute;
-  right: 16px;
+  left: 16px;
   z-index: 10;
 }
 
