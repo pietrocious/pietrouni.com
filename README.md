@@ -1,7 +1,9 @@
-# pietrOS
+# pietrouni.com
 
 [![CI/CD](https://github.com/pietrocious/pietrouni.com/actions/workflows/production.yml/badge.svg)](https://github.com/pietrocious/pietrouni.com/actions/workflows/production.yml)
 [![](https://img.shields.io/website?down_color=red&down_message=offline&label=pietrouni.com&up_color=green&up_message=online&url=https%3A%2F%2Fpietrouni.com)](https://pietrouni.com)
+
+# pietrOS
 
 an OS-inspired interactive portfolio showcasing my profile and my DevOps and Infrastructure projects. Works on all devices—desktop, tablet, and mobile.
 
