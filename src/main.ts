@@ -104,6 +104,14 @@ document.addEventListener("DOMContentLoaded", () => {
           applyWallpaper();
         };
 
+        // set wallpaper by index (for settings grid)
+        window.setWallpaper = function (index: number) {
+          if (index >= 0 && index < wallpapers.length) {
+            setActiveWallpaperIndex(index);
+            applyWallpaper();
+          }
+        };
+
         window.addEventListener("message", (event) => {
           if (event.data && event.data.type === "request-theme") {
             const currentTheme = document.documentElement.classList.contains(
@@ -690,6 +698,99 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 500,
             height: 480,
           },
+          settings: {
+            title: "Settings",
+            content: `
+                    <div class="h-full flex flex-col bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight p-6 select-none font-ui overflow-y-auto">
+                        <h1 class="text-xl font-bold mb-1 font-serif">Settings</h1>
+                        <div class="text-xs opacity-60 mb-4 font-mono">System Preferences</div>
+                        <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-6"></div>
+                        
+                        <div class="space-y-6">
+                            <!-- Appearance Section -->
+                            <div>
+                                <div class="font-bold opacity-40 mb-3 text-xs uppercase tracking-wider">Appearance</div>
+                                
+                                <!-- Theme Toggle -->
+                                <div class="flex items-center justify-between p-4 bg-black/5 dark:bg-white/5 rounded-lg mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-300 to-orange-400 dark:from-indigo-500 dark:to-purple-600 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-white block dark:hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"></path></svg>
+                                            <svg class="w-5 h-5 text-white hidden dark:block" fill="currentColor" viewBox="0 0 24 24"><path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"></path></svg>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-sm">Theme</div>
+                                            <div class="text-xs opacity-60" id="settings-theme-label">Light Mode</div>
+                                        </div>
+                                    </div>
+                                    <button onclick="window.toggleTheme(); document.getElementById('settings-theme-label').textContent = document.documentElement.classList.contains('dark') ? 'Dark Mode' : 'Light Mode';" class="px-4 py-2 bg-her-red text-white rounded-lg text-sm font-medium hover:bg-her-red/90 transition-colors">
+                                        Toggle
+                                    </button>
+                                </div>
+
+                                <!-- Wallpaper Picker Grid -->
+                                <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-sm">Wallpaper</div>
+                                            <div class="text-xs opacity-60">Choose a background</div>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-3" id="wallpaper-grid">
+                                        <!-- Sonoma -->
+                                        <button onclick="setWallpaper(0);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="0">
+                                            <div class="absolute inset-0 sonoma-bg"></div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-1 right-1 text-[10px] font-medium text-white drop-shadow-md">Sonoma</div>
+                                        </button>
+                                        <!-- Sequoia -->
+                                        <button onclick="setWallpaper(1);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="1">
+                                            <div class="absolute inset-0 sequoia-bg"></div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-1 right-1 text-[10px] font-medium text-white drop-shadow-md">Sequoia</div>
+                                        </button>
+                                        <!-- Ventura -->
+                                        <button onclick="setWallpaper(2);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="2">
+                                            <div class="absolute inset-0 ventura-bg"></div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-1 right-1 text-[10px] font-medium text-white drop-shadow-md">Ventura</div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- About Section -->
+                            <div>
+                                <div class="font-bold opacity-40 mb-3 text-xs uppercase tracking-wider">About</div>
+                                
+                                <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 002 12a10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2z"/></svg>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-sm">pietrOS</div>
+                                            <div class="text-xs opacity-60">Version 1.4 (Jade-Jonze)</div>
+                                        </div>
+                                    </div>
+                                    <button onclick="openWindow('sysinfo'); closeWindow('settings');" class="w-full px-4 py-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-her-text/10 dark:border-white/10 rounded-lg text-sm font-medium transition-colors">
+                                        View System Info
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto pt-6 text-center text-xs opacity-40 font-mono">
+                            © 2026 Pietro Uni
+                        </div>
+                    </div>
+                `,
+            width: 380,
+            height: 600,
+          },
         };
 
         // window ops
@@ -768,9 +869,9 @@ document.addEventListener("DOMContentLoaded", () => {
           winEl.innerHTML = `
                 <div class="window-header" onmousedown="window.startDrag(event, '${id}')" ondblclick="window.toggleMaximize('${id}')">
                     <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                        <button class="btn-neon close" onclick="window.closeWindow('${id}')" aria-label="Close window"></button>
                         <button class="btn-neon min" onclick="window.minimizeWindow('${id}')" aria-label="Minimize window"></button>
                         <button class="btn-neon max" onclick="window.toggleMaximize('${id}')" aria-label="Maximize window"></button>
-                        <button class="btn-neon close" onclick="window.closeWindow('${id}')" aria-label="Close window"></button>
                     </div>
                     <span class="window-title" id="win-title-${id}">${winConfig.title}</span>
                 </div>
@@ -2689,10 +2790,8 @@ ${digTarget}.          300     IN      A       151.101.65.140
           }, 1000));
         }
 
-        // Initial site Launch
-        setTimeout(() => {
-          window.openWindow("about");
-        }, 100);
+        // Initial site Launch - start with clean desktop
+        // (Windows can be opened from the dock)
       });
 
 // register service worker for pwa

@@ -14,6 +14,10 @@ declare global {
     // Theme
     toggleTheme: () => void;
 
+    // Wallpaper
+    cycleWallpaper: () => void;
+    setWallpaper: (index: number) => void;
+
     // Vault
     vaultShowFile: (filename: string) => void;
 

@@ -325,6 +325,67 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
   animation: venturaWave 18s ease-in-out infinite;
 }
 
+/* Wallpaper Picker Thumbnails - Dark Mode Overrides */
+html.dark .sonoma-bg {
+  background: radial-gradient(
+      ellipse 80% 60% at 20% 40%,
+      rgba(59, 130, 246, 0.3) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 70% 80% at 80% 60%,
+      rgba(139, 92, 246, 0.3) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 60% 70% at 50% 80%,
+      rgba(99, 102, 241, 0.25) 0%,
+      transparent 50%
+    ),
+    linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c4a6e 100%);
+  background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+}
+
+html.dark .sequoia-bg {
+  background: linear-gradient(
+      135deg,
+      rgba(22, 101, 52, 0.6) 0%,
+      rgba(6, 78, 59, 0.5) 30%,
+      transparent 60%
+    ),
+    linear-gradient(
+      315deg,
+      rgba(30, 58, 138, 0.5) 0%,
+      rgba(23, 37, 84, 0.4) 40%,
+      transparent 70%
+    ),
+    linear-gradient(180deg, #052e16 0%, #0c1629 50%, #0a0a0a 100%);
+  background-size: 200% 200%, 200% 200%, 100% 100%;
+}
+
+html.dark .ventura-bg {
+  background: linear-gradient(
+      120deg,
+      rgba(20, 184, 166, 0.3) 0%,
+      rgba(6, 182, 212, 0.25) 50%,
+      transparent 80%
+    ),
+    linear-gradient(
+      240deg,
+      rgba(139, 92, 246, 0.3) 0%,
+      rgba(124, 58, 237, 0.25) 50%,
+      transparent 80%
+    ),
+    linear-gradient(
+      360deg,
+      rgba(99, 102, 241, 0.25) 0%,
+      rgba(79, 70, 229, 0.2) 50%,
+      transparent 80%
+    ),
+    linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #134e4a 100%);
+  background-size: 300% 300%, 300% 300%, 300% 300%, 100% 100%;
+}
+
 /* Cards / Windows (Tactile, not Glass) */
 .window {
   /* Solid paper feel */
