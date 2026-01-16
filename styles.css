@@ -611,15 +611,13 @@ html.dark .window-header {
   }
 }
 
-/* Active State - The Blue Frame */
+/* Active State - No visible border */
 .window.active-window {
-  border: 1px solid #4a7c9d;
-  /* Her Blue */
+  border: 1px solid transparent;
 }
 
 html.dark .window.active-window {
-  border: 1px solid #4a7c9d;
-  /* Blue in Dark mode too */
+  border: 1px solid transparent;
 }
 
 .window.dragging {
