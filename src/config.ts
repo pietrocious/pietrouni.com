@@ -39,7 +39,7 @@ export const vaultData: VaultItem[] = [
     desc: "Books that shaped my thinking",
     type: "book",
     category: "Creative",
-    status: "soon",
+    status: "ready",
     action: "window.vaultShowFile('books.md')",
   },
   {

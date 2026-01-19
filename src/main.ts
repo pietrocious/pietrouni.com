@@ -367,10 +367,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">My Journey</h2>
                                 <p class="opacity-90">
-                                    I'm an Infrastructure Engineer based in Barcelona with a somewhat winding path through tech. What started as HP printer support in 2014 eventually led me through enterprise help desk work, specialized medical device support, and into the world of enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 companies—the kind of work that teaches you how distributed systems actually break in production.
+                                    I'm an Infrastructure Engineer specializing in AWS architecture and infrastructure-as-code automation. My path into cloud started with enterprise infrastructure, I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers. That foundation taught me how distributed systems actually work under the hood.
                                 </p>
                                 <p class="opacity-90 mt-4">
-                                    These days, I have been working on Infrastructure for the last two years and I'm actively transitioning toward DevOps and Platform Engineering. I've realized I'd rather build and automate systems than just keep them running.
+                                    These days, I focus on building reliable cloud infrastructure. My current work centers on architecting AWS environments using Terraform, implementing CI/CD automation, and designing secure, highly-available systems that leverage cloud-native services.
                                 </p>
                             </div>
 
@@ -378,24 +378,26 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
                                 <p class="opacity-90 mb-4">
-                                    I believe the best way to learn is to build things that actually work. My current focus is creating production-grade infrastructure projects that demonstrate real DevOps capabilities:
+                                    I build production-grade AWS infrastructure that demonstrates real cloud engineering capabilities:
                                 </p>
                                 <ul class="list-none space-y-4 font-serif font-normal">
                                     <li class="pl-4 border-l-2 border-her-red">
-                                        <a href="https://github.com/pietrocious/terraform-aws-pietrouni" target="_blank" class="content-link font-semibold">Terraform AWS Modules</a> – Complete AWS infrastructure featuring Multi-AZ networking, Auto-scaling, and CloudFront. Built to demonstrate enterprise DevOps practices.
+                                        <a href="https://github.com/pietrocious/terraform-aws-pietrouni" target="_blank" class="content-link font-semibold">Terraform AWS Infrastructure</a>: Complete AWS cloud architecture featuring Multi-AZ networking, auto-scaling, CloudFront CDN, and automated deployment. Built to demonstrate enterprise IaC patterns.
+                                        <div class="text-xs opacity-70 mt-1">Tech: AWS (VPC, EC2, ALB, ASG, S3, CloudFront, Route53, ACM), Terraform, GitHub Actions</div>
                                     </li>
                                     <li class="pl-4 border-l-2 border-her-red">
-                                        <a href="https://github.com/pietrocious/pietrouni.com" target="_blank" class="content-link font-semibold">pietrouni.com</a> – This interactive OS-themed portfolio website you're viewing right now. Built with HTML, TypeScript, and Tailwind CSS.
+                                        <a href="https://github.com/pietrocious/pietrouni.com" target="_blank" class="content-link font-semibold">pietrouni.com</a>: The interactive portfolio website you're viewing right now, running on the AWS infrastructure above. Desktop OS mockup built with Vite, TypeScript and Tailwind CSS.
+                                        <div class="text-xs opacity-70 mt-1">Tech: Vite, TypeScript, Tailwind v4</div>
                                     </li>
                                 </ul>
-                                <p class="mt-4 italic opacity-70">You can see the code behind these projects on my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a>.</p>
+                                <p class="mt-4 italic opacity-70">More projects coming soon. Check my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a> for updates.</p>
                             </div>
 
-                            <!-- Why DevOps -->
+                            <!-- Why Cloud Engineering -->
                             <div>
-                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Why DevOps?</h2>
+                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Why Cloud Engineering?</h2>
                                 <p class="opacity-90">
-                                    After years of troubleshooting other people's infrastructure, I want to be the one designing and building it. My networking background gives me an edge—I understand how distributed systems communicate, fail, and scale. DevOps lets me leverage that foundation while learning to automate, containerize, and orchestrate at scale.
+                                    After years of troubleshooting other people's infrastructure, I want to be the one designing and building it. Cloud engineering lets me leverage that infrastructure foundation while learning modern automation patterns like IaC, containers, orchestration, and CI/CD.
                                 </p>
                             </div>
 
@@ -403,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-serif font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">Beyond Work</h2>
                                 <p class="opacity-90">
-                                    Outside of infrastructure work, I listen to music across pretty much every genre, play games when I have time, and enjoy understanding how complex systems get built. I'm fascinated by the engineering behind games and tech products; the coordination, the tradeoffs, the architecture decisions that make something actually work at such a scale, and how much we're all standing on the shoulders of giants.
+                                    Outside of infrastructure work, I listen to music across pretty much every genre, play games when I have time, and enjoy understanding how complex systems get built. I'm fascinated by how architecture decisions make something actually work at such a scale, and how much we're all standing on the shoulders of giants.
                                 </p>
                             </div>
 
@@ -415,9 +417,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </p>
                                 <div class="mt-4 flex gap-4 text-sm font-ui font-semibold tracking-wide">
                                     <a href="mailto:pietrouni@gmail.com" class="content-link">EMAIL</a>
-                                    <span class="opacity-30">/</span>
+                                    <span class="opacity-30">·</span>
                                     <a href="https://github.com/pietrocious" target="_blank" class="content-link">GITHUB</a>
-                                    <span class="opacity-30">/</span>
+                                    <span class="opacity-30">·</span>
                                     <a href="https://linkedin.com/in/pietrouni" target="_blank" class="content-link">LINKEDIN</a>
                                 </div>
                             </div>
@@ -449,36 +451,40 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
                                     <!-- Terraform AWS Modules -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
                                         </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">Complete AWS infrastructure featuring Multi-AZ networking, Auto-scaling, and CloudFront. Built to demonstrate enterprise DevOps practices.</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Complete AWS infrastructure featuring Multi-AZ networking, Auto-scaling, and CloudFront. Built to demonstrate enterprise DevOps practices.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TERRAFORM</span>
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CICD</span>
-                                        </div>
-                                        <div class="flex gap-3 text-xs opacity-60">
-                                            <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg> GitHub</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-60">
+                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>GitHub</span>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <!-- pietrouni.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Portfolio</span>
                                         </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">This interactive OS-themed portfolio website. Built with HTML, TypeScript, and Tailwind CSS.</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">This interactive OS-themed portfolio website. Built with HTML, TypeScript, and Tailwind CSS.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">HTML</span>
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TAILWIND</span>
-                                        </div>
-                                        <div class="flex gap-3 text-xs opacity-60">
-                                            <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg> GitHub</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-60">
+                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>GitHub</span>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -494,36 +500,40 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
                                     <!-- psbp-scripts -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate" style="animation-delay: 100ms">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 100ms">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">psbp-scripts</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
                                         </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">PowerShell, bash and Python scripts for network automation, home lab automation and experiments like a wifi-keys ps1 script to extract all wifi passwords.</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">POWERSHELL</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">BASH</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PYTHON</span>
-                                        </div>
-                                        <div class="flex gap-3 text-xs opacity-50">
-                                            <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">PowerShell, bash and Python scripts for network automation, home lab automation and experiments like a wifi-keys ps1 script to extract all wifi passwords.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">POWERSHELL</span>
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">BASH</span>
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PYTHON</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-50">
+                                                <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <!-- runcible -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate" style="animation-delay: 150ms">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 150ms">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">runcible</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
                                         </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight">An out-of-place artifact (OOPArt) — a self-contained AI knowledge system for edge hardware. Exploring how to compress human knowledge into the smallest viable form factor.</p>
-                                        <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PYTHON</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">LLM</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">RASPBERRY PI</span>
-                                        </div>
-                                        <div class="flex gap-3 text-xs opacity-50">
-                                            <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">An out-of-place artifact (OOPArt) — a self-contained AI knowledge system for edge hardware. Exploring how to compress human knowledge into the smallest viable form factor.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PYTHON</span>
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">LLM</span>
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">RASPBERRY PI</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-50">
+                                                <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
+                                            </div>
                                         </div>
                                     </div>
 
