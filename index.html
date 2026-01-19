@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- Google tag (gtag.js) -->
@@ -252,7 +252,7 @@
       <div
         id="spotlight"
         class="absolute inset-0 z-[6000] hidden flex-col items-center pt-[20vh]"
-        onclick="if(event.target.id === 'spotlight') toggleSpotlight()"
+        onclick="if (event.target.id === 'spotlight') toggleSpotlight();"
         role="dialog"
         aria-modal="true"
         aria-label="Search applications and files"
@@ -278,7 +278,7 @@
               class="w-full bg-transparent outline-none text-lg font-ui text-her-text dark:text-her-textLight placeholder:opacity-50"
               autocomplete="off"
               oninput="handleSearch(this.value)"
-              onkeydown="if(event.key==='Enter') executeSearchResult()"
+              onkeydown="if (event.key === 'Enter') executeSearchResult();"
             />
           </div>
           <div
@@ -356,6 +356,24 @@
               class="dock-icon"
               src="assets/icons/org.gnome.FileRoller.svg"
               alt="Vault"
+              aria-hidden="true"
+            />
+          </div>
+
+          <!-- Tech Stack -->
+          <div
+            id="dock-techstack"
+            class="dock-item cursor-pointer group"
+            onclick="restoreWindow('techstack')"
+            title="Tech Stack"
+            role="button"
+            aria-label="Open Tech Stack"
+          >
+            <span class="dock-label">Tech Stack</span>
+            <img
+              class="dock-icon"
+              src="assets/icons/org.gnome.TextEditor.svg"
+              alt="Tech Stack"
               aria-hidden="true"
             />
           </div>
