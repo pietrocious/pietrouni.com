@@ -7,6 +7,7 @@ CF_DIST_ID="EYTCRVJKEMOQJ"
 
 echo "==> Pulling latest changes..."
 cd $REPO_DIR
+git checkout -- dist/index.html
 git pull origin main
 
 echo "==> Building site..."
