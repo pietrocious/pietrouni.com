@@ -226,18 +226,18 @@ document.addEventListener("DOMContentLoaded", () => {
           container.innerHTML = "";
           const term = query.toLowerCase().trim();
 
-          // Define all apps with icons
+          // Define all apps with same icons as dock
           const spotlightApps = [
-            { id: "about", title: "README.md", icon: "📄", color: "bg-blue-500" },
-            { id: "projects", title: "Projects", icon: "📁", color: "bg-purple-500" },
-            { id: "vault", title: "Vault", icon: "🔒", color: "bg-amber-500" },
-            { id: "techstack", title: "Tech Stack", icon: "⚡", color: "bg-green-500" },
-            { id: "terminal", title: "Terminal", icon: "💻", color: "bg-gray-700" },
-            { id: "finder", title: "Finder", icon: "📂", color: "bg-blue-400" },
-            { id: "monitor", title: "Monitoring", icon: "📊", color: "bg-teal-500" },
-            { id: "settings", title: "Settings", icon: "⚙️", color: "bg-gray-500" },
-            { id: "sysinfo", title: "About pietrOS", icon: "ℹ️", color: "bg-rose-500" },
-            { id: "experiments", title: "Lab", icon: "🧪", color: "bg-lime-500" },
+            { id: "finder", title: "Finder", icon: "assets/icons/org.gnome.Nautilus.svg" },
+            { id: "about", title: "README.md", icon: "assets/icons/org.gnome.Logs.svg" },
+            { id: "projects", title: "Projects", icon: "assets/icons/org.gnome.tweaks.svg" },
+            { id: "vault", title: "Vault", icon: "assets/icons/org.gnome.FileRoller.svg" },
+            { id: "techstack", title: "Tech Stack", icon: "assets/icons/org.gnome.TextEditor.svg" },
+            { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
+            { id: "monitor", title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
+            { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
+            { id: "sysinfo", title: "About pietrOS", icon: "assets/icons/contacts.svg" },
+            { id: "experiments", title: "Lab", icon: "assets/icons/font-viewer.svg" },
           ];
 
           // If no search term, show app grid (like macOS 26 Siri/Spotlight)
@@ -248,15 +248,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="grid grid-cols-5 gap-3">
                   ${spotlightApps.map(app => `
                     <div 
-                      class="spotlight-app flex flex-col items-center gap-1 p-2 rounded-lg cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                      class="spotlight-app flex flex-col items-center gap-1 p-2 rounded-lg cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all hover:scale-105"
                       onclick="restoreWindow('${app.id}'); toggleSpotlight();"
                       role="button"
                       tabindex="0"
                       onkeydown="if(event.key==='Enter'){restoreWindow('${app.id}'); toggleSpotlight();}"
                     >
-                      <div class="w-10 h-10 rounded-xl ${app.color} flex items-center justify-center text-lg shadow-sm">
-                        ${app.icon}
-                      </div>
+                      <img src="${app.icon}" alt="${app.title}" class="w-10 h-10 drop-shadow-sm" />
                       <span class="text-[10px] text-center truncate w-full opacity-70">${app.title}</span>
                     </div>
                   `).join("")}
@@ -275,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 title: app.title,
                 desc: "Application",
                 action: `restoreWindow('${app.id}'); toggleSpotlight();`,
-                icon: `<div class="w-8 h-8 rounded-lg ${app.color} flex items-center justify-center text-sm">${app.icon}</div>`,
+                icon: `<img src="${app.icon}" alt="${app.title}" class="w-8 h-8" />`,
               });
             }
           });
