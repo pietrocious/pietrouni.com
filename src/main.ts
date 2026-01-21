@@ -224,21 +224,58 @@ document.addEventListener("DOMContentLoaded", () => {
         window.handleSearch = function (query) {
           const container = document.getElementById("spotlight-results");
           container.innerHTML = "";
-          const term = query.toLowerCase();
+          const term = query.toLowerCase().trim();
+
+          // Define all apps with icons
+          const spotlightApps = [
+            { id: "about", title: "README.md", icon: "📄", color: "bg-blue-500" },
+            { id: "projects", title: "Projects", icon: "📁", color: "bg-purple-500" },
+            { id: "vault", title: "Vault", icon: "🔒", color: "bg-amber-500" },
+            { id: "techstack", title: "Tech Stack", icon: "⚡", color: "bg-green-500" },
+            { id: "terminal", title: "Terminal", icon: "💻", color: "bg-gray-700" },
+            { id: "finder", title: "Finder", icon: "📂", color: "bg-blue-400" },
+            { id: "monitor", title: "Monitoring", icon: "📊", color: "bg-teal-500" },
+            { id: "settings", title: "Settings", icon: "⚙️", color: "bg-gray-500" },
+            { id: "sysinfo", title: "About pietrOS", icon: "ℹ️", color: "bg-rose-500" },
+            { id: "experiments", title: "Lab", icon: "🧪", color: "bg-lime-500" },
+          ];
+
+          // If no search term, show app grid (like macOS 26 Siri/Spotlight)
+          if (!term) {
+            container.innerHTML = `
+              <div class="p-4">
+                <div class="text-[10px] uppercase font-bold opacity-40 tracking-wider mb-3">Applications</div>
+                <div class="grid grid-cols-5 gap-3">
+                  ${spotlightApps.map(app => `
+                    <div 
+                      class="spotlight-app flex flex-col items-center gap-1 p-2 rounded-lg cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                      onclick="restoreWindow('${app.id}'); toggleSpotlight();"
+                      role="button"
+                      tabindex="0"
+                      onkeydown="if(event.key==='Enter'){restoreWindow('${app.id}'); toggleSpotlight();}"
+                    >
+                      <div class="w-10 h-10 rounded-xl ${app.color} flex items-center justify-center text-lg shadow-sm">
+                        ${app.icon}
+                      </div>
+                      <span class="text-[10px] text-center truncate w-full opacity-70">${app.title}</span>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            `;
+            return;
+          }
 
           const results = [];
 
-          // Search Windows (Apps)
-          Object.keys(windows).forEach((key) => {
-            const w = windows[key];
-            if (w.title.toLowerCase().includes(term) || key.includes(term)) {
+          // Search apps
+          spotlightApps.forEach(app => {
+            if (app.title.toLowerCase().includes(term) || app.id.includes(term)) {
               results.push({
-                title: w.title,
+                title: app.title,
                 desc: "Application",
-                action: `restoreWindow('${key}'); toggleSpotlight();`,
-                icon: `<div class="w-8 h-8 rounded bg-her-red text-white flex items-center justify-center font-bold text-xs">${w.title
-                  .substring(0, 2)
-                  .toUpperCase()}</div>`,
+                action: `restoreWindow('${app.id}'); toggleSpotlight();`,
+                icon: `<div class="w-8 h-8 rounded-lg ${app.color} flex items-center justify-center text-sm">${app.icon}</div>`,
               });
             }
           });
@@ -678,9 +715,15 @@ document.addEventListener("DOMContentLoaded", () => {
             content: `
                     <div class="h-full bg-transparent text-white p-4 font-kernel text-sm flex flex-col overflow-hidden" id="term-container" onclick="document.getElementById('cmd-input').focus()">
                         <div id="term-output" class="flex-1 overflow-y-auto space-y-1 window-content" style="-webkit-overflow-scrolling: touch; touch-action: pan-y;">
-                            <div class="text-gray-400 hidden md:block">pietrOS v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
-                            <div class="text-gray-500 hidden md:block">Type 'help' for available commands</div>
-                            <div class="text-gray-500 mb-4 hidden md:block">...and 'help-fun' for fun commands!</div>
+                            <pre class="text-green-400 hidden md:block text-xs leading-tight mb-2"> 
+     _     _       _____ _____ 
+ ___|_|___| |_ ___|     |   __|
+| . | | -_|  _|  _|  |  |__   |
+|  _|_|___|_| |_| |_____|_____|
+|_|                            
+                            </pre>
+                            <div class="text-gray-400 hidden md:block">v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
+                            <div class="text-gray-500 hidden md:block">Type 'help' for available commands... and 'help-fun' for fun commands!</div>
                         </div>
                         <div class="md:border-t border-white/20 md:pt-2">
                             <div class="text-gray-400 text-xs md:hidden">pietrOS v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
@@ -925,6 +968,105 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 450,
             height: 700,
           },
+          finder: {
+            title: "Finder",
+            content: `
+                    <div id="finder-app" class="h-full flex bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight select-none font-ui">
+                        <!-- Sidebar -->
+                        <div class="w-48 flex-shrink-0 bg-black/5 dark:bg-white/5 border-r border-her-text/10 dark:border-white/10 p-3 hidden md:block">
+                            <div class="text-[10px] uppercase font-bold opacity-40 tracking-wider mb-2 px-2">Favorites</div>
+                            <div class="space-y-1">
+                                <button onclick="window.finderNavigate('/home/guest')" class="finder-nav-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-sm transition-colors text-left" data-path="/home/guest">
+                                    <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                                    Home
+                                </button>
+                                <button onclick="window.finderNavigate('/home/guest/projects')" class="finder-nav-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-sm transition-colors text-left" data-path="/home/guest/projects">
+                                    <svg class="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+                                    Projects
+                                </button>
+                                <button onclick="window.finderNavigate('/home/guest/photos')" class="finder-nav-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-sm transition-colors text-left" data-path="/home/guest/photos">
+                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                                    Photos
+                                </button>
+                                <button onclick="window.finderNavigate('/home/guest/vault')" class="finder-nav-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-sm transition-colors text-left" data-path="/home/guest/vault">
+                                    <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                                    Vault
+                                </button>
+                            </div>
+                            <div class="text-[10px] uppercase font-bold opacity-40 tracking-wider mb-2 px-2 mt-6">Locations</div>
+                            <div class="space-y-1">
+                                <button onclick="window.finderNavigate('/')" class="finder-nav-item w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-sm transition-colors text-left" data-path="/">
+                                    <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h4v6H4v-6zm6 6v-6h4v6h-4zm10 0h-4v-6h4v6zm0-8H4V6h16v2z"/></svg>
+                                    Root
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Main Content -->
+                        <div class="flex-1 flex flex-col overflow-hidden">
+                            <!-- Toolbar -->
+                            <div class="flex items-center justify-between px-4 py-2 border-b border-her-text/10 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.02]">
+                                <div class="flex items-center gap-2">
+                                    <button onclick="window.finderBack()" class="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" title="Back">
+                                        <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                                    </button>
+                                    <button onclick="window.finderForward()" class="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" title="Forward">
+                                        <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </button>
+                                </div>
+                                <div id="finder-path" class="text-sm font-medium opacity-70 truncate max-w-[200px] md:max-w-none">/home/guest</div>
+                                <div class="flex items-center gap-1">
+                                    <button onclick="window.finderToggleView('grid')" class="finder-view-btn p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" data-view="grid" title="Grid view">
+                                        <svg class="w-4 h-4 opacity-60" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3v8h8V3H3zm6 6H5V5h4v4zm-6 4v8h8v-8H3zm6 6H5v-4h4v4zm4-16v8h8V3h-8zm6 6h-4V5h4v4zm-6 4v8h8v-8h-8zm6 6h-4v-4h4v4z"/></svg>
+                                    </button>
+                                    <button onclick="window.finderToggleView('list')" class="finder-view-btn p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" data-view="list" title="List view">
+                                        <svg class="w-4 h-4 opacity-60" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- File Grid -->
+                            <div id="finder-files" class="flex-1 overflow-y-auto p-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 content-start">
+                                <!-- Files injected by JS -->
+                            </div>
+                            
+                            <!-- Status Bar -->
+                            <div class="px-4 py-2 border-t border-her-text/10 dark:border-white/10 text-xs opacity-50 flex justify-between bg-black/[0.02] dark:bg-white/[0.02]">
+                                <span id="finder-item-count">0 items</span>
+                                <span id="finder-storage">pietrOS Storage</span>
+                            </div>
+                        </div>
+                    </div>
+                `,
+            width: 850,
+            height: 550,
+          },
+          launchpad: {
+            title: "Launchpad",
+            content: `
+                    <div id="launchpad-app" class="h-full flex flex-col bg-gradient-to-b from-black/80 to-black/90 backdrop-blur-xl p-6 md:p-8 select-none">
+                        <!-- Search Bar -->
+                        <div class="flex justify-center mb-8">
+                            <div class="relative w-full max-w-md">
+                                <svg class="w-4 h-4 absolute left-3 top-2.5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <input type="text" id="launchpad-search" placeholder="Search apps..." oninput="window.filterLaunchpad(this.value)" class="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 text-sm outline-none focus:border-white/40 transition-colors">
+                            </div>
+                        </div>
+                        
+                        <!-- Apps Grid -->
+                        <div id="launchpad-grid" class="flex-1 overflow-y-auto grid grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-4 md:gap-6 content-start">
+                            <!-- Apps injected by JS -->
+                        </div>
+                        
+                        <!-- Hint -->
+                        <div class="text-center text-white/30 text-xs mt-6">
+                            Click an app to open, or click outside to close
+                        </div>
+                    </div>
+                `,
+            width: 900,
+            height: 600,
+          },
         };
 
         // window ops
@@ -1065,6 +1207,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 iframe.src += `?theme=${theme}`;
             }
           }
+          if (id === "finder") window.initFinder();
+          if (id === "launchpad") window.initLaunchpad();
         };
 
 
@@ -2790,7 +2934,171 @@ ${digTarget}.          300     IN      A       151.101.65.140
           window.renderVault("");
         };
 
-        // fake monitor charts
+        // =====================================
+        // FINDER APP FUNCTIONS
+        // =====================================
+        let finderCurrentPath = "/home/guest";
+        let finderHistory: string[] = ["/home/guest"];
+        let finderHistoryIndex = 0;
+        let finderViewMode = "grid";
+
+        window.initFinder = function () {
+          window.finderNavigate("/home/guest");
+        };
+
+        window.finderNavigate = function (path: string) {
+          finderCurrentPath = path;
+          
+          // Add to history if navigating forward
+          if (finderHistoryIndex < finderHistory.length - 1) {
+            finderHistory = finderHistory.slice(0, finderHistoryIndex + 1);
+          }
+          if (finderHistory[finderHistory.length - 1] !== path) {
+            finderHistory.push(path);
+            finderHistoryIndex = finderHistory.length - 1;
+          }
+          
+          window.finderRender();
+        };
+
+        window.finderBack = function () {
+          if (finderHistoryIndex > 0) {
+            finderHistoryIndex--;
+            finderCurrentPath = finderHistory[finderHistoryIndex];
+            window.finderRender();
+          }
+        };
+
+        window.finderForward = function () {
+          if (finderHistoryIndex < finderHistory.length - 1) {
+            finderHistoryIndex++;
+            finderCurrentPath = finderHistory[finderHistoryIndex];
+            window.finderRender();
+          }
+        };
+
+        window.finderToggleView = function (mode: string) {
+          finderViewMode = mode;
+          window.finderRender();
+        };
+
+        window.finderRender = function () {
+          const pathEl = document.getElementById("finder-path");
+          const filesEl = document.getElementById("finder-files");
+          const countEl = document.getElementById("finder-item-count");
+          
+          if (!pathEl || !filesEl || !countEl) return;
+          
+          pathEl.textContent = finderCurrentPath;
+          
+          // Get current directory contents from fileSystem
+          const parts = finderCurrentPath.split("/").filter(p => p);
+          let current: any = fileSystem.root;
+          
+          for (const part of parts) {
+            if (current && current[part] !== undefined) {
+              current = current[part];
+            } else {
+              current = null;
+              break;
+            }
+          }
+          
+          filesEl.innerHTML = "";
+          
+          if (!current || typeof current === "string") {
+            filesEl.innerHTML = '<div class="col-span-full text-center opacity-50 py-8">No items</div>';
+            countEl.textContent = "0 items";
+            return;
+          }
+          
+          const entries = Object.entries(current);
+          countEl.textContent = `${entries.length} item${entries.length !== 1 ? 's' : ''}`;
+          
+          // Update sidebar active state
+          document.querySelectorAll(".finder-nav-item").forEach((btn) => {
+            const btnPath = btn.getAttribute("data-path");
+            if (btnPath === finderCurrentPath) {
+              btn.classList.add("bg-her-red/20", "text-her-red");
+            } else {
+              btn.classList.remove("bg-her-red/20", "text-her-red");
+            }
+          });
+          
+          entries.forEach(([name, value]) => {
+            const isFile = value === "FILE";
+            const isHidden = name.startsWith(".");
+            
+            const item = document.createElement("div");
+            item.className = `finder-item flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition-colors ${isHidden ? 'opacity-50' : ''}`;
+            
+            const icon = isFile 
+              ? `<svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`
+              : `<svg class="w-10 h-10 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
+            
+            item.innerHTML = `
+              ${icon}
+              <span class="text-xs text-center truncate w-full">${name}</span>
+            `;
+            
+            if (!isFile) {
+              item.onclick = () => window.finderNavigate(`${finderCurrentPath}/${name}`.replace("//", "/"));
+            }
+            
+            filesEl.appendChild(item);
+          });
+        };
+
+        // =====================================
+        // LAUNCHPAD APP FUNCTIONS
+        // =====================================
+        const launchpadApps = [
+          { id: "about", title: "README.md", icon: "📄", color: "bg-blue-500" },
+          { id: "projects", title: "Projects", icon: "📁", color: "bg-purple-500" },
+          { id: "vault", title: "Vault", icon: "🔒", color: "bg-amber-500" },
+          { id: "techstack", title: "Tech Stack", icon: "⚡", color: "bg-green-500" },
+          { id: "terminal", title: "Terminal", icon: "💻", color: "bg-gray-700" },
+          { id: "finder", title: "Finder", icon: "📂", color: "bg-blue-400" },
+          { id: "monitor", title: "Monitoring", icon: "📊", color: "bg-teal-500" },
+          { id: "settings", title: "Settings", icon: "⚙️", color: "bg-gray-500" },
+          { id: "sysinfo", title: "About pietrOS", icon: "ℹ️", color: "bg-rose-500" },
+          { id: "experiments", title: "Lab", icon: "🧪", color: "bg-lime-500" },
+        ];
+
+        window.initLaunchpad = function () {
+          window.filterLaunchpad("");
+        };
+
+        window.filterLaunchpad = function (query: string) {
+          const grid = document.getElementById("launchpad-grid");
+          if (!grid) return;
+          
+          const term = query.toLowerCase();
+          const filtered = launchpadApps.filter(app => 
+            app.title.toLowerCase().includes(term) || app.id.includes(term)
+          );
+          
+          grid.innerHTML = "";
+          
+          filtered.forEach((app, idx) => {
+            const item = document.createElement("div");
+            item.className = "launchpad-item flex flex-col items-center gap-2 cursor-pointer group";
+            item.style.animationDelay = `${idx * 30}ms`;
+            item.innerHTML = `
+              <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl ${app.color} flex items-center justify-center text-2xl md:text-3xl shadow-lg group-hover:scale-110 transition-transform">
+                ${app.icon}
+              </div>
+              <span class="text-white text-xs text-center truncate w-full opacity-80 group-hover:opacity-100">${app.title}</span>
+            `;
+            
+            item.onclick = () => {
+              window.closeWindow("launchpad");
+              setTimeout(() => window.restoreWindow(app.id), 100);
+            };
+            
+            grid.appendChild(item);
+          });
+        };
         window.switchMonitorTab = function (tab) {
           document.getElementById("mon-view-infra").style.display = "none";
           document.getElementById("mon-view-cloudfront").style.display = "none";

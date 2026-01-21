@@ -292,7 +292,7 @@
           <div
             class="p-2 bg-black/5 dark:bg-white/5 text-[10px] text-center opacity-50 font-mono"
           >
-            PRESS ENTER TO OPEN
+            ⌘K / CTRL+K TO OPEN • ENTER TO SELECT
           </div>
         </div>
       </div>
@@ -306,6 +306,24 @@
           role="navigation"
           aria-label="Application dock"
         >
+          <!-- Finder -->
+          <div
+            id="dock-finder"
+            class="dock-item cursor-pointer group"
+            onclick="restoreWindow('finder')"
+            title="Finder"
+            role="button"
+            aria-label="Open Finder"
+          >
+            <span class="dock-label">Finder</span>
+            <img
+              class="dock-icon"
+              src="assets/icons/org.gnome.Nautilus.svg"
+              alt="Finder"
+              aria-hidden="true"
+            />
+          </div>
+
           <!-- README.md -->
           <div
             id="dock-about"
