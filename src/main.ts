@@ -237,7 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "monitor", title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
             { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
             { id: "sysinfo", title: "About pietrOS", icon: "assets/icons/contacts.svg" },
-            { id: "experiments", title: "Lab", icon: "assets/icons/font-viewer.svg" },
           ];
 
           // If no search term, show app grid (like macOS 26 Siri/Spotlight)
@@ -898,10 +897,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                                 
                                 <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg mb-3">
-                                    <div class="flex items-center gap-2 mb-3">
-                                        <span class="text-[10px] px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 font-bold border border-orange-200 dark:border-orange-900/50">PRIMARY</span>
-                                        <span class="font-semibold">AWS</span>
-                                    </div>
+                                        <div class="font-semibold mb-3">AWS</div>
                                     <div class="space-y-2 opacity-80">
                                         <div><span class="font-medium text-her-red">Compute:</span> EC2, Auto Scaling, ELB/ALB</div>
                                         <div><span class="font-medium text-her-red">Networking:</span> VPC, Route53, CloudFront, Direct Connect</div>
@@ -911,6 +907,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <div><span class="font-medium text-her-red">Databases:</span> RDS, DynamoDB</div>
                                     </div>
                                 </div>
+                            </div>
 
                             <!-- Infrastructure & Automation -->
                             <div>

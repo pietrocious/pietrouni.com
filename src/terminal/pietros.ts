@@ -281,6 +281,12 @@ export function handlePietrOSCommand(
       break;
     }
 
+    case "noclip": {
+      window.openWindow("experiments");
+      output.innerHTML += `<div class="text-purple-400">🔬 Accessing R&D Lab...</div>`;
+      break;
+    }
+
     case "open": {
       const appName = args[1]?.toLowerCase();
       if (windows && (windows[appName] || appName === "terminal" || appName === "vault")) {
