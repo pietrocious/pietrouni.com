@@ -5,6 +5,7 @@ import { vaultData, fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS
 import { getVaultContent } from './vault';
 import { initTetris, destroyTetris } from './apps/tetris';
 import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
+import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topology';
 
 // state - shared app state with setters for mutations
 import {
@@ -700,11 +701,17 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <p class="text-xs opacity-60">Visual graph for Terraform and Kubernetes infrastructure code.</p>
                                 <div class="text-xs mt-2 opacity-40">Status: COMPLETE</div>
                             </div>
+                            <div onclick="window.openWindow('networktopology'); window.closeWindow('experiments');" class="border border-green-500/30 p-4 hover:bg-green-500/10 cursor-pointer transition-all group">
+                                <div class="text-xs border border-green-500 inline-block px-1 mb-2">INTERACTIVE</div>
+                                <h3 class="font-bold text-lg mb-1 group-hover:text-green-300">🗺️ Network Topology</h3>
+                                <p class="text-xs opacity-60">Visualize network topology from LLDP/CDP output or routing tables.</p>
+                                <div class="text-xs mt-2 opacity-40">Status: COMPLETE</div>
+                            </div>
                         </div>
                         
                         <div class="mt-8 text-xs opacity-40">
                             > SYSTEM INTEGRITY: 100%<br>
-                            > ACTIVE EXPERIMENTS: 2<br>
+                            > ACTIVE EXPERIMENTS: 3<br>
                             > ACCESS: TERMINAL ONLY
                         </div>
                     </div>
@@ -1074,6 +1081,57 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             onClose: () => {
               destroyIaCVisualizer();
+            },
+          },
+          networktopology: {
+            title: "Network Topology Mapper",
+            content: `
+                    <div id="netmap-app" class="h-full flex bg-[#0f172a] text-white select-none font-ui">
+                        <!-- Left Panel: Data Input -->
+                        <div class="w-[400px] flex-shrink-0 flex flex-col border-r border-white/10">
+                            <div class="p-3 border-b border-white/10 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold uppercase opacity-50">Input</span>
+                                    <span id="netmap-format" class="text-xs bg-teal-500/20 text-teal-400 px-2 py-0.5 rounded">LLDP Neighbors</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button id="netmap-lldp" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">LLDP</button>
+                                    <button id="netmap-cdp" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">CDP</button>
+                                    <button id="netmap-routing" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">Routing</button>
+                                </div>
+                            </div>
+                            <textarea id="netmap-code" class="flex-1 bg-[#1e293b] text-teal-400 font-mono text-xs p-4 resize-none outline-none" spellcheck="false" placeholder="Paste LLDP/CDP neighbors or routing table output..."></textarea>
+                        </div>
+                        
+                        <!-- Right Panel: Topology Graph + Details -->
+                        <div class="flex-1 flex flex-col">
+                            <div class="p-3 border-b border-white/10 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold uppercase opacity-50">Network Topology</span>
+                                    <span id="netmap-count" class="text-xs opacity-50">0 devices, 0 links</span>
+                                </div>
+                                <span class="text-xs opacity-30">Drag nodes to rearrange</span>
+                            </div>
+                            <div class="flex-1 relative">
+                                <canvas id="netmap-canvas" width="700" height="450" class="absolute inset-0 w-full h-full"></canvas>
+                            </div>
+                            <div id="netmap-details" class="h-28 border-t border-white/10 p-3 overflow-y-auto text-sm">
+                                <div class="text-xs opacity-50">Click a device to view details</div>
+                            </div>
+                            <div id="netmap-errors" class="hidden bg-red-500/20 text-red-400 text-xs p-2 border-t border-red-500/30"></div>
+                        </div>
+                    </div>
+                `,
+            width: 1100,
+            height: 650,
+            onOpen: () => {
+              setTimeout(() => {
+                const container = document.getElementById('netmap-app');
+                if (container) initNetworkTopology(container);
+              }, 100);
+            },
+            onClose: () => {
+              destroyNetworkTopology();
             },
           },
           finder: {

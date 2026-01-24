@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- Google tag (gtag.js) -->
@@ -118,8 +118,8 @@
       fetchpriority="high"
     />
 
-    <script type="module" crossorigin src="/assets/index-Bs2amqu4.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-D1j0BEHN.css">
+    <script type="module" crossorigin src="/assets/index-CBtdFRyC.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-De0uPT27.css">
   </head>
 
   <body
@@ -253,7 +253,7 @@
       <div
         id="spotlight"
         class="absolute inset-0 z-[6000] hidden flex-col items-center pt-[20vh]"
-        onclick="if(event.target.id === 'spotlight') toggleSpotlight()"
+        onclick="if (event.target.id === 'spotlight') toggleSpotlight();"
         role="dialog"
         aria-modal="true"
         aria-label="Search applications and files"
@@ -279,7 +279,7 @@
               class="w-full bg-transparent outline-none text-lg font-ui text-her-text dark:text-her-textLight placeholder:opacity-50"
               autocomplete="off"
               oninput="handleSearch(this.value)"
-              onkeydown="if(event.key==='Enter') executeSearchResult()"
+              onkeydown="if (event.key === 'Enter') executeSearchResult();"
             />
           </div>
           <div
@@ -293,7 +293,7 @@
           <div
             class="p-2 bg-black/5 dark:bg-white/5 text-[10px] text-center opacity-50 font-mono"
           >
-            PRESS ENTER TO OPEN
+            ⌘K / CTRL+K TO OPEN • ENTER TO SELECT
           </div>
         </div>
       </div>
@@ -307,6 +307,24 @@
           role="navigation"
           aria-label="Application dock"
         >
+          <!-- Finder -->
+          <div
+            id="dock-finder"
+            class="dock-item cursor-pointer group"
+            onclick="restoreWindow('finder')"
+            title="Finder"
+            role="button"
+            aria-label="Open Finder"
+          >
+            <span class="dock-label">Finder</span>
+            <img
+              class="dock-icon"
+              src="/assets/org.gnome.Nautilus-SAKDkncp.svg"
+              alt="Finder"
+              aria-hidden="true"
+            />
+          </div>
+
           <!-- README.md -->
           <div
             id="dock-about"
@@ -357,6 +375,24 @@
               class="dock-icon"
               src="/assets/org.gnome.FileRoller-CmMrPM9K.svg"
               alt="Vault"
+              aria-hidden="true"
+            />
+          </div>
+
+          <!-- Tech Stack -->
+          <div
+            id="dock-techstack"
+            class="dock-item cursor-pointer group"
+            onclick="restoreWindow('techstack')"
+            title="Tech Stack"
+            role="button"
+            aria-label="Open Tech Stack"
+          >
+            <span class="dock-label">Tech Stack</span>
+            <img
+              class="dock-icon"
+              src="/assets/org.gnome.TextEditor-Cka0W7ZJ.svg"
+              alt="Tech Stack"
               aria-hidden="true"
             />
           </div>
@@ -413,9 +449,7 @@
               alt="Settings"
               aria-hidden="true"
             />
-          </div>
         </div>
-      </div>
     </div>
 
   </body>
