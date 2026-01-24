@@ -3,6 +3,8 @@ import { marked } from 'marked';
 // config - static data
 import { vaultData, fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
 import { getVaultContent } from './vault';
+import { initTetris, destroyTetris } from './apps/tetris';
+import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
 
 // state - shared app state with setters for mutations
 import {
@@ -686,21 +688,24 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="border border-green-500/30 p-4 hover:bg-green-500/10 cursor-pointer transition-all">
-                                <div class="text-xs border border-green-500 inline-block px-1 mb-2">PROTOTYPE</div>
-                                <h3 class="font-bold text-lg mb-1">WebGL Fluid Sim</h3>
-                                <p class="text-xs opacity-60">GPU-accelerated fluid dynamics test using Three.js.</p>
+                            <div onclick="window.openWindow('tetris'); window.closeWindow('experiments');" class="border border-green-500/30 p-4 hover:bg-green-500/10 cursor-pointer transition-all group">
+                                <div class="text-xs border border-green-500 inline-block px-1 mb-2">PLAYABLE</div>
+                                <h3 class="font-bold text-lg mb-1 group-hover:text-green-300">🎮 Tetris</h3>
+                                <p class="text-xs opacity-60">Classic falling blocks game. Canvas-based with ghost pieces and hold queue.</p>
+                                <div class="text-xs mt-2 opacity-40">Status: COMPLETE</div>
                             </div>
-                            <div class="border border-green-500/30 p-4 hover:bg-green-500/10 cursor-pointer transition-all">
-                                <div class="text-xs border border-green-500 inline-block px-1 mb-2">CONCEPT</div>
-                                <h3 class="font-bold text-lg mb-1">Neural Network Viz</h3>
-                                <p class="text-xs opacity-60">Visualizing weights and biases in real-time.</p>
+                            <div onclick="window.openWindow('iacvisualizer'); window.closeWindow('experiments');" class="border border-green-500/30 p-4 hover:bg-green-500/10 cursor-pointer transition-all group">
+                                <div class="text-xs border border-green-500 inline-block px-1 mb-2">INTERACTIVE</div>
+                                <h3 class="font-bold text-lg mb-1 group-hover:text-green-300">🏗️ IaC Visualizer</h3>
+                                <p class="text-xs opacity-60">Visual graph for Terraform and Kubernetes infrastructure code.</p>
+                                <div class="text-xs mt-2 opacity-40">Status: COMPLETE</div>
                             </div>
                         </div>
                         
                         <div class="mt-8 text-xs opacity-40">
                             > SYSTEM INTEGRITY: 100%<br>
-                            > LOGGING ENABLED
+                            > ACTIVE EXPERIMENTS: 2<br>
+                            > ACCESS: TERMINAL ONLY
                         </div>
                     </div>
                 `,
@@ -963,6 +968,114 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 450,
             height: 700,
           },
+          tetris: {
+            title: "Tetris",
+            content: `
+                    <div id="tetris-app" class="h-full flex bg-[#1e1e2e] text-white select-none font-ui p-4 gap-4">
+                        <!-- Left Panel: Hold & Stats -->
+                        <div class="flex flex-col gap-3 w-24">
+                            <div class="bg-[#313244] rounded-lg p-2">
+                                <div class="text-[10px] uppercase font-bold opacity-60 mb-2 text-center">Hold</div>
+                                <canvas id="tetris-hold" width="80" height="60" class="w-full rounded"></canvas>
+                            </div>
+                            <div class="bg-[#313244] rounded-lg p-2 space-y-2 text-xs">
+                                <div><span class="opacity-60">High:</span> <span id="tetris-highscore" class="font-bold">0</span></div>
+                                <div><span class="opacity-60">Level:</span> <span id="tetris-level" class="font-bold">1</span></div>
+                                <div><span class="opacity-60">Score:</span> <span id="tetris-score" class="font-bold">0</span></div>
+                                <div><span class="opacity-60">Lines:</span> <span id="tetris-lines" class="font-bold">0</span></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Center: Game Board -->
+                        <div class="flex flex-col items-center">
+                            <canvas id="tetris-board" width="240" height="480" class="rounded-lg border border-[#313244]"></canvas>
+                            <div id="tetris-status" class="h-8 flex items-center justify-center mt-2"></div>
+                        </div>
+                        
+                        <!-- Right Panel: Next & Controls -->
+                        <div class="flex flex-col gap-3 w-24">
+                            <div class="bg-[#313244] rounded-lg p-2">
+                                <div class="text-[10px] uppercase font-bold opacity-60 mb-2 text-center">Next</div>
+                                <canvas id="tetris-next" width="80" height="180" class="w-full rounded"></canvas>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button id="tetris-pause" class="w-full py-1.5 bg-[#313244] hover:bg-[#45475a] rounded text-xs font-bold transition-colors">Pause</button>
+                                <button id="tetris-reset" class="w-full py-1.5 bg-[#313244] hover:bg-[#45475a] rounded text-xs font-bold transition-colors">Reset</button>
+                            </div>
+                            <div class="bg-[#313244] rounded-lg p-2 text-[9px] opacity-70 space-y-1">
+                                <div>← → Move</div>
+                                <div>↑ Rotate</div>
+                                <div>↓ Soft drop</div>
+                                <div>Space Hard drop</div>
+                                <div>H Hold</div>
+                                <div>P Pause</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+            width: 450,
+            height: 580,
+            onOpen: () => {
+              setTimeout(() => {
+                const container = document.getElementById('tetris-app');
+                if (container) initTetris(container);
+              }, 100);
+            },
+            onClose: () => {
+              destroyTetris();
+            },
+          },
+          iacvisualizer: {
+            title: "IaC Visualizer",
+            content: `
+                    <div id="iac-app" class="h-full flex bg-[#0f172a] text-white select-none font-ui">
+                        <!-- Left Panel: Code Editor -->
+                        <div class="w-[400px] flex-shrink-0 flex flex-col border-r border-white/10">
+                            <div class="p-3 border-b border-white/10 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold uppercase opacity-50">Code</span>
+                                    <span id="iac-format" class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">Terraform HCL</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button id="iac-terraform" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">Terraform</button>
+                                    <button id="iac-kubernetes" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">Kubernetes</button>
+                                    <button id="iac-microservices" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">Microservices</button>
+                                </div>
+                            </div>
+                            <textarea id="iac-code" class="flex-1 bg-[#1e293b] text-green-400 font-mono text-xs p-4 resize-none outline-none" spellcheck="false" placeholder="Paste your Terraform or Kubernetes code here..."></textarea>
+                        </div>
+                        
+                        <!-- Right Panel: Graph + Details -->
+                        <div class="flex-1 flex flex-col">
+                            <div class="p-3 border-b border-white/10 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold uppercase opacity-50">Infrastructure Graph</span>
+                                    <span id="iac-count" class="text-xs opacity-50">0 resources</span>
+                                </div>
+                                <span class="text-xs opacity-30">Drag nodes to rearrange</span>
+                            </div>
+                            <div class="flex-1 relative">
+                                <canvas id="iac-canvas" width="700" height="400" class="absolute inset-0 w-full h-full"></canvas>
+                            </div>
+                            <div id="iac-details" class="h-32 border-t border-white/10 p-3 overflow-y-auto text-sm">
+                                <div class="text-xs opacity-50">Click a node to view details</div>
+                            </div>
+                            <div id="iac-errors" class="hidden bg-red-500/20 text-red-400 text-xs p-2 border-t border-red-500/30"></div>
+                        </div>
+                    </div>
+                `,
+            width: 1100,
+            height: 600,
+            onOpen: () => {
+              setTimeout(() => {
+                const container = document.getElementById('iac-app');
+                if (container) initIaCVisualizer(container);
+              }, 100);
+            },
+            onClose: () => {
+              destroyIaCVisualizer();
+            },
+          },
           finder: {
             title: "Finder",
             content: `
@@ -1204,6 +1317,12 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           if (id === "finder") window.initFinder();
           if (id === "launchpad") window.initLaunchpad();
+          if (id === "tetris") {
+            setTimeout(() => {
+              const container = document.getElementById('tetris-app');
+              if (container) initTetris(container);
+            }, 100);
+          }
         };
 
 
@@ -2619,6 +2738,10 @@ ${digTarget}.          300     IN      A       151.101.65.140
               break;
             case "resume":
               window.openWindow("resume");
+              break;
+            case "noclip":
+              window.openWindow("experiments");
+              output.innerHTML += `<div class="text-purple-400">🔬 Accessing R&D Lab...</div>`;
               break;
             default:
               output.innerHTML += `<div class="text-red-400">Command not found: ${cmd}</div>`;
