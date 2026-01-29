@@ -2951,6 +2951,25 @@ ${digTarget}.          300     IN      A       151.101.65.140
             case "noclip":
               window.openWindow("experiments");
               output.innerHTML += `<div class="text-purple-400">🔬 Accessing R&D Lab...</div>`;
+              // Add experiments to dock if not already there
+              if (!document.getElementById('dock-experiments')) {
+                const dock = document.querySelector('.dock-container');
+                if (dock) {
+                  const dockItem = document.createElement('div');
+                  dockItem.id = 'dock-experiments';
+                  dockItem.className = 'dock-item cursor-pointer group';
+                  dockItem.setAttribute('title', 'Experiments Lab');
+                  dockItem.setAttribute('role', 'button');
+                  dockItem.setAttribute('aria-label', 'Open Experiments Lab');
+                  dockItem.onclick = () => (window as any).restoreWindow('experiments');
+                  dockItem.innerHTML = `
+                    <span class="dock-label">Experiments</span>
+                    <img class="dock-icon" src="assets/icons/org.gnome.Extensions.svg" alt="Experiments" aria-hidden="true" />
+                  `;
+                  dock.appendChild(dockItem);
+                  output.innerHTML += `<div class="text-green-400">✓ Experiments Lab added to dock</div>`;
+                }
+              }
               break;
             default:
               output.innerHTML += `<div class="text-red-400">Command not found: ${cmd}</div>`;
