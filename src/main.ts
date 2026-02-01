@@ -740,7 +740,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <!-- IaC Visualizer -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:shadow-lg transition-all cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.openWindow('iacvisualizer');">
                                         <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">🏗️ IaC Visualizer</h3>
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gaphor.Gaphor.svg" class="inline w-5 h-5 mr-1" alt="" /> IaC Visualizer</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">INTERACTIVE</span>
                                         </div>
                                         <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Visual dependency graph for Terraform and Kubernetes infrastructure code. Drag nodes to rearrange.</p>
@@ -756,7 +756,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <!-- Network Topology -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:shadow-lg transition-all cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 150ms" onclick="window.openWindow('networktopology');">
                                         <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">🗺️ Network Topology</h3>
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/network-wired.svg" class="inline w-5 h-5 mr-1" alt="" /> Network Topology</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">INTERACTIVE</span>
                                         </div>
                                         <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Visualize network topology from LLDP/CDP neighbor output or routing tables.</p>
