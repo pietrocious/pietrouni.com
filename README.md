@@ -62,5 +62,5 @@ dock icons are from the [Neuwaita](https://github.com/RusticBard/Neuwaita) icon 
 
 ### special thanks
 
-[Shubham Agrawal](https://agrashu.me/) for the inspiration
-[Tailwind CSS](https://tailwindcss.com/) by Tailwind Labs
+- [Shubham Agrawal](https://agrashu.me/) for the inspiration
+- [Tailwind CSS](https://tailwindcss.com/) by Tailwind Labs
