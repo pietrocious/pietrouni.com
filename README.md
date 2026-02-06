@@ -11,7 +11,7 @@ live demo: [pietrouni.com](https://pietrouni.com)
 
 ## concept
 
-this project is meant to be more than a simple static resume and be a functional ["webtop"](https://en.wikipedia.org/wiki/Web_desktop). featuring a window management system, a functional terminal, and an interactive "vault" for exploring files and resources, all within a macOS/GNOME-inspired hybrid desktop environment
+this project is meant to be more than a simple static resume and be a functional ["webtop"](https://en.wikipedia.org/wiki/Web_desktop). featuring a window management system, a functional terminal, and an interactive "vault" for exploring files and resources, all within an archlinux based desktop environment
 
 this project started as a single HTML file with vanilla JavaScript, CSS, and Tailwind v3 via CDN. it has since evolved to use Vite, TypeScript, and Tailwind v4. I'm pretty happy with the results after this big upgrade
 
@@ -60,6 +60,7 @@ this project uses a combination of Google Fonts and one custom font:
 
 dock icons are from the [Neuwaita](https://github.com/RusticBard/Neuwaita) icon theme by [RusticBard](https://github.com/RusticBard), a beautiful take on the Adwaita theme for GNOME
 
-### tailwind css
+### special thanks
 
-[Tailwind CSS](https://tailwindcss.com/) by Tailwind Labs
+- [Shubham Agrawal](https://agrashu.me/) for the inspiration
+- [Tailwind CSS](https://tailwindcss.com/) by Tailwind Labs
