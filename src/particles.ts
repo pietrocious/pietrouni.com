@@ -1,14 +1,17 @@
-// particles.ts - ambient floating particles on the desktop background
+// particles.ts  depth parallax, soft shadows, and cursor repulsion
 
 interface Particle {
   x: number;
   y: number;
   vx: number;
   vy: number;
-  radius: number;
+  size: number;
+  color: string;
+  rotation: number;
+  rotationSpeed: number;
+  shape: number; // 0=circle, 1=square, 2=triangle
+  depth: number; // 0.5–1.5, affects size/speed/shadow for parallax
   opacity: number;
-  baseOpacity: number;
-  phase: number; // for gentle pulse
 }
 
 let canvas: HTMLCanvasElement | null = null;
@@ -19,33 +22,64 @@ let mouseX = -1000;
 let mouseY = -1000;
 let width = 0;
 let height = 0;
+let dpr = 1;
 
-const PARTICLE_COUNT = 35;
-const MAX_RADIUS = 2.5;
-const MIN_RADIUS = 0.8;
-const MAX_SPEED = 0.3;
-const MOUSE_REPEL_RANGE = 120;
-const MOUSE_REPEL_STRENGTH = 0.8;
+// Config
+const PARTICLE_COUNT = 45;
+const GRAVITY = -0.04; // negative = float upward
+const SPEED_FACTOR = 0.6;
+const FRICTION = 0.98;
+const INTERACTION_RADIUS = 150;
+const INTERACTION_FORCE = 3.5;
 
-function createParticle(): Particle {
+// Site-themed palette — muted, elegant tones
+const COLORS_LIGHT = [
+  '#4a7c9d', // primary blue
+  '#5b9ab8', // lighter blue
+  '#d4a574', // warm amber
+  '#8fb8a0', // sage green
+  '#c4917a', // terracotta
+  '#b8ccd8', // pale blue
+];
+
+const COLORS_DARK = [
+  '#5b9ab8', // blue
+  '#7ab5cc', // lighter blue
+  '#d4a574', // warm amber
+  '#a0c9b2', // sage green
+  '#d9a48f', // soft terracotta
+  '#8aa8b8', // steel blue
+];
+
+function createParticle(randomY = true): Particle {
+  const isDark = document.documentElement.classList.contains('dark');
+  const colors = isDark ? COLORS_DARK : COLORS_LIGHT;
+
   return {
     x: Math.random() * width,
-    y: Math.random() * height,
-    vx: (Math.random() - 0.5) * MAX_SPEED,
-    vy: (Math.random() - 0.5) * MAX_SPEED,
-    radius: MIN_RADIUS + Math.random() * (MAX_RADIUS - MIN_RADIUS),
-    opacity: 0,
-    baseOpacity: 0.15 + Math.random() * 0.25,
-    phase: Math.random() * Math.PI * 2,
+    y: randomY ? Math.random() * height : height + 60,
+    vx: (Math.random() - 0.5) * 2 * SPEED_FACTOR,
+    vy: (Math.random() - 0.5) * 2 * SPEED_FACTOR - Math.random() * Math.abs(GRAVITY) * 20,
+    size: Math.random() * 14 + 5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rotation: Math.random() * Math.PI * 2,
+    rotationSpeed: (Math.random() - 0.5) * 0.03,
+    shape: Math.floor(Math.random() * 3),
+    depth: Math.random() * 1 + 0.5,
+    opacity: randomY ? 0.35 + Math.random() * 0.35 : 0.4,
   };
 }
 
 function resizeCanvas(): void {
   if (!canvas) return;
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
   width = window.innerWidth;
   height = window.innerHeight;
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  canvas.style.width = width + 'px';
+  canvas.style.height = height + 'px';
+  if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 function animate(): void {
@@ -53,53 +87,89 @@ function animate(): void {
 
   ctx.clearRect(0, 0, width, height);
 
-  const isDark = document.documentElement.classList.contains('dark');
-  const time = performance.now() * 0.001;
-
   for (const p of particles) {
-    // Gentle pulse
-    const pulse = Math.sin(time * 0.5 + p.phase) * 0.1;
-    p.opacity += (p.baseOpacity + pulse - p.opacity) * 0.02;
+    // Antigravity — float upward
+    p.vy += GRAVITY * 0.05 * p.depth;
 
-    // Mouse repulsion
+    // Cursor repulsion
     const dx = p.x - mouseX;
     const dy = p.y - mouseY;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
-    if (dist < MOUSE_REPEL_RANGE && dist > 0) {
-      const force = (1 - dist / MOUSE_REPEL_RANGE) * MOUSE_REPEL_STRENGTH;
-      p.vx += (dx / dist) * force;
-      p.vy += (dy / dist) * force;
+    if (dist < INTERACTION_RADIUS && dist > 0) {
+      const force = (INTERACTION_RADIUS - dist) / INTERACTION_RADIUS;
+      const angle = Math.atan2(dy, dx);
+      p.vx += Math.cos(angle) * force * INTERACTION_FORCE;
+      p.vy += Math.sin(angle) * force * INTERACTION_FORCE;
     }
 
     // Friction
-    p.vx *= 0.99;
-    p.vy *= 0.99;
-
-    // Clamp speed
-    const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-    if (speed > MAX_SPEED * 3) {
-      p.vx = (p.vx / speed) * MAX_SPEED * 3;
-      p.vy = (p.vy / speed) * MAX_SPEED * 3;
-    }
+    p.vx *= FRICTION;
+    p.vy *= FRICTION;
 
     // Move
-    p.x += p.vx;
-    p.y += p.vy;
+    p.x += p.vx * p.depth;
+    p.y += p.vy * p.depth;
+    p.rotation += p.rotationSpeed;
 
-    // Wrap around edges
-    if (p.x < -10) p.x = width + 10;
-    if (p.x > width + 10) p.x = -10;
-    if (p.y < -10) p.y = height + 10;
-    if (p.y > height + 10) p.y = -10;
+    // Horizontal wrap
+    if (p.x < -60) p.x = width + 60;
+    if (p.x > width + 60) p.x = -60;
+
+    // Reset when floated off top (antigravity)
+    if (p.y < -80) {
+      Object.assign(p, createParticle(false));
+      p.y = height + 60;
+    }
+    // Safety: if somehow below screen
+    if (p.y > height + 80) {
+      Object.assign(p, createParticle(false));
+      p.y = -60;
+    }
 
     // Draw
+    const s = p.size * p.depth;
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.globalAlpha = p.opacity * p.depth;
+
+    // Soft shadow
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
+    ctx.shadowBlur = 8 * p.depth;
+    ctx.shadowOffsetX = 3 * p.depth;
+    ctx.shadowOffsetY = 3 * p.depth;
+
+    ctx.fillStyle = p.color;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-    ctx.fillStyle = isDark
-      ? `rgba(239, 235, 233, ${p.opacity})`  // warm white for dark mode
-      : `rgba(78, 52, 46, ${p.opacity * 0.6})`; // dark brown for light mode
+
+    if (p.shape === 0) {
+      // Circle
+      ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
+    } else if (p.shape === 1) {
+      // Rounded square
+      const half = s / 2;
+      const r = s * 0.15; // corner radius
+      ctx.moveTo(-half + r, -half);
+      ctx.lineTo(half - r, -half);
+      ctx.quadraticCurveTo(half, -half, half, -half + r);
+      ctx.lineTo(half, half - r);
+      ctx.quadraticCurveTo(half, half, half - r, half);
+      ctx.lineTo(-half + r, half);
+      ctx.quadraticCurveTo(-half, half, -half, half - r);
+      ctx.lineTo(-half, -half + r);
+      ctx.quadraticCurveTo(-half, -half, -half + r, -half);
+    } else {
+      // Triangle
+      ctx.moveTo(0, -s / 2);
+      ctx.lineTo(s / 2, s / 2);
+      ctx.lineTo(-s / 2, s / 2);
+      ctx.closePath();
+    }
+
     ctx.fill();
+    ctx.restore();
   }
 
   animId = requestAnimationFrame(animate);
@@ -108,6 +178,16 @@ function animate(): void {
 function handleMouseMove(e: MouseEvent): void {
   mouseX = e.clientX;
   mouseY = e.clientY;
+}
+
+function handleTouchMove(e: TouchEvent): void {
+  mouseX = e.touches[0].clientX;
+  mouseY = e.touches[0].clientY;
+}
+
+function handleMouseLeave(): void {
+  mouseX = -1000;
+  mouseY = -1000;
 }
 
 export function initParticles(): void {
@@ -119,7 +199,7 @@ export function initParticles(): void {
 
   canvas = document.createElement('canvas');
   canvas.id = 'particle-canvas';
-  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:1;';
 
   // Insert inside desktop, before windows-container
   const desktop = document.getElementById('desktop');
@@ -140,18 +220,12 @@ export function initParticles(): void {
   // Create particles
   particles = [];
   for (let i = 0; i < PARTICLE_COUNT; i++) {
-    particles.push(createParticle());
+    particles.push(createParticle(true));
   }
 
-  // Fade in particles gradually
-  particles.forEach((p, i) => {
-    p.opacity = 0;
-    setTimeout(() => {
-      p.baseOpacity = 0.15 + Math.random() * 0.25;
-    }, i * 80);
-  });
-
   window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('touchmove', handleTouchMove, { passive: true });
+  document.addEventListener('mouseleave', handleMouseLeave);
   window.addEventListener('resize', resizeCanvas);
 
   animId = requestAnimationFrame(animate);
@@ -161,6 +235,8 @@ export function destroyParticles(): void {
   if (animId) cancelAnimationFrame(animId);
   canvas?.remove();
   window.removeEventListener('mousemove', handleMouseMove);
+  window.removeEventListener('touchmove', handleTouchMove);
+  document.removeEventListener('mouseleave', handleMouseLeave);
   window.removeEventListener('resize', resizeCanvas);
   canvas = null;
   ctx = null;

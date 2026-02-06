@@ -8,10 +8,9 @@ import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
 import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topology';
 import { initThrees, destroyThrees } from './apps/threes';
 import { initDock, dockBounce } from './dock';
-import { initBoot } from './boot';
 import { animateWindowContent } from './animations';
 import { initParticles } from './particles';
-import { initAudio, playClick, playWindowOpen, playBootChime, isSoundEnabled, toggleSound } from './audio';
+import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
 
 
 // state - shared app state with setters for mutations
@@ -53,18 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // initialize window event listeners (drag, resize)
         initWindowEventListeners();
 
-        // boot sequence - desktop reveals after boot completes
         // initialize audio system (loads saved preference)
         initAudio();
 
-        initBoot(() => {
-          // initialize dock fish-eye magnification after desktop is visible
-          initDock();
-          // ambient floating particles
-          initParticles();
-          // boot chime if sound enabled
-          playBootChime();
-        });
+        // initialize dock fish-eye magnification
+        initDock();
+        // ambient floating particles
+        initParticles();
 
         // expose sound toggle for settings
         window.toggleSound = toggleSound;
