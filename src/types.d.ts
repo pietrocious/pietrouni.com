@@ -25,6 +25,10 @@ declare global {
     handlePietrOSCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
     handleCyberpunkCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
     handleFalloutCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
+
+    // Audio
+    toggleSound: () => boolean;
+    isSoundEnabled: () => boolean;
   }
 }
 

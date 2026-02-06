@@ -7,6 +7,12 @@ import { initTetris, destroyTetris } from './apps/tetris';
 import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
 import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topology';
 import { initThrees, destroyThrees } from './apps/threes';
+import { initDock, dockBounce } from './dock';
+import { initBoot } from './boot';
+import { animateWindowContent } from './animations';
+import { initParticles } from './particles';
+import { initAudio, playClick, playWindowOpen, playBootChime, isSoundEnabled, toggleSound } from './audio';
+
 
 // state - shared app state with setters for mutations
 import {
@@ -46,6 +52,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // initialize window event listeners (drag, resize)
         initWindowEventListeners();
+
+        // boot sequence - desktop reveals after boot completes
+        // initialize audio system (loads saved preference)
+        initAudio();
+
+        initBoot(() => {
+          // initialize dock fish-eye magnification after desktop is visible
+          initDock();
+          // ambient floating particles
+          initParticles();
+          // boot chime if sound enabled
+          playBootChime();
+        });
+
+        // expose sound toggle for settings
+        window.toggleSound = toggleSound;
+        window.isSoundEnabled = isSoundEnabled;
+
+        // dock click sound via event delegation
+        const dockContainer = document.querySelector('.dock-container');
+        if (dockContainer) {
+          dockContainer.addEventListener('click', () => playClick());
+        }
 
         function applyWallpaper() {
           const isDark = document.documentElement.classList.contains("dark");
@@ -903,6 +932,22 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </button>
                                 </div>
 
+                                <!-- Sound Toggle -->
+                                <div class="flex items-center justify-between p-4 bg-black/5 dark:bg-white/5 rounded-lg mb-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-sm">UI Sounds</div>
+                                            <div class="text-xs opacity-60" id="settings-sound-label">Off</div>
+                                        </div>
+                                    </div>
+                                    <button onclick="const on = window.toggleSound(); document.getElementById('settings-sound-label').textContent = on ? 'On' : 'Off'; this.textContent = on ? 'Disable' : 'Enable';" class="px-4 py-2 bg-her-red text-white rounded-lg text-sm font-medium hover:bg-her-red/90 transition-colors">
+                                        Enable
+                                    </button>
+                                </div>
+
                                 <!-- Wallpaper Picker Grid -->
                                 <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg">
                                     <div class="flex items-center gap-3 mb-4">
@@ -1492,13 +1537,22 @@ document.addEventListener("DOMContentLoaded", () => {
             prevRect: null,
           };
 
-          // Remove opening animation class after animation completes
-          setTimeout(() => winEl.classList.remove("window-opening"), 350);
+          // Play window open sound
+          playWindowOpen();
 
-          // Dock State
+          // Trigger content entrance animations immediately (plays during window open)
+          animateWindowContent(winEl);
+
+          // Remove opening animation class after animation completes
+          setTimeout(() => {
+            winEl.classList.remove("window-opening");
+          }, 450);
+
+          // Dock State + Launch Bounce
           const dockItem = document.getElementById(`dock-${id}`);
           if (dockItem) {
             dockItem.classList.add("active");
+            dockBounce(id);
           }
 
           // App specific logic init
@@ -1664,7 +1718,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-        // clock
+        // clock with flip-digit animation
+        let prevClockText = '';
         function updateClock() {
           const now = new Date();
           const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -1673,7 +1728,37 @@ document.addEventListener("DOMContentLoaded", () => {
             hour: "2-digit",
             minute: "2-digit",
           });
-          document.getElementById("clock").innerText = `${day} ${time}`;
+          const text = `${day} ${time}`;
+          const clockEl = document.getElementById("clock");
+          if (!clockEl) return;
+
+          // First render or text length changed — just set it
+          if (!prevClockText || prevClockText.length !== text.length) {
+            clockEl.innerHTML = '';
+            for (const ch of text) {
+              const span = document.createElement('span');
+              span.className = 'clock-char';
+              span.textContent = ch;
+              span.dataset.char = ch;
+              clockEl.appendChild(span);
+            }
+            prevClockText = text;
+            return;
+          }
+
+          // Animate only changed characters
+          const spans = clockEl.querySelectorAll('.clock-char');
+          for (let i = 0; i < text.length; i++) {
+            if (prevClockText[i] !== text[i] && spans[i]) {
+              const span = spans[i] as HTMLElement;
+              span.classList.add('clock-char-flip');
+              span.textContent = text[i];
+              span.dataset.char = text[i];
+              // Remove animation class after it completes
+              setTimeout(() => span.classList.remove('clock-char-flip'), 400);
+            }
+          }
+          prevClockText = text;
         }
         setInterval(updateClock, 1000);
         updateClock();

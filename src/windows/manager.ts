@@ -2,11 +2,17 @@
 // dragging, resizing, minimize/maximize, z-index stuff
 
 import { activeWindows, incrementZIndex, setMonitorInterval, monitorInterval } from '../state';
+import { playWindowClose } from '../audio';
 
 // drag state - keep these local since they're only used here
 let isDragging = false;
 let dragOffset = { x: 0, y: 0 };
 let dragId: string | null = null;
+
+// drag velocity tracking for momentum
+let dragVelocity = { x: 0, y: 0 };
+let lastDragPos = { x: 0, y: 0 };
+let lastDragTime = 0;
 
 // resize state
 let resizeDir: string | null = null;
@@ -19,8 +25,10 @@ let startResizePos: { x: number; y: number } | null = null;
 export function bringToFront(id: string): void {
   if (activeWindows[id]) {
     activeWindows[id].element.style.zIndex = String(incrementZIndex());
-    // update styling for all windows
-    document.querySelectorAll('.window').forEach(w => w.classList.remove('active-window'));
+    // update styling for all windows - active gets enhanced shadow
+    document.querySelectorAll('.window').forEach(w => {
+      w.classList.remove('active-window');
+    });
     activeWindows[id].element.classList.add('active-window');
   }
 }
@@ -29,6 +37,9 @@ export function bringToFront(id: string): void {
 export function closeWindow(id: string): void {
   const win = document.getElementById(`win-${id}`);
   if (!win) return;
+
+  // play close sound
+  playWindowClose();
 
   // add closing animation
   win.classList.add('window-closing');
@@ -181,6 +192,12 @@ export function startDrag(e: MouseEvent | TouchEvent, id: string): void {
   dragId = id;
   dragOffset.x = clientX - rect.left;
   dragOffset.y = clientY - rect.top;
+
+  // init velocity tracking
+  dragVelocity = { x: 0, y: 0 };
+  lastDragPos = { x: clientX, y: clientY };
+  lastDragTime = performance.now();
+
   win.classList.add('dragging');
   bringToFront(id);
   if (e.stopPropagation) e.stopPropagation();
@@ -198,26 +215,36 @@ let cursorThrottleId: number | null = null;
 function handleMove(e: MouseEvent | TouchEvent): void {
   if (!isDragging || !dragId) return;
   e.preventDefault();
-  
+
   const clientX = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
   const clientY = e.type.includes('touch') ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY;
-  
+
+  // track velocity
+  const now = performance.now();
+  const dt = now - lastDragTime;
+  if (dt > 0) {
+    dragVelocity.x = (clientX - lastDragPos.x) / dt;
+    dragVelocity.y = (clientY - lastDragPos.y) / dt;
+  }
+  lastDragPos = { x: clientX, y: clientY };
+  lastDragTime = now;
+
   pendingMove = { clientX, clientY };
-  
+
   if (rafId) return; // skip if rAF already scheduled
-  
+
   rafId = requestAnimationFrame(() => {
     if (pendingMove && dragId && activeWindows[dragId]) {
       const win = activeWindows[dragId].element;
       const container = win.offsetParent || document.body;
       const containerRect = container.getBoundingClientRect();
-      
+
       let newX = pendingMove.clientX - dragOffset.x - containerRect.left;
       let newY = pendingMove.clientY - dragOffset.y - containerRect.top;
-      
+
       // keep header accessible - dont let it go above 0
       if (newY < 0) newY = 0;
-      
+
       win.style.left = `${newX}px`;
       win.style.top = `${newY}px`;
     }
@@ -229,20 +256,20 @@ function handleMove(e: MouseEvent | TouchEvent): void {
 // handle resize with rAF batching
 function handleResize(e: MouseEvent): void {
   if (!isResizing || !resizeWin || !startResizeRect || !startResizePos) return;
-  
+
   pendingResize = { clientX: e.clientX, clientY: e.clientY };
-  
+
   if (rafId) return; // reuse same rAF guard
-  
+
   rafId = requestAnimationFrame(() => {
     if (pendingResize && resizeWin && startResizeRect && startResizePos && resizeDir) {
       const dx = pendingResize.clientX - startResizePos.x;
       const dy = pendingResize.clientY - startResizePos.y;
       const rect = startResizeRect;
-      
+
       const minW = 300;
       const minH = 200;
-      
+
       if (resizeDir.includes('e')) {
         resizeWin.style.width = `${Math.max(minW, rect.width + dx)}px`;
       }
@@ -265,14 +292,58 @@ function handleResize(e: MouseEvent): void {
   });
 }
 
+// apply momentum after drag release
+function applyMomentum(win: HTMLElement): void {
+  // Only apply if there's meaningful velocity
+  const speed = Math.sqrt(dragVelocity.x ** 2 + dragVelocity.y ** 2);
+  if (speed < 0.2) return;
+
+  // Check reduced motion preference
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const container = win.offsetParent || document.body;
+  const containerRect = container.getBoundingClientRect();
+
+  // Scale velocity to px displacement (capped)
+  const momentumX = Math.max(-80, Math.min(80, dragVelocity.x * 120));
+  const momentumY = Math.max(-80, Math.min(80, dragVelocity.y * 120));
+
+  const currentLeft = win.offsetLeft;
+  const currentTop = win.offsetTop;
+
+  let targetX = currentLeft + momentumX;
+  let targetY = currentTop + momentumY;
+
+  // Boundary clamping
+  const maxX = containerRect.width - 100;
+  const maxY = containerRect.height - 100;
+  targetX = Math.max(-win.offsetWidth + 100, Math.min(maxX, targetX));
+  targetY = Math.max(0, Math.min(maxY, targetY));
+
+  // Apply with spring-like transition
+  win.style.transition = 'left 0.5s cubic-bezier(0.16, 1, 0.3, 1), top 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+  win.style.left = `${targetX}px`;
+  win.style.top = `${targetY}px`;
+
+  // Cleanup transition after animation
+  setTimeout(() => {
+    win.style.transition = '';
+  }, 500);
+}
+
 // end drag operation
 function handleEnd(): void {
-  if (isDragging && dragId) {
-    activeWindows[dragId].element.classList.remove('dragging');
+  if (isDragging && dragId && activeWindows[dragId]) {
+    const win = activeWindows[dragId].element;
+    win.classList.remove('dragging');
+
+    // Apply momentum effect
+    applyMomentum(win);
   }
   isDragging = false;
   dragId = null;
-  
+  dragVelocity = { x: 0, y: 0 };
+
   // cancel any pending rAF
   if (rafId) {
     cancelAnimationFrame(rafId);
@@ -296,9 +367,9 @@ export function addTouchListeners(winEl: HTMLElement, id: string): void {
 export function updateWindowCursor(e: MouseEvent, win: HTMLElement): void {
   if (isResizing || isDragging) return;
   if (cursorThrottleId) return; // skip if throttled
-  
+
   cursorThrottleId = window.setTimeout(() => { cursorThrottleId = null; }, 50);
-  
+
   const rect = win.getBoundingClientRect();
   const border = 10; // detection area
   const x = e.clientX - rect.left;
@@ -365,11 +436,11 @@ export function initWindowEventListeners(): void {
       handleResize(e);
     }
   });
-  
+
   // single mouseup handler for both
   window.addEventListener('mouseup', () => {
     handleEnd();
-    
+
     if (isResizing && resizeWin) {
       resizeWin.classList.remove('resizing');
     }
@@ -377,4 +448,3 @@ export function initWindowEventListeners(): void {
     resizeWin = null;
   });
 }
-

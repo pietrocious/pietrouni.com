@@ -71,6 +71,136 @@ body {
   overscroll-behavior: none;
 }
 
+/* ===== Boot Sequence ===== */
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.boot-screen.boot-exit {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+.boot-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.boot-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  animation: bootLogoIn 1s ease forwards;
+}
+
+@keyframes bootLogoIn {
+  0% { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.boot-logo-text {
+  font-family: "Fixedsys", "JetBrains Mono", monospace;
+  font-size: 36px;
+  color: #4a7c9d;
+  text-shadow: 0 0 20px rgba(74, 124, 157, 0.5), 0 0 40px rgba(74, 124, 157, 0.2);
+  letter-spacing: 4px;
+}
+
+.boot-logo-version {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 2px;
+}
+
+.boot-terminal {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.8;
+  text-align: left;
+  width: 100%;
+  min-height: 120px;
+  padding: 0 20px;
+}
+
+.boot-terminal .boot-line {
+  opacity: 0;
+  animation: bootLineIn 0.3s ease forwards;
+}
+
+@keyframes bootLineIn {
+  0% { opacity: 0; transform: translateX(-4px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.boot-terminal .boot-ok {
+  color: #28c840;
+}
+
+.boot-terminal .boot-info {
+  color: #4a7c9d;
+}
+
+.boot-progress-track {
+  width: 200px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.boot-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #4a7c9d;
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(74, 124, 157, 0.6);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.boot-skip {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 1px;
+  opacity: 0;
+  animation: bootSkipIn 0.5s ease 1s forwards;
+}
+
+@keyframes bootSkipIn {
+  to { opacity: 1; }
+}
+
+/* Desktop hidden during boot */
+.desktop-hidden {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.desktop-reveal {
+  animation: desktopReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes desktopReveal {
+  0% { opacity: 0; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 /* Warm Ambient Background - Base Classes */
 @keyframes herGradient {
   0% {
@@ -403,11 +533,18 @@ html.dark .ventura-bg {
   /* Allow vertical scrolling, prevent horizontal pan */
 }
 
-/* Window Open Animation */
+/* Window Open Animation - Spring with overshoot */
 @keyframes windowOpen {
   0% {
     opacity: 0;
-    transform: scale(0.8) translateY(20px);
+    transform: scale(0.75) translateY(24px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-2px);
+  }
+  80% {
+    transform: scale(0.995) translateY(1px);
   }
   100% {
     opacity: 1;
@@ -423,17 +560,37 @@ html.dark .ventura-bg {
   }
   100% {
     opacity: 0;
-    transform: scale(0.8) translateY(20px);
+    transform: scale(0.85) translateY(16px);
   }
 }
 
 .window.window-opening {
-  animation: windowOpen 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: windowOpen 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 
 .window.window-closing {
-  animation: windowClose 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+  animation: windowClose 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+  will-change: transform, opacity;
   pointer-events: none;
+}
+
+/* Active window enhanced shadow + subtle lift */
+.window.active-window {
+  box-shadow: 0 16px 40px rgba(62, 39, 35, 0.2), 0 2px 8px rgba(62, 39, 35, 0.08);
+}
+
+html.dark .window.active-window {
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Inactive windows - subtler shadow */
+.window:not(.active-window):not(.dragging) {
+  box-shadow: 0 6px 20px rgba(62, 39, 35, 0.1);
+}
+
+html.dark .window:not(.active-window):not(.dragging) {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 /* Vault Card Animation */
@@ -452,6 +609,64 @@ html.dark .ventura-bg {
   animation: vaultCardIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
 }
+
+/* ===== Content Entrance Animations ===== */
+/* Fade up - general content entrance */
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Scale fade - for cards */
+@keyframes scaleFadeIn {
+  0% { opacity: 0; transform: scale(0.92) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Content animation classes */
+.anim-fade-up {
+  opacity: 0;
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-slide-left {
+  opacity: 0;
+  animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-scale-in {
+  opacity: 0;
+  animation: scaleFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scroll-triggered animation - hidden until in viewport */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delay utilities */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+.stagger-7 { animation-delay: 350ms; }
+.stagger-8 { animation-delay: 400ms; }
 
 .window.maximized {
   transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease;
@@ -544,6 +759,24 @@ html.dark .window-header {
   background: #28c840;
 }
 
+/* Traffic light symbols - reveal on group hover */
+.btn-neon::after {
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  font-family: system-ui, sans-serif;
+}
+
+.btn-neon.close::after { content: "×"; color: #4a0000; }
+.btn-neon.min::after { content: "−"; color: #4a3500; }
+.btn-neon.max::after { content: "+"; color: #003a10; }
+
+.controls-neon-flat:hover .btn-neon::after {
+  opacity: 1;
+}
+
 /* Hover State: Neon Glow */
 .btn-neon.close:hover {
   box-shadow: 0 0 10px #ff5f57, 0 0 20px #ff5f57;
@@ -622,10 +855,14 @@ html.dark .window.active-window {
 
 .window.dragging {
   transition: none;
-  opacity: 0.95;
-  box-shadow: 0 30px 60px rgba(62, 39, 35, 0.2);
+  opacity: 0.92;
+  box-shadow: 0 35px 70px rgba(62, 39, 35, 0.25), 0 5px 15px rgba(62, 39, 35, 0.1);
   will-change: left, top;
-  transform: translateZ(0);
+  transform: scale(1.01) translateZ(0);
+}
+
+html.dark .window.dragging {
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.5), 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .window.resizing {
@@ -713,6 +950,7 @@ html.dark .dock-container {
   display: flex;
   align-items: center;
   justify-content: center;
+  will-change: transform;
 }
 
 /* Mobile: smaller dock items */
@@ -728,8 +966,9 @@ html.dark .dock-item {
 }
 
 /* Hover effects only on devices that support hover (not touch) */
+/* When fish-eye JS is active, .dock-fisheye-active disables CSS hover */
 @media (hover: hover) {
-  .dock-item:hover {
+  .dock-container:not(.dock-fisheye-active) .dock-item:hover {
     transform: scale(1.15) translateY(-8px);
   }
 }
@@ -750,6 +989,31 @@ html.dark .dock-item {
 /* Launch Animation */
 .animate-dock-bounce {
   animation: dockBounce 0.6s cubic-bezier(0.28, 0.84, 0.42, 1);
+}
+
+/* Enhanced Bounce with Squash & Stretch */
+@keyframes dockBounceEnhanced {
+  0% { transform: translateY(0) scaleX(1) scaleY(1); }
+  15% { transform: translateY(-18px) scaleX(0.92) scaleY(1.12); }
+  30% { transform: translateY(0) scaleX(1.08) scaleY(0.9); }
+  45% { transform: translateY(-10px) scaleX(0.96) scaleY(1.06); }
+  60% { transform: translateY(0) scaleX(1.04) scaleY(0.96); }
+  75% { transform: translateY(-4px) scaleX(0.98) scaleY(1.02); }
+  100% { transform: translateY(0) scaleX(1) scaleY(1); }
+}
+
+.dock-bounce-enhanced {
+  animation: dockBounceEnhanced 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Active Indicator Pulse */
+@keyframes activePulse {
+  0%, 100% { box-shadow: 0 0 4px #4a7c9d; opacity: 1; }
+  50% { box-shadow: 0 0 8px #4a7c9d, 0 0 12px rgba(74, 124, 157, 0.4); opacity: 0.8; }
+}
+
+.dock-item.active::after {
+  animation: activePulse 2.5s ease-in-out infinite;
 }
 
 /* Icon Shapes (img or SVG) */
@@ -831,32 +1095,116 @@ html.dark .dock-container {
 
 /* Menu Bar */
 #menubar {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(244, 235, 217, 0.25);
-  border-bottom: 1px solid rgba(74, 124, 157, 0.08);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  background: rgba(244, 235, 217, 0.45);
+  border-bottom: 1px solid rgba(74, 124, 157, 0.1);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease;
 }
 
 html.dark #menubar {
-  background: rgba(62, 39, 35, 0.2);
-  border-bottom: 1px solid rgba(74, 124, 157, 0.08);
+  background: rgba(62, 39, 35, 0.35);
+  border-bottom: 1px solid rgba(74, 124, 157, 0.1);
+}
+
+/* Menu bar button hover effects */
+#menubar button {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+#menubar button:hover {
+  transform: scale(1.1);
+}
+#menubar button:active {
+  transform: scale(0.95);
+}
+
+/* Clock flip digit animation */
+.clock-flip {
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.clock-char {
+  display: inline-block;
+  transition: none;
+}
+
+.clock-char-flip {
+  animation: clockCharFlip 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes clockCharFlip {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* Spotlight Search */
 #spotlight {
-  backdrop-filter: blur(8px);
-  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.5);
+  transition: backdrop-filter 0.3s ease;
+}
+
+#spotlight-box {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .spotlight-result {
-  transition: all 0.1s;
+  transition: all 0.15s ease;
   cursor: pointer;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: spotlightResultIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border-left: 3px solid transparent;
+}
+
+.spotlight-result:nth-child(1) { animation-delay: 0ms; }
+.spotlight-result:nth-child(2) { animation-delay: 30ms; }
+.spotlight-result:nth-child(3) { animation-delay: 60ms; }
+.spotlight-result:nth-child(4) { animation-delay: 90ms; }
+.spotlight-result:nth-child(5) { animation-delay: 120ms; }
+.spotlight-result:nth-child(6) { animation-delay: 150ms; }
+
+@keyframes spotlightResultIn {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .spotlight-result.selected,
 .spotlight-result:hover {
   background: rgba(74, 124, 157, 0.1);
   border-left: 3px solid #4a7c9d;
+}
+
+/* Spotlight app grid items */
+.spotlight-app {
+  opacity: 0;
+  animation: spotlightAppIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.spotlight-app:nth-child(1) { animation-delay: 0ms; }
+.spotlight-app:nth-child(2) { animation-delay: 30ms; }
+.spotlight-app:nth-child(3) { animation-delay: 60ms; }
+.spotlight-app:nth-child(4) { animation-delay: 90ms; }
+.spotlight-app:nth-child(5) { animation-delay: 120ms; }
+.spotlight-app:nth-child(6) { animation-delay: 150ms; }
+.spotlight-app:nth-child(7) { animation-delay: 180ms; }
+.spotlight-app:nth-child(8) { animation-delay: 210ms; }
+.spotlight-app:nth-child(9) { animation-delay: 240ms; }
+
+@keyframes spotlightAppIn {
+  0% { opacity: 0; transform: scale(0.85) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 /* Scrollbar styles consolidated in global section above (lines 100-155) */
@@ -1333,6 +1681,7 @@ html.dark .markdown-body pre {
   pointer-events: none;
 }
 
+
 /* =========================================
    Accessibility: Reduced Motion Support
    ========================================= */
@@ -1378,5 +1727,49 @@ html.dark .markdown-body pre {
   /* Disable glitch effects */
   .window-glitch::before {
     animation: none !important;
+  }
+
+  /* Disable boot sequence animations */
+  .boot-screen,
+  .boot-exit {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Disable content entrance animations */
+  .anim-fade-up,
+  .anim-slide-left,
+  .anim-scale-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Disable scroll reveal */
+  .scroll-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Disable clock flip */
+  .clock-char-flip {
+    animation: none !important;
+  }
+
+  /* Disable dock bounce */
+  .dock-item-bounce {
+    animation: none !important;
+  }
+
+  /* Disable spotlight animations */
+  .spotlight-result,
+  .spotlight-app {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Disable menu bar button scale */
+  #menubar button:hover {
+    transform: none !important;
   }
 }
