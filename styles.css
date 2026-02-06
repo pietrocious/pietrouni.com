@@ -630,23 +630,6 @@ html.dark .window-header {
   background: #28c840;
 }
 
-/* Traffic light symbols - reveal on group hover */
-.btn-neon::after {
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 1;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-  font-family: system-ui, sans-serif;
-}
-
-.btn-neon.close::after { content: "×"; color: #4a0000; }
-.btn-neon.min::after { content: "−"; color: #4a3500; }
-.btn-neon.max::after { content: "+"; color: #003a10; }
-
-.controls-neon-flat:hover .btn-neon::after {
-  opacity: 1;
-}
 
 /* Hover State: Neon Glow */
 .btn-neon.close:hover {

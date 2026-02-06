@@ -550,6 +550,25 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
                                     </div>
 
+                                    <!-- suprsymmetry.com -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.open('https://suprsymmetry.com/', '_blank')">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">suprsymmetry.com</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">AI Art</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">AI art studio for generative art and concept art. Features Gemini-powered image generation with a sleek nocturne-themed interface.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">GEMINI</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AI</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-60">
+                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>Live Site</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
