@@ -363,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
           sysinfo: {
             title: "About pietrOS",
             content: `
-                     <div class="h-full flex flex-col bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight p-6 select-none font-ui">
+                     <div class="h-full flex flex-col text-her-text dark:text-her-textLight p-6 select-none font-ui">
                         <h1 class="text-xl font-bold mb-1 font-serif">About pietrOS</h1>
                         <div class="text-xs opacity-60 mb-4 font-mono">Version 1.4 (Jade-Jonze)</div>
                         <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-4"></div>
@@ -495,7 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
           projects: {
             title: "Projects",
             content: `
-                     <div class="h-full dyn-p font-ui overflow-y-auto window-content selection:bg-her-red selection:text-white p-2">
+                     <div class="h-full dyn-p font-ui overflow-y-auto window-content selection:bg-her-red selection:text-white p-2" style="min-width: 500px;">
                         <!-- Header -->
                         <div class="mb-6 p-4">
                             <h1 class="font-ui font-bold text-2xl text-her-dark dark:text-her-textLight">Projects</h1>
@@ -550,13 +550,43 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
                                     </div>
 
+                                </div>
+                            </div>
+
+                            <!-- Personal Projects -->
+                            <div>
+                                <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                    Personal Projects
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                                     <!-- suprsymmetry.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.open('https://suprsymmetry.com/', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://suprsymmetry.com/', '_blank')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">suprsymmetry.com</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">AI Art</span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
                                         </div>
                                         <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">AI art studio for generative art and concept art. Features Gemini-powered image generation with a sleek nocturne-themed interface.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">GEMINI</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AI</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-60">
+                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>Live Site</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- cerebralwwaves.com -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://cerebralwwaves.com/', '_blank')">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">cerebralwwaves.com</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Creative experimental space with an obsidian cinema aesthetic. Features AI-powered content generation with a dark, cinematic interface.</p>
                                         <div class="mt-auto">
                                             <div class="flex flex-wrap gap-1.5 mb-4">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
@@ -675,7 +705,7 @@ document.addEventListener("DOMContentLoaded", () => {
           vault: {
             title: "Personal Vault",
             content: `
-                    <div id="vault-app" class="h-full flex flex-col bg-her-paper dark:bg-[#2D1A14]">
+                    <div id="vault-app" class="h-full flex flex-col" style="min-width: 400px;">
                         <!-- Header with Back Button -->
                         <div class="px-6 py-4 flex items-center justify-between border-b border-her-text/10">
                             <div class="flex items-center gap-3">
@@ -704,7 +734,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                         
                         <!-- Grid View -->
-                        <div id="vault-grid" class="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 content-start">
+                        <div id="vault-grid" class="flex-1 overflow-y-auto p-3 md:p-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 content-start">
                             <!-- Items Injected Here -->
                         </div>
                         
@@ -866,7 +896,7 @@ document.addEventListener("DOMContentLoaded", () => {
           monitor: {
             title: "Monitoring",
             content: `
-                    <div class="h-full flex flex-col items-center justify-center bg-her-paper dark:bg-[#2D1A14] p-8 text-center">
+                    <div class="h-full flex flex-col items-center justify-center p-8 text-center">
                         <!-- Work in Progress Icon -->
                         <div class="w-20 h-20 mb-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
                             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -918,7 +948,7 @@ document.addEventListener("DOMContentLoaded", () => {
           settings: {
             title: "Settings",
             content: `
-                    <div class="h-full flex flex-col bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight p-6 select-none font-ui overflow-y-auto">
+                    <div class="h-full flex flex-col text-her-text dark:text-her-textLight p-6 select-none font-ui overflow-y-auto">
                         <h1 class="text-xl font-bold mb-1 font-serif">Settings</h1>
                         <div class="text-xs opacity-60 mb-4 font-mono">System Preferences</div>
                         <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-6"></div>
@@ -1027,7 +1057,7 @@ document.addEventListener("DOMContentLoaded", () => {
           techstack: {
             title: "Tech Stack",
             content: `
-                    <div class="h-full flex flex-col bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight p-6 select-none font-ui overflow-y-auto">
+                    <div class="h-full flex flex-col text-her-text dark:text-her-textLight p-6 select-none font-ui overflow-y-auto">
                         <h1 class="text-xl font-bold mb-1 font-serif">Tech Stack</h1>
                         <div class="text-xs opacity-60 mb-4 font-mono">Skills & Technologies</div>
                         <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-6"></div>
@@ -1340,7 +1370,7 @@ document.addEventListener("DOMContentLoaded", () => {
           finder: {
             title: "Finder",
             content: `
-                    <div id="finder-app" class="h-full flex bg-her-paper dark:bg-[#1a100c] text-her-text dark:text-her-textLight select-none font-ui">
+                    <div id="finder-app" class="h-full flex text-her-text dark:text-her-textLight select-none font-ui">
                         <!-- Sidebar -->
                         <div class="w-48 flex-shrink-0 bg-black/5 dark:bg-white/5 border-r border-her-text/10 dark:border-white/10 p-3 hidden md:block">
                             <div class="text-[10px] uppercase font-bold opacity-40 tracking-wider mb-2 px-2">Favorites</div>
@@ -1641,7 +1671,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const viewerConfig = {
             title: title,
             content: `
-                        <div class="h-full overflow-y-auto bg-her-paper dark:bg-[#2D1A14] p-6 md:p-8">
+                        <div class="h-full overflow-y-auto p-6 md:p-8">
                             <article class="markdown-body prose prose-sm dark:prose-invert max-w-none">
                                 ${htmlContent}
                             </article>
@@ -3220,7 +3250,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
             // Render Card
             const card = document.createElement("div");
             card.className =
-              "p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-orange/50 transition-all cursor-pointer group h-36 vault-card-animate";
+              "p-3 md:p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-orange/50 transition-all cursor-pointer group min-h-[120px] md:min-h-[144px] vault-card-animate";
             card.style.animationDelay = `${grid.children.length * 50}ms`;
             if (item.action) card.setAttribute("onclick", item.action);
 
@@ -3269,22 +3299,22 @@ ${digTarget}.          300     IN      A       151.101.65.140
             }
 
             card.innerHTML = `
-                    <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-start justify-between mb-2 md:mb-3">
                         ${icon}
                         ${
                           item.status === "soon"
-                            ? '<span class="px-2 py-0.5 text-[10px] font-bold bg-yellow-100 text-yellow-800 rounded">Soon</span>'
+                            ? '<span class="px-1.5 md:px-2 py-0.5 text-[9px] md:text-[10px] font-bold bg-yellow-100 text-yellow-800 rounded">Soon</span>'
                             : ""
                         }
                     </div>
-                    <div class="font-bold text-sm mb-1 group-hover:text-her-red transition-colors">${
+                    <div class="font-bold text-xs md:text-sm mb-1 group-hover:text-her-red transition-colors truncate">${
                       item.title
                     }</div>
-                    <div class="text-xs opacity-60 mb-3 line-clamp-2">${
+                    <div class="text-[10px] md:text-xs opacity-60 mb-2 md:mb-3 line-clamp-2">${
                       item.desc
                     }</div>
                     <div class="flex items-center gap-2">
-                        <span class="px-2 py-1 bg-black/5 dark:bg-white/10 rounded text-[10px] uppercase font-bold opacity-50">${
+                        <span class="px-1.5 md:px-2 py-0.5 md:py-1 bg-black/5 dark:bg-white/10 rounded text-[8px] md:text-[10px] uppercase font-bold opacity-50">${
                           item.category
                         }</span>
                         ${

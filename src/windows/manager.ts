@@ -267,7 +267,7 @@ function handleResize(e: MouseEvent): void {
       const dy = pendingResize.clientY - startResizePos.y;
       const rect = startResizeRect;
 
-      const minW = 300;
+      const minW = 400;
       const minH = 200;
 
       if (resizeDir.includes('e')) {
