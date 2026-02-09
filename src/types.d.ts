@@ -22,9 +22,13 @@ declare global {
     vaultShowFile: (filename: string) => void;
 
     // Terminal command handlers
+    handleTerminalCommand: (e: KeyboardEvent) => void;
     handlePietrOSCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
     handleCyberpunkCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
     handleFalloutCommand: (input: string, output: HTMLElement, inputEl: HTMLInputElement) => void;
+
+    // Terminal sub-mode reset (for Ctrl+C)
+    resetTerminalSubModes: () => void;
 
     // Audio
     toggleSound: () => boolean;

@@ -117,3 +117,19 @@ export function setTabCompletionIndex(idx: number): void {
 export function setLastTabInput(input: string): void {
   lastTabInput = input;
 }
+
+// terminal cleanup registry for Ctrl+C cancellation
+let terminalCleanupFns: (() => void)[] = [];
+
+export function registerTerminalCleanup(fn: () => void): void {
+  terminalCleanupFns.push(fn);
+}
+
+export function runTerminalCleanups(): void {
+  for (const fn of terminalCleanupFns) fn();
+  terminalCleanupFns = [];
+}
+
+export function hasActiveCleanups(): boolean {
+  return terminalCleanupFns.length > 0;
+}

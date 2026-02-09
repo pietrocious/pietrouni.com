@@ -7,7 +7,8 @@ import {
   terminalHistory, pushTerminalHistory,
   terminalHistoryIndex, setTerminalHistoryIndex,
   tabCompletionIndex, setTabCompletionIndex,
-  lastTabInput, setLastTabInput
+  lastTabInput, setLastTabInput,
+  runTerminalCleanups, hasActiveCleanups
 } from '../state';
 import type { FileSystemNode } from '../types';
 
@@ -45,6 +46,38 @@ export function handleTerminalCommand(e: KeyboardEvent): void {
   const output = document.getElementById("term-output");
 
   if (!inputEl || !output) return;
+
+  // Ctrl+C — cancel running animations / exit sub-modes
+  if (e.key === "c" && e.ctrlKey) {
+    e.preventDefault();
+    if (hasActiveCleanups()) {
+      runTerminalCleanups();
+      inputEl.disabled = false;
+      inputEl.focus();
+    }
+    // reset sub-modes via pietros handler
+    if (window.resetTerminalSubModes) {
+      window.resetTerminalSubModes();
+    }
+    output.innerHTML += `${getTerminalPromptHTML()} <span class="text-red-400">^C</span></div>`;
+    inputEl.value = "";
+    output.scrollTop = output.scrollHeight;
+    return;
+  }
+
+  // Ctrl+L — clear terminal
+  if (e.key === "l" && e.ctrlKey) {
+    e.preventDefault();
+    output.innerHTML = "";
+    return;
+  }
+
+  // Ctrl+U — clear current input line
+  if (e.key === "u" && e.ctrlKey) {
+    e.preventDefault();
+    inputEl.value = "";
+    return;
+  }
 
   // History Navigation (Shared)
   if (e.key === "ArrowUp") {

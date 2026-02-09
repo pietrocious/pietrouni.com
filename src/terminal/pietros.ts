@@ -3,13 +3,26 @@
 
 import { getTerminalPromptHTML, resolvePath, TERMINAL_STATE, pushTerminalHistory, setTerminalHistoryIndex } from './core';
 import { fileSystem } from '../config';
-import { shuffledQuotes, quoteIndex, setQuoteIndex, shuffleArray, quotes } from '../state';
+import { shuffledQuotes, quoteIndex, setQuoteIndex, shuffleArray, quotes, terminalHistory, registerTerminalCleanup } from '../state';
 import type { FileSystemNode, WindowConfig } from '../types';
 
 // sub-mode state - these are local to the terminal
 const guessGame = { active: false, target: 0 as number | null, attempts: 0 };
 const ciscoMode = { active: false };
 const terraformMode = { active: false };
+
+// reset sub-modes on Ctrl+C
+export function resetTerminalSubModes(): void {
+  guessGame.active = false;
+  ciscoMode.active = false;
+  terraformMode.active = false;
+  // restore default prompt
+  const prompt = document.getElementById("term-prompt");
+  if (prompt && (ciscoMode.active || TERMINAL_STATE.mode === "pietros")) {
+    prompt.outerHTML =
+      '<span id="term-prompt" class="text-green-400 font-semibold">guest@pietrOS</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>';
+  }
+}
 
 // filesystem state
 let currentPath = '/home/guest';

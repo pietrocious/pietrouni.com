@@ -20,7 +20,8 @@ import {
   terminalHistoryIndex, setTerminalHistoryIndex, guessGame, ciscoMode, terraformMode,
   shuffledQuotes, quoteIndex, setQuoteIndex, reshuffleQuotes, TERMINAL_STATE,
   activeWallpaperIndex, setActiveWallpaperIndex, monitorInterval, setMonitorInterval,
-  tabCompletionIndex, setTabCompletionIndex, lastTabInput, setLastTabInput
+  tabCompletionIndex, setTabCompletionIndex, lastTabInput, setLastTabInput,
+  registerTerminalCleanup, runTerminalCleanups, hasActiveCleanups
 } from './state';
 
 // window management
@@ -878,11 +879,11 @@ document.addEventListener("DOMContentLoaded", () => {
 |_|                            
                             </pre>
                             <div class="text-gray-400 hidden md:block">v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
-                            <div class="text-gray-500 hidden md:block">Type 'help' for available commands... and 'help-fun' for fun commands!</div>
+                            <div class="text-gray-500 hidden md:block">Type 'help' for commands, 'man &lt;cmd&gt;' for details</div>
                         </div>
                         <div class="md:border-t border-white/20 md:pt-2">
                             <div class="text-gray-400 text-xs md:hidden">pietrOS v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
-                            <div class="text-gray-500 text-xs mb-2 md:hidden">Type 'help' or 'help-fun' for available commands</div>
+                            <div class="text-gray-500 text-xs mb-2 md:hidden">Type 'help' for commands</div>
                             <div class="flex items-center gap-2 text-white">
                                 <span id="term-prompt" class="text-green-400 font-semibold whitespace-nowrap">guest@pietrOS</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>
                                 <input id="cmd-input" type="text" class="flex-1 bg-transparent border-none outline-none text-white font-kernel focus:ring-0 min-w-0" autocomplete="off" onkeydown="window.handleTerminalCommand(event)">
@@ -1841,9 +1842,50 @@ document.addEventListener("DOMContentLoaded", () => {
         window.handleFalloutCommand = null;
 
 
+        // reset sub-modes (called by Ctrl+C)
+        window.resetTerminalSubModes = function () {
+          guessGame.active = false;
+          ciscoMode.active = false;
+          terraformMode.active = false;
+          const prompt = document.getElementById("term-prompt");
+          if (prompt) {
+            prompt.outerHTML =
+              '<span id="term-prompt" class="text-green-400 font-semibold">guest@OS93</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>';
+          }
+        };
+
         window.handleTerminalCommand = function (e) {
           const inputEl = document.getElementById("cmd-input");
           const output = document.getElementById("term-output");
+
+          // Ctrl+C — cancel running animations / exit sub-modes
+          if (e.key === "c" && e.ctrlKey) {
+            e.preventDefault();
+            if (hasActiveCleanups()) {
+              runTerminalCleanups();
+              inputEl.disabled = false;
+              inputEl.focus();
+            }
+            window.resetTerminalSubModes();
+            output.innerHTML += `${getTerminalPromptHTML()} <span class="text-red-400">^C</span></div>`;
+            inputEl.value = "";
+            output.scrollTop = output.scrollHeight;
+            return;
+          }
+
+          // Ctrl+L — clear terminal
+          if (e.key === "l" && e.ctrlKey) {
+            e.preventDefault();
+            output.innerHTML = "";
+            return;
+          }
+
+          // Ctrl+U — clear current input line
+          if (e.key === "u" && e.ctrlKey) {
+            e.preventDefault();
+            inputEl.value = "";
+            return;
+          }
 
           // History Navigation (Shared)
           if (e.key === "ArrowUp") {
@@ -2085,41 +2127,7 @@ document.addEventListener("DOMContentLoaded", () => {
               break;
 
             case "help":
-              output.innerHTML += `
-                        <div class="opacity-80 mt-1 mb-2">
-                            <div class="font-bold text-her-red mb-1">Available Commands:</div>
-                            <div class="pl-2">
-                                <div class="text-blue-400 font-bold text-xs uppercase mt-2">System</div>
-                                <div>help, about, clear, neofetch, version</div>
-                                
-                                <div class="text-blue-400 font-bold text-xs uppercase mt-2">File Operations</div>
-                                <div>ls [-a], cd, pwd, mkdir, touch, rmdir, cat</div>
-                                
-                                <div class="text-blue-400 font-bold text-xs uppercase mt-2">Applications</div>
-                                <div>open [app], about, projects, resume</div>
-                                
-                                <div class="text-blue-400 font-bold text-xs uppercase mt-2">Network & DevOps</div>
-                                <div>traceroute, dig, curl, docker, terraform, ssh, cisco</div>
-                                
-                                <div class="text-blue-400 font-bold text-xs uppercase mt-2">Utilities</div>
-                                <div>calc, uptime, clock, version, quote</div>
-                                
-                                <div class="text-blue-400 font-bold text-xs uppercase mt-2">Fun & Games</div>
-                                <div>💡 Try 'help-fun' for some fun commands!</div>
-                            </div>
-                        </div>`;
-              break;
-            case "help-fun":
-              output.innerHTML += `
-                            <div class="opacity-80 mt-1 mb-2">
-                                <div class="font-bold text-purple-400 mb-2">🎮 Fun Commands:</div>
-                                <div class="pl-2 space-y-2">
-                                    <div><span class="text-pink-400 font-bold text-xs uppercase">Text & Art:</span> ascii, figlet, cowsay, flip</div>
-                                    <div><span class="text-green-400 font-bold text-xs uppercase">Games:</span> guess, rps, 8ball, hack</div>
-                                    <div><span class="text-cyan-400 font-bold text-xs uppercase">Visuals:</span> matrix, rain, sl, clock</div>
-                                    <div><span class="text-yellow-400 font-bold text-xs uppercase">Eggs:</span> hlx, fallout, sudo, rm, pietro</div>
-                                </div>
-                            </div>`;
+              output.innerHTML += `<div class="my-2 font-mono text-xs"><div class="text-her-red font-bold mb-2">Available Commands</div><div class="grid gap-y-1"><div><span class="text-blue-400 font-bold w-20 inline-block">SYSTEM</span> <span class="text-gray-300">help, clear, neofetch, version, uptime, history</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">FILE OPS</span> <span class="text-gray-300">ls [-a], cd, pwd, mkdir, touch, rmdir, cat</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">APPS</span> <span class="text-gray-300">open [app], about, projects, resume, contact</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">NETWORK</span> <span class="text-gray-300">traceroute, dig, curl</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">DEVOPS</span> <span class="text-gray-300">docker, terraform, cisco, ssh</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">UTILS</span> <span class="text-gray-300">calc, clock, quote, whoami, skills, timeline</span></div><div><span class="text-pink-400 font-bold w-20 inline-block">TEXT ART</span> <span class="text-gray-300">ascii, figlet, cowsay, flip</span></div><div><span class="text-green-400 font-bold w-20 inline-block">GAMES</span> <span class="text-gray-300">guess, rps, 8ball</span></div><div><span class="text-cyan-400 font-bold w-20 inline-block">VISUALS</span> <span class="text-gray-300">matrix, rain, sl, hack, hlx</span></div><div><span class="text-yellow-400 font-bold w-20 inline-block">THEMES</span> <span class="text-gray-300">cyberpunk, fallout</span></div></div><div class="text-gray-500 mt-2">Type <span class="text-white">man &lt;cmd&gt;</span> for details. <span class="text-gray-600">Ctrl+C</span> cancels running commands.</div></div>`;
               break;
             case "clear":
               output.innerHTML = "";
@@ -2131,20 +2139,38 @@ document.addEventListener("DOMContentLoaded", () => {
               output.innerHTML += `<div>${currentPath}</div>`;
               break;
             case "ls":
-            case "ll":
-              let showHidden = args.includes("-a");
-              let content = "";
-              if (dirObj) {
-                Object.keys(dirObj).forEach((k) => {
-                  if (!showHidden && k.startsWith(".")) return;
-                  const isDir = typeof dirObj[k] === "object";
-                  content += `<span class="${
-                    isDir ? "text-blue-400 font-bold" : ""
-                  } mr-4">${k}${isDir ? "/" : ""}</span>`;
-                });
+            case "ll": {
+              const showHidden = args.includes("-a") || args.includes("-la") || args.includes("-al");
+              const longFormat = cmd === "ll" || args.includes("-l") || args.includes("-la") || args.includes("-al");
+              if (longFormat) {
+                let rows = `<div class="text-xs font-mono my-1">`;
+                if (dirObj) {
+                  const keys = Object.keys(dirObj);
+                  const visibleKeys = showHidden ? keys : keys.filter(k => !k.startsWith("."));
+                  rows += `<div class="text-gray-500">total ${visibleKeys.length}</div>`;
+                  visibleKeys.forEach((k) => {
+                    const isDir = typeof dirObj[k] === "object";
+                    const perms = isDir ? "drwxr-xr-x" : "-rw-r--r--";
+                    const size = isDir ? "4096" : " 128";
+                    const nameClass = isDir ? "text-blue-400 font-bold" : "text-gray-200";
+                    rows += `<div><span class="text-green-400">${perms}</span> <span class="text-gray-500">guest guest</span> <span class="text-gray-400">${size}</span> <span class="text-gray-500">Jan 15 09:42</span> <span class="${nameClass}">${k}${isDir ? "/" : ""}</span></div>`;
+                  });
+                }
+                rows += `</div>`;
+                output.innerHTML += rows;
+              } else {
+                let content = "";
+                if (dirObj) {
+                  Object.keys(dirObj).forEach((k) => {
+                    if (!showHidden && k.startsWith(".")) return;
+                    const isDir = typeof dirObj[k] === "object";
+                    content += `<span class="${isDir ? "text-blue-400 font-bold" : ""} mr-4">${k}${isDir ? "/" : ""}</span>`;
+                  });
+                }
+                output.innerHTML += `<div>${content}</div>`;
               }
-              output.innerHTML += `<div>${content}</div>`;
               break;
+            }
             case "cd":
               const target = args[1];
               if (!target) break;
@@ -2258,50 +2284,37 @@ document.addEventListener("DOMContentLoaded", () => {
               output.innerHTML += `<div class="text-green-400 font-bold my-2">🎮 Guess the Number Game Started!</div><div>I'm thinking of a number between 1 and 100.</div><div>Type your guess below:</div>`;
               break;
             case "traceroute":
-            case "tracert":
+            case "tracert": {
               const traceTarget = args[1] || "pietrouni.com";
               const hops = [
                 { ip: "192.168.1.1", host: "router.local", ms: [1, 2, 1] },
                 { ip: "10.0.0.1", host: "isp-gateway.net", ms: [8, 9, 8] },
-                {
-                  ip: "72.14.215.85",
-                  host: "edge-router-1.carrier.net",
-                  ms: [15, 14, 16],
-                },
-                {
-                  ip: "142.250.169.174",
-                  host: "core-switch-eu.backbone.net",
-                  ms: [24, 25, 23],
-                },
-                {
-                  ip: "203.0.113.50",
-                  host: "cdn-edge.cloudfront.net",
-                  ms: [28, 29, 27],
-                },
+                { ip: "72.14.215.85", host: "edge-router-1.carrier.net", ms: [15, 14, 16] },
+                { ip: "142.250.169.174", host: "core-switch-eu.backbone.net", ms: [24, 25, 23] },
+                { ip: "203.0.113.50", host: "cdn-edge.cloudfront.net", ms: [28, 29, 27] },
                 { ip: "151.101.1.140", host: traceTarget, ms: [32, 31, 33] },
               ];
               output.innerHTML += `<div class="text-cyan-400 text-xs">traceroute to ${traceTarget}, 30 hops max, 60 byte packets</div>`;
               let hopIndex = 0;
+              let traceCancelled = false;
+              let traceTimeout;
               function showNextHop() {
+                if (traceCancelled) return;
                 if (hopIndex >= hops.length) {
                   output.innerHTML += `<div class="text-green-400 text-xs mt-1">Trace complete.</div>`;
                   output.scrollTop = output.scrollHeight;
                   return;
                 }
                 const hop = hops[hopIndex];
-                output.innerHTML += `<div class="text-gray-300 text-xs font-mono">${(
-                  hopIndex + 1
-                )
-                  .toString()
-                  .padStart(2)}  ${hop.host} (${hop.ip})  ${hop.ms[0]}ms  ${
-                  hop.ms[1]
-                }ms  ${hop.ms[2]}ms</div>`;
+                output.innerHTML += `<div class="text-gray-300 text-xs font-mono">${(hopIndex + 1).toString().padStart(2)}  ${hop.host} (${hop.ip})  ${hop.ms[0]}ms  ${hop.ms[1]}ms  ${hop.ms[2]}ms</div>`;
                 output.scrollTop = output.scrollHeight;
                 hopIndex++;
-                setTimeout(showNextHop, 300 + Math.random() * 200);
+                traceTimeout = setTimeout(showNextHop, 300 + Math.random() * 200);
               }
+              registerTerminalCleanup(() => { traceCancelled = true; clearTimeout(traceTimeout); });
               showNextHop();
               break;
+            }
             case "dig":
               const digTarget = args[1] || "pietrouni.com";
               output.innerHTML += `<pre class="text-cyan-400 text-xs my-2">; <<>> DiG 9.18.18 <<>> ${digTarget}
@@ -2378,30 +2391,21 @@ ${digTarget}.          300     IN      A       151.101.65.140
               }
               break;
             case "cisco":
-            case "ssh":
+            case "ssh": {
               inputEl.disabled = true;
               const sshPrompt = document.getElementById("term-prompt");
               const sshMessages = [
-                {
-                  text: '<span class="text-gray-400">Connecting to CORE-RTR-01 (192.168.1.1)...</span>',
-                  delay: 0,
-                },
-                {
-                  text: '<span class="text-gray-400">Verifying SSH key fingerprint...</span>',
-                  delay: 500,
-                },
-                {
-                  text: '<span class="text-green-400">Connection established.</span>',
-                  delay: 1000,
-                },
+                { text: '<span class="text-gray-400">Connecting to CORE-RTR-01 (192.168.1.1)...</span>', delay: 0 },
+                { text: '<span class="text-gray-400">Verifying SSH key fingerprint...</span>', delay: 500 },
+                { text: '<span class="text-green-400">Connection established.</span>', delay: 1000 },
                 { text: "", delay: 1200 },
-                {
-                  text: '<span class="text-cyan-400">CORE-RTR-01#</span> <span class="text-gray-500">Type ? for available commands, exit to disconnect</span>',
-                  delay: 1400,
-                },
+                { text: '<span class="text-cyan-400">CORE-RTR-01#</span> <span class="text-gray-500">Type ? for available commands, exit to disconnect</span>', delay: 1400 },
               ];
               let sshIndex = 0;
+              let sshCancelled = false;
+              let sshTimeout;
               function showNextSsh() {
+                if (sshCancelled) return;
                 if (sshIndex >= sshMessages.length) {
                   ciscoMode.active = true;
                   sshPrompt.outerHTML =
@@ -2414,15 +2418,20 @@ ${digTarget}.          300     IN      A       151.101.65.140
                 if (msg.text) output.innerHTML += `<div>${msg.text}</div>`;
                 output.scrollTop = output.scrollHeight;
                 sshIndex++;
-                setTimeout(
+                sshTimeout = setTimeout(
                   showNextSsh,
-                  sshMessages[sshIndex]?.delay
-                    ? sshMessages[sshIndex].delay - msg.delay
-                    : 200
+                  sshMessages[sshIndex]?.delay ? sshMessages[sshIndex].delay - msg.delay : 200
                 );
               }
+              registerTerminalCleanup(() => {
+                sshCancelled = true;
+                clearTimeout(sshTimeout);
+                inputEl.disabled = false;
+                inputEl.focus();
+              });
               showNextSsh();
               break;
+            }
             case "version":
               output.innerHTML += `<div class="my-2"><div class="text-her-red font-bold mb-2">📋 OS93 Version History</div><div class="font-mono text-xs space-y-1"><div class="flex gap-4"><span class="text-gray-500">1.0</span><span class="text-red-400">Scarlet-Samantha</span></div><div class="flex gap-4"><span class="text-gray-500">1.1</span><span class="text-teal-400">Teal-Twombly</span></div><div class="flex gap-4"><span class="text-gray-500">1.2</span><span class="text-orange-400">Coral-Catherine</span></div><div class="flex gap-4"><span class="text-gray-500">1.3</span><span class="text-amber-700">Walnut-Watts</span></div><div class="flex gap-4"><span class="text-green-400 font-bold">1.4</span><span class="text-emerald-400 font-bold">Jade-Jonze</span><span class="text-gray-400">Current ✓</span></div></div></div>`;
               break;
@@ -2748,25 +2757,16 @@ ${digTarget}.          300     IN      A       151.101.65.140
               if (input.includes("-rf") && input.includes("/")) {
                 inputEl.disabled = true;
                 const rmMessages = [
-                  {
-                    text: '<span class="text-red-500 font-bold">⚠️ WARNING: DESTRUCTIVE OPERATION DETECTED</span>',
-                    delay: 0,
-                  },
-                  {
-                    text: '<span class="text-red-400">Deleting /bin...</span>',
-                    delay: 600,
-                  },
-                  {
-                    text: '<span class="text-yellow-500 animate-pulse">KERNEL PANIC</span>',
-                    delay: 3000,
-                  },
-                  {
-                    text: '<span class="text-green-400 font-bold text-lg"> jk this is just a website, silly 😂</span>',
-                    delay: 4000,
-                  },
+                  { text: '<span class="text-red-500 font-bold">⚠️ WARNING: DESTRUCTIVE OPERATION DETECTED</span>', delay: 0 },
+                  { text: '<span class="text-red-400">Deleting /bin...</span>', delay: 600 },
+                  { text: '<span class="text-yellow-500 animate-pulse">KERNEL PANIC</span>', delay: 3000 },
+                  { text: '<span class="text-green-400 font-bold text-lg"> jk this is just a website, silly 😂</span>', delay: 4000 },
                 ];
                 let rmIndex = 0;
+                let rmCancelled = false;
+                let rmTimeout;
                 function showNextRm() {
+                  if (rmCancelled) return;
                   if (rmIndex >= rmMessages.length) {
                     inputEl.disabled = false;
                     inputEl.focus();
@@ -2776,13 +2776,17 @@ ${digTarget}.          300     IN      A       151.101.65.140
                   if (msg.text) output.innerHTML += `<div>${msg.text}</div>`;
                   output.scrollTop = output.scrollHeight;
                   rmIndex++;
-                  setTimeout(
+                  rmTimeout = setTimeout(
                     showNextRm,
-                    rmMessages[rmIndex]?.delay
-                      ? rmMessages[rmIndex].delay - msg.delay
-                      : 500
+                    rmMessages[rmIndex]?.delay ? rmMessages[rmIndex].delay - msg.delay : 500
                   );
                 }
+                registerTerminalCleanup(() => {
+                  rmCancelled = true;
+                  clearTimeout(rmTimeout);
+                  inputEl.disabled = false;
+                  inputEl.focus();
+                });
                 showNextRm();
               } else {
                 output.innerHTML += `<div class="text-red-400">rm: missing operand</div>`;
@@ -2851,15 +2855,16 @@ ${digTarget}.          300     IN      A       151.101.65.140
                 }
               }
               const matrixInterval = setInterval(drawMatrix, 30);
-              output.innerHTML += `<div class="text-green-400 font-bold my-2">Follow the white rabbit... (Click to stop)</div>`;
+              output.innerHTML += `<div class="text-green-400 font-bold my-2">Follow the white rabbit... (Click or Ctrl+C to stop)</div>`;
               const stopMatrix = () => {
                 clearInterval(matrixInterval);
                 canvas.remove();
                 document.removeEventListener("click", stopMatrix);
               };
               document.addEventListener("click", stopMatrix);
+              registerTerminalCleanup(stopMatrix);
               break;
-            case "rain":
+            case "rain": {
               const rainCanvas = document.createElement("canvas");
               rainCanvas.className =
                 "fixed top-0 left-0 w-full h-full pointer-events-none z-50 opacity-50";
@@ -2875,7 +2880,10 @@ ${digTarget}.          300     IN      A       151.101.65.140
                   l: Math.random() * 20 + 10,
                   v: Math.random() * 10 + 5,
                 });
+              let rainRunning = true;
+              let rainFrameId;
               function drawRain() {
+                if (!rainRunning) return;
                 rctx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
                 rctx.strokeStyle = "rgba(174, 194, 224, 0.5)";
                 rctx.lineWidth = 1;
@@ -2890,12 +2898,18 @@ ${digTarget}.          300     IN      A       151.101.65.140
                   }
                 }
                 rctx.stroke();
-                requestAnimationFrame(drawRain);
+                rainFrameId = requestAnimationFrame(drawRain);
               }
-              const rainAnim = requestAnimationFrame(drawRain);
-              output.innerHTML += `<div class="text-blue-300 font-bold my-2">🌧️ It's raining code... (Reload to stop)</div>`;
+              rainFrameId = requestAnimationFrame(drawRain);
+              registerTerminalCleanup(() => {
+                rainRunning = false;
+                cancelAnimationFrame(rainFrameId);
+                rainCanvas.remove();
+              });
+              output.innerHTML += `<div class="text-blue-300 font-bold my-2">🌧️ It's raining code... (Ctrl+C to stop)</div>`;
               break;
-            case "sl":
+            }
+            case "sl": {
               const trainFrames = [
                 "      ____\n     |DD|____T_\n     |_ |_____|<\n       @-@-@-oo\\",
                 "      ____\n     |DD|____T_\n     |_ |_____|<\n      _@-@-@-oo\\",
@@ -2908,8 +2922,10 @@ ${digTarget}.          300     IN      A       151.101.65.140
                 "fixed bottom-10 z-50 text-white font-bold text-xs whitespace-pre";
               document.body.appendChild(trainDiv);
               let frameIdx = 0;
+              let trainRunning = true;
+              let trainFrameId;
               function moveTrain() {
-                if (trainPos < -200) {
+                if (!trainRunning || trainPos < -200) {
                   trainDiv.remove();
                   return;
                 }
@@ -2917,36 +2933,33 @@ ${digTarget}.          300     IN      A       151.101.65.140
                 trainDiv.innerText = trainFrames[frameIdx % 4];
                 trainPos -= 10;
                 frameIdx++;
-                requestAnimationFrame(moveTrain);
+                trainFrameId = requestAnimationFrame(moveTrain);
               }
+              registerTerminalCleanup(() => {
+                trainRunning = false;
+                cancelAnimationFrame(trainFrameId);
+                trainDiv.remove();
+              });
               moveTrain();
               output.innerHTML += `<div class="text-yellow-400 font-mono my-2">CHOO CHOO! 🚂</div>`;
               break;
-            case "hack":
+            }
+            case "hack": {
               inputEl.disabled = true;
               const hackLines = [
-                {
-                  text: "Initializing brute-force attack...",
-                  color: "text-green-500",
-                },
-                {
-                  text: "Target: MAINFRAME (10.0.0.1)",
-                  color: "text-green-500",
-                },
+                { text: "Initializing brute-force attack...", color: "text-green-500" },
+                { text: "Target: MAINFRAME (10.0.0.1)", color: "text-green-500" },
                 { text: "Bypassing firewall...", color: "text-yellow-500" },
                 { text: "Accessing secure nodes...", color: "text-yellow-500" },
                 { text: "Decrypting passwords...", color: "text-red-500" },
-                {
-                  text: "ACCESS GRANTED. Downloading database...",
-                  color: "text-green-500 font-bold",
-                },
-                {
-                  text: "Download complete. Traces cleared.",
-                  color: "text-blue-500",
-                },
+                { text: "ACCESS GRANTED. Downloading database...", color: "text-green-500 font-bold" },
+                { text: "Download complete. Traces cleared.", color: "text-blue-500" },
               ];
               let hackIndex = 0;
+              let hackCancelled = false;
+              let hackTimeout;
               function runHack() {
+                if (hackCancelled) return;
                 if (hackIndex >= hackLines.length) {
                   inputEl.disabled = false;
                   inputEl.focus();
@@ -2955,44 +2968,29 @@ ${digTarget}.          300     IN      A       151.101.65.140
                 output.innerHTML += `<div class="${hackLines[hackIndex].color} font-mono text-xs my-1">${hackLines[hackIndex].text}</div>`;
                 output.scrollTop = output.scrollHeight;
                 hackIndex++;
-                setTimeout(runHack, Math.random() * 800 + 200);
+                hackTimeout = setTimeout(runHack, Math.random() * 800 + 200);
               }
+              registerTerminalCleanup(() => {
+                hackCancelled = true;
+                clearTimeout(hackTimeout);
+                inputEl.disabled = false;
+                inputEl.focus();
+              });
               runHack();
               break;
-            case "hlx":
-              // Half-Life 3 / HLX Easter Egg
+            }
+            case "hlx": {
               inputEl.disabled = true;
-
               const hlxMessages = [
-                {
-                  text: '<span class="text-green-400">Connecting to Valve servers...</span>',
-                  delay: 0,
-                },
-                {
-                  text: '<span class="text-green-400">Authenticating: ████████████ 100%</span>',
-                  delay: 800,
-                },
-                {
-                  text: '<span class="text-yellow-400">Loading HLX assets: 1... 2... 2.5... 2.75... 2.9... 2.99... 2.999...</span>',
-                  delay: 1600,
-                },
-                { text: "", delay: 2400 }, // Lambda will be inserted here
-                {
-                  text: '<span class="text-gray-400 italic">"The right man in the wrong place can make all the difference in the world..."</span>',
-                  delay: 4500,
-                },
-                {
-                  text: '<span class="text-gray-500 text-xs">                                                              - G-Man</span>',
-                  delay: 5000,
-                },
+                { text: '<span class="text-green-400">Connecting to Valve servers...</span>', delay: 0 },
+                { text: '<span class="text-green-400">Authenticating: ████████████ 100%</span>', delay: 800 },
+                { text: '<span class="text-yellow-400">Loading HLX assets: 1... 2... 2.5... 2.75... 2.9... 2.99... 2.999...</span>', delay: 1600 },
+                { text: "", delay: 2400 },
+                { text: '<span class="text-gray-400 italic">"The right man in the wrong place can make all the difference in the world..."</span>', delay: 4500 },
+                { text: '<span class="text-gray-500 text-xs">                                                              - G-Man</span>', delay: 5000 },
                 { text: "", delay: 5800 },
-                {
-                  text: '<span class="text-red-500 font-bold">ERROR: Unable to count to 3. This is a known Valve limitation.</span>',
-                  delay: 6300,
-                },
+                { text: '<span class="text-red-500 font-bold">ERROR: Unable to count to 3. This is a known Valve limitation.</span>', delay: 6300 },
               ];
-
-              // Lambda ASCII art with glitch effect
               const lambdaArt = `
 <pre class="hlx-lambda text-orange-500 font-bold my-2" style="text-shadow: 0 0 10px rgba(255,165,0,0.5);">
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣤⣴⣦⣤⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -3011,59 +3009,54 @@ ${digTarget}.          300     IN      A       151.101.65.140
 ⠀⠀⠀⠀⠀⠀⠈⠛⠿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⠁⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠛⠛⠛⠛⠛⠛⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 </pre>`;
-
               let hlxIndex = 0;
-
+              let hlxCancelled = false;
+              let hlxTimeout;
+              let hlxGlitchInterval;
               function showNextHlx() {
+                if (hlxCancelled) return;
                 if (hlxIndex >= hlxMessages.length) {
                   inputEl.disabled = false;
                   inputEl.focus();
-                  // Start glitch effect on lambda
                   const lambdaEl = output.querySelector(".hlx-lambda");
                   if (lambdaEl) {
                     let glitchCount = 0;
-                    const glitchInterval = setInterval(() => {
-                      if (glitchCount > 10) {
-                        clearInterval(glitchInterval);
+                    hlxGlitchInterval = setInterval(() => {
+                      if (glitchCount > 10 || hlxCancelled) {
+                        clearInterval(hlxGlitchInterval);
                         lambdaEl.style.transform = "none";
                         lambdaEl.style.opacity = "1";
                         return;
                       }
-                      const offsetX = (Math.random() - 0.5) * 4;
-                      const offsetY = (Math.random() - 0.5) * 2;
-                      const skew = (Math.random() - 0.5) * 3;
-                      lambdaEl.style.transform = `translate(${offsetX}px, ${offsetY}px) skewX(${skew}deg)`;
-                      lambdaEl.style.opacity =
-                        Math.random() > 0.3 ? "1" : "0.7";
-                      // Color glitch
-                      lambdaEl.style.color =
-                        Math.random() > 0.8 ? "#ff6b6b" : "#f97316";
+                      lambdaEl.style.transform = `translate(${(Math.random() - 0.5) * 4}px, ${(Math.random() - 0.5) * 2}px) skewX(${(Math.random() - 0.5) * 3}deg)`;
+                      lambdaEl.style.opacity = Math.random() > 0.3 ? "1" : "0.7";
+                      lambdaEl.style.color = Math.random() > 0.8 ? "#ff6b6b" : "#f97316";
                       glitchCount++;
                     }, 100);
                   }
                   return;
                 }
-
                 const hlxMsg = hlxMessages[hlxIndex];
-                const nextDelay =
-                  hlxIndex < hlxMessages.length - 1
-                    ? hlxMessages[hlxIndex + 1].delay - hlxMsg.delay
-                    : 500;
-
+                const nextDelay = hlxIndex < hlxMessages.length - 1 ? hlxMessages[hlxIndex + 1].delay - hlxMsg.delay : 500;
                 if (hlxIndex === 3) {
-                  // Insert lambda art
                   output.innerHTML += lambdaArt;
                 } else if (hlxMsg.text) {
                   output.innerHTML += `<div>${hlxMsg.text}</div>`;
                 }
-
                 output.scrollTop = output.scrollHeight;
                 hlxIndex++;
-                setTimeout(showNextHlx, nextDelay);
+                hlxTimeout = setTimeout(showNextHlx, nextDelay);
               }
-
+              registerTerminalCleanup(() => {
+                hlxCancelled = true;
+                clearTimeout(hlxTimeout);
+                if (hlxGlitchInterval) clearInterval(hlxGlitchInterval);
+                inputEl.disabled = false;
+                inputEl.focus();
+              });
               showNextHlx();
               break;
+            }
             case "about":
               window.openWindow("about");
               break;
@@ -3099,6 +3092,129 @@ ${digTarget}.          300     IN      A       151.101.65.140
                 }
               }
               break;
+            case "history":
+              if (terminalHistory.length === 0) {
+                output.innerHTML += `<div class="text-gray-500">No commands in history.</div>`;
+              } else {
+                let histOut = "";
+                terminalHistory.forEach((h, i) => {
+                  histOut += `<div class="text-xs font-mono"><span class="text-gray-500 inline-block w-8 text-right mr-2">${i + 1}</span>${h}</div>`;
+                });
+                output.innerHTML += `<div class="my-1">${histOut}</div>`;
+              }
+              break;
+
+            case "man": {
+              const manCmd = args[1]?.toLowerCase();
+              const manPages = {
+                help: ["help", "Display all available commands grouped by category."],
+                clear: ["clear", "Clear the terminal output. Shortcut: Ctrl+L"],
+                ls: ["ls [-a]", "List files in the current directory. Use -a to show hidden files."],
+                cd: ["cd <dir>", "Change directory. Use '..' to go up one level."],
+                cat: ["cat <file>", "View file contents. Try: cat .secrets"],
+                open: ["open <app>", "Open an application window. Apps: about, projects, resume, contact, terminal, vault"],
+                matrix: ["matrix", "Full-screen Matrix rain effect. Click or Ctrl+C to stop."],
+                rain: ["rain", "Ambient rainfall overlay. Ctrl+C to stop."],
+                hack: ["hack", "Simulated hacking sequence with progressive output."],
+                hlx: ["hlx", "Half-Life easter egg. A known Valve limitation applies."],
+                skills: ["skills", "Animated skill assessment showing technical proficiencies."],
+                timeline: ["timeline", "Career timeline with roles and tech stacks."],
+                history: ["history", "Show all commands entered this session."],
+                neofetch: ["neofetch", "Display system information with ASCII logo."],
+                docker: ["docker [ps|images|stats]", "Simulated Docker container management."],
+                terraform: ["terraform [init|plan]", "Simulated Terraform infrastructure workflow."],
+                cisco: ["cisco / ssh", "Connect to simulated Cisco router. Type 'exit' to disconnect."],
+                traceroute: ["traceroute [host]", "Animated network trace route simulation."],
+                cyberpunk: ["cyberpunk", "Switch terminal to Cyberpunk 2077 NET_ARCH mode."],
+                fallout: ["fallout", "Switch terminal to Fallout Pip-Boy RobCo mode."],
+                guess: ["guess", "Number guessing game (1-100). Type numbers to guess."],
+                rps: ["rps [rock|paper|scissors]", "Rock-Paper-Scissors against the CPU."],
+                calc: ["calc <expr>", "Calculator. Example: calc 2 + 2"],
+                sl: ["sl", "You meant 'ls', right? ...right?"],
+                pietro: ["pietro", "Who is this guy anyway?"],
+                cowsay: ["cowsay [msg]", "A cow says your message."],
+                ascii: ["ascii [text]", "Convert text to block-letter ASCII art."],
+                figlet: ["figlet [text]", "Convert text to heavy block-letter art."],
+                flip: ["flip [text]", "Flip text upside down."],
+                man: ["man <cmd>", "You're reading it. Very meta."],
+              };
+              if (!manCmd) {
+                output.innerHTML += `<div class="text-yellow-400">Usage: man &lt;command&gt;</div>`;
+              } else if (manPages[manCmd]) {
+                const [usage, desc] = manPages[manCmd];
+                output.innerHTML += `<div class="my-2 font-mono text-xs"><div class="text-her-red font-bold mb-1">MANUAL: ${manCmd.toUpperCase()}</div><div class="text-gray-500 mb-1">─────────────────────────</div><div><span class="text-blue-400">Usage:</span> <span class="text-white">${usage}</span></div><div class="mt-1"><span class="text-blue-400">Info:</span> <span class="text-gray-300">${desc}</span></div></div>`;
+              } else {
+                output.innerHTML += `<div class="text-red-400">No manual entry for '${manCmd}'</div>`;
+              }
+              break;
+            }
+
+            case "skills": {
+              inputEl.disabled = true;
+              const skills = [
+                { name: "AWS", level: 90, color: "text-green-400" },
+                { name: "Terraform", level: 85, color: "text-green-400" },
+                { name: "Docker/K8s", level: 85, color: "text-green-400" },
+                { name: "CI/CD", level: 90, color: "text-green-400" },
+                { name: "Python", level: 80, color: "text-yellow-400" },
+                { name: "Networking", level: 75, color: "text-yellow-400" },
+                { name: "TypeScript", level: 70, color: "text-yellow-400" },
+              ];
+              const barWidth = 22;
+              output.innerHTML += `<div class="my-2 font-mono text-xs"><div class="text-her-red font-bold mb-1">SKILLS ASSESSMENT</div><div class="text-gray-500 mb-2">───────────────────────────────────────</div><div id="skills-output"></div></div>`;
+              const skillsContainer = output.querySelector("#skills-output");
+              let skillIdx = 0;
+              let skillCancelled = false;
+              let skillTimeout;
+              function showNextSkill() {
+                if (skillCancelled) return;
+                if (skillIdx >= skills.length) {
+                  inputEl.disabled = false;
+                  inputEl.focus();
+                  return;
+                }
+                const s = skills[skillIdx];
+                const filled = Math.round((s.level / 100) * barWidth);
+                const empty = barWidth - filled;
+                const bar = "█".repeat(filled) + "░".repeat(empty);
+                const row = document.createElement("div");
+                row.className = "flex items-center gap-2 mb-1";
+                row.innerHTML = `<span class="text-gray-400 w-24 inline-block text-right">${s.name}</span> <span class="${s.color}">${bar}</span> <span class="text-white font-bold">${s.level}%</span>`;
+                skillsContainer.appendChild(row);
+                output.scrollTop = output.scrollHeight;
+                skillIdx++;
+                skillTimeout = setTimeout(showNextSkill, 200);
+              }
+              registerTerminalCleanup(() => {
+                skillCancelled = true;
+                clearTimeout(skillTimeout);
+                inputEl.disabled = false;
+                inputEl.focus();
+              });
+              showNextSkill();
+              break;
+            }
+
+            case "timeline":
+              output.innerHTML += `<div class="my-2 font-mono text-xs">
+<div class="text-her-red font-bold mb-1">CAREER TIMELINE</div>
+<div class="text-gray-500 mb-2">═══════════════════════════════════════</div>
+<div class="space-y-1">
+<div><span class="text-cyan-400 font-bold">2024</span> <span class="text-gray-500">───</span> <span class="text-white font-bold">Infrastructure Engineer</span></div>
+<div class="text-gray-500 pl-12">│  <span class="text-gray-400">AWS, Terraform, Kubernetes, CI/CD</span></div>
+<div class="text-gray-500 pl-12">│</div>
+<div><span class="text-cyan-400 font-bold">2022</span> <span class="text-gray-500">───</span> <span class="text-white font-bold">DevOps Engineer</span></div>
+<div class="text-gray-500 pl-12">│  <span class="text-gray-400">Docker, Ansible, Jenkins, Python</span></div>
+<div class="text-gray-500 pl-12">│</div>
+<div><span class="text-cyan-400 font-bold">2020</span> <span class="text-gray-500">───</span> <span class="text-white font-bold">Network Engineer</span></div>
+<div class="text-gray-500 pl-12">│  <span class="text-gray-400">Cisco, Juniper, Python automation</span></div>
+<div class="text-gray-500 pl-12">│</div>
+<div><span class="text-cyan-400 font-bold">2018</span> <span class="text-gray-500">───</span> <span class="text-white font-bold">IT Support &rarr; Networking</span></div>
+<div class="text-gray-500 pl-12">   <span class="text-gray-400">Started the journey</span></div>
+</div>
+<div class="text-gray-500 mt-2">═══════════════════════════════════════</div></div>`;
+              break;
+
             default:
               output.innerHTML += `<div class="text-red-400">Command not found: ${cmd}</div>`;
           }

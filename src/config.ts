@@ -154,7 +154,6 @@ export const asciiAlpha: Record<string, string[]> = {
 // command lists for tab autocomplete
 export const PIETROS_COMMANDS: string[] = [
   "help",
-  "help-fun",
   "clear",
   "whoami",
   "pwd",
@@ -203,6 +202,10 @@ export const PIETROS_COMMANDS: string[] = [
   "rain",
   "sl",
   "noclip",
+  "man",
+  "history",
+  "skills",
+  "timeline",
 ];
 
 export const CYBERPUNK_COMMANDS: string[] = [
