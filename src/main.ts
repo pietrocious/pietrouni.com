@@ -88,43 +88,85 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // theme + wallpaper
-        function initTheme() {
+        function setTheme(dark: boolean) {
           const desktop = document.getElementById("desktop");
-          if (
-            localStorage.theme === "dark" ||
-            (!("theme" in localStorage) &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches)
-          ) {
+          if (dark) {
             document.documentElement.classList.add("dark");
-            // Initial load: remove defaults to allow style override
-            desktop.classList.remove("her-bg", "her-bg-dark");
           } else {
             document.documentElement.classList.remove("dark");
-            desktop.classList.remove("her-bg", "her-bg-dark");
           }
-          applyWallpaper();
-        }
-
-        window.toggleTheme = function () {
-          if (document.documentElement.classList.contains("dark")) {
-            document.documentElement.classList.remove("dark");
-            localStorage.theme = "light";
-          } else {
-            document.documentElement.classList.add("dark");
-            localStorage.theme = "dark";
-          }
+          desktop.classList.remove("her-bg", "her-bg-dark");
           applyWallpaper();
 
-          const frames = document.querySelectorAll("iframe");
-          const newTheme = document.documentElement.classList.contains("dark")
-            ? "dark"
-            : "light";
-          frames.forEach((frame) => {
+          // notify iframes
+          const newTheme = dark ? "dark" : "light";
+          document.querySelectorAll("iframe").forEach((frame) => {
             frame.contentWindow.postMessage(
               { type: "theme-change", theme: newTheme },
               "*"
             );
           });
+        }
+
+        function initTheme() {
+          // Resolve initial theme: explicit localStorage > system preference
+          const prefersDark =
+            localStorage.theme === "dark" ||
+            (!("theme" in localStorage) &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          setTheme(prefersDark);
+          updateThemeUI();
+
+          // Live-sync with OS preference when user hasn't manually overridden
+          window
+            .matchMedia("(prefers-color-scheme: dark)")
+            .addEventListener("change", (e) => {
+              if (!("theme" in localStorage)) {
+                setTheme(e.matches);
+                updateThemeUI();
+              }
+            });
+        }
+
+        function updateThemeUI() {
+          const mode = localStorage.theme || "system";
+          const isDark = document.documentElement.classList.contains("dark");
+          // Update settings label
+          const label = document.getElementById("settings-theme-label");
+          if (label) {
+            const labels: Record<string, string> = { light: "Light Mode", dark: "Dark Mode", system: "System (" + (isDark ? "Dark" : "Light") + ")" };
+            label.textContent = labels[mode] || labels.system;
+          }
+          // Update segmented control active state
+          document.querySelectorAll(".theme-seg-btn").forEach((btn) => {
+            const el = btn as HTMLElement;
+            const isActive = el.dataset.mode === mode;
+            if (isActive) {
+              el.classList.add("bg-her-red", "text-white");
+              el.classList.remove("hover:bg-black/10", "dark:hover:bg-white/10");
+            } else {
+              el.classList.remove("bg-her-red", "text-white");
+              el.classList.add("hover:bg-black/10", "dark:hover:bg-white/10");
+            }
+          });
+        }
+
+        window.setThemeMode = function (mode: string) {
+          if (mode === "system") {
+            localStorage.removeItem("theme");
+            setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
+          } else {
+            localStorage.theme = mode;
+            setTheme(mode === "dark");
+          }
+          updateThemeUI();
+        };
+
+        // Keep toggleTheme for the menu bar button — cycles light → dark → system
+        window.toggleTheme = function () {
+          const current = localStorage.theme || "system";
+          const next = current === "light" ? "dark" : current === "dark" ? "system" : "light";
+          window.setThemeMode(next);
         };
 
         window.cycleWallpaper = function () {
@@ -960,20 +1002,31 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="font-bold opacity-40 mb-3 text-xs uppercase tracking-wider">Appearance</div>
                                 
                                 <!-- Theme Toggle -->
-                                <div class="flex items-center justify-between p-4 bg-black/5 dark:bg-white/5 rounded-lg mb-3">
-                                    <div class="flex items-center gap-3">
+                                <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg mb-3">
+                                    <div class="flex items-center gap-3 mb-3">
                                         <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-300 to-orange-400 dark:from-indigo-500 dark:to-purple-600 flex items-center justify-center">
                                             <svg class="w-5 h-5 text-white block dark:hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"></path></svg>
                                             <svg class="w-5 h-5 text-white hidden dark:block" fill="currentColor" viewBox="0 0 24 24"><path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"></path></svg>
                                         </div>
                                         <div>
                                             <div class="font-semibold text-sm">Theme</div>
-                                            <div class="text-xs opacity-60" id="settings-theme-label">Light Mode</div>
+                                            <div class="text-xs opacity-60" id="settings-theme-label">System</div>
                                         </div>
                                     </div>
-                                    <button onclick="window.toggleTheme(); document.getElementById('settings-theme-label').textContent = document.documentElement.classList.contains('dark') ? 'Dark Mode' : 'Light Mode';" class="px-4 py-2 bg-her-red text-white rounded-lg text-sm font-medium hover:bg-her-red/90 transition-colors">
-                                        Toggle
-                                    </button>
+                                    <div id="theme-segmented" class="flex rounded-lg overflow-hidden border border-her-text/10 dark:border-white/10">
+                                        <button onclick="window.setThemeMode('light')" data-mode="light" class="theme-seg-btn flex-1 py-2 text-xs font-medium transition-colors flex items-center justify-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"></path></svg>
+                                            Light
+                                        </button>
+                                        <button onclick="window.setThemeMode('system')" data-mode="system" class="theme-seg-btn flex-1 py-2 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 border-x border-her-text/10 dark:border-white/10">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm6 9.5a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h4a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5h-4zM7 18.25a.75.75 0 000 1.5h10a.75.75 0 000-1.5H7z"/></svg>
+                                            System
+                                        </button>
+                                        <button onclick="window.setThemeMode('dark')" data-mode="dark" class="theme-seg-btn flex-1 py-2 text-xs font-medium transition-colors flex items-center justify-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z"></path></svg>
+                                            Dark
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <!-- Sound Toggle -->

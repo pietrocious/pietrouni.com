@@ -13,6 +13,7 @@ declare global {
 
     // Theme
     toggleTheme: () => void;
+    setThemeMode: (mode: string) => void;
 
     // Wallpaper
     cycleWallpaper: () => void;
