@@ -162,11 +162,10 @@ document.addEventListener("DOMContentLoaded", () => {
           updateThemeUI();
         };
 
-        // Keep toggleTheme for the menu bar button — cycles light → dark → system
+        // Menu bar button — simple light/dark flip (pins the choice)
         window.toggleTheme = function () {
-          const current = localStorage.theme || "system";
-          const next = current === "light" ? "dark" : current === "dark" ? "system" : "light";
-          window.setThemeMode(next);
+          const goingDark = !document.documentElement.classList.contains("dark");
+          window.setThemeMode(goingDark ? "dark" : "light");
         };
 
         window.cycleWallpaper = function () {
