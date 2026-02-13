@@ -5,7 +5,7 @@
 
 # pietrOS
 
-an OS-inspired interactive portfolio showcasing my profile and my DevOps and Infrastructure projects. Works on all devices—desktop, tablet, and mobile.
+an OS-inspired interactive portfolio showcasing my profile and my DevOps and Infrastructure projects. Works on all devices: desktop, tablet, and mobile.
 
 live demo: [pietrouni.com](https://pietrouni.com)
 
@@ -19,13 +19,19 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
 
 - **core:** HTML5, TypeScript
 - **build:** Vite
-- **styling:** Tailwind CSS v4, custom CSS (glassmorphism, animations)
+- **styling:** Tailwind CSS v4, custom CSS
+- **3d / wallpapers:** Vanta.js, Three.js
 - **features:**
   - **window management:** draggable, resizable window system
-  - **terminal emulator:** custom shell with command history, filesystem simulation, and fun commands
+  - **terminal emulator:** custom shell with command history, filesystem simulation, tab completion, and fun commands. switchable themes: pietrOS, Cyberpunk, and Fallout
+  - **animated wallpapers:** 3D WebGL wallpapers powered by Vanta.js (Birds, Halo, Waves) with light/dark theme–aware configs. switchable from the settings panel
   - **spotlight search:** global search (Ctrl+K) for apps and vault items
   - **vault:** markdown-based content files
-  - **dynamic theme:** system-aware dark mode and multiple wallpapers
+  - **games arcade:** Snake, 2048, Tetris, Threes, Tic-Tac-Toe, and a Doom launcher
+  - **experiments lab:** interactive DevOps demos (IaC Visualizer, Network Topology)
+  - **dock:** macOS-style fish-eye magnification with Gaussian falloff and bounce animations
+  - **audio system:** synthesized UI sound effects (boot chime, clicks, window open/close) via Web Audio API — no external files needed
+  - **dynamic theme:** system-aware dark mode with smooth transitions
 
 ## project structure
 
@@ -36,7 +42,12 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
 │   ├── main.ts         # core app logic, window definitions, terminal commands
 │   ├── config.ts       # static data (vault items, filesystem, commands)
 │   ├── state.ts        # shared app state (windows, terminal, wallpapers)
-│   ├── terminal/       # terminal commands and theme modules
+│   ├── vanta.ts        # Vanta.js animated wallpaper manager (Birds, Halo, Waves)
+│   ├── dock.ts         # macOS-style fish-eye dock magnification
+│   ├── audio.ts        # synthesized UI sound effects (Web Audio API)
+│   ├── terminal/       # terminal commands and theme modules (pietrOS, Cyberpunk, Fallout)
+│   ├── games/          # built-in games (Snake, 2048, Tetris, Threes, Tic-Tac-Toe, Doom)
+│   ├── apps/           # standalone app modules (IaC Visualizer, Network Topology)
 │   └── windows/        # window management (drag, resize, minimize)
 ├── assets/
 │   ├── icons/          # dock and UI icons
@@ -56,9 +67,11 @@ this project uses a combination of Google Fonts and one custom font:
 - **JetBrains Mono** (Google Fonts) – code/monospace
 - **Fixedsys** (custom, not included) – terminal emulator font
 
-### icons
+### icons and wallpapers
 
 dock icons are from the [Neuwaita](https://github.com/RusticBard/Neuwaita) icon theme by [RusticBard](https://github.com/RusticBard), a beautiful take on the Adwaita theme for GNOME
+
+animated desktop wallpapers are powered by [Vanta.js](https://github.com/tengbao/vanta) by [Teng Bao](https://github.com/tengbao), using [Three.js](https://threejs.org/) for WebGL rendering
 
 ### special thanks
 
