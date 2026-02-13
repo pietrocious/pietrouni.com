@@ -8,29 +8,20 @@ export let zIndexCounter = 100;
 export const activeWindows: Record<string, WindowState> = {};
 export let monitorInterval: ReturnType<typeof setInterval> | null = null;
 
-// wallpaper state
-export let activeWallpaperIndex = 0;
+// wallpaper state — Halo (index 1) is default
+export let activeWallpaperIndex = 1;
 
-// wallpapers - named after macos versions because why not
+// 3D vanta effects only
 export const wallpapers: Wallpaper[] = [
-  // Sonoma Flow - Organic Flowing Blobs (Default)
-  { type: "class", light: "sonoma-bg", dark: "sonoma-bg-dark" },
-  // Sequoia Gradient - Rich Layered Diagonals
-  { type: "class", light: "sequoia-bg", dark: "sequoia-bg-dark" },
-  // Ventura Waves - Smooth Flowing Layers
-  { type: "class", light: "ventura-bg", dark: "ventura-bg-dark" },
+  { type: "vanta", light: "", dark: "", label: "Birds", vantaEffect: "BIRDS" },
+  { type: "vanta", light: "", dark: "", label: "Halo",  vantaEffect: "HALO"  },
+  { type: "vanta", light: "", dark: "", label: "Waves", vantaEffect: "WAVES" },
 ];
 
-// all wallpaper classes for cleanup
+// CSS classes to clean up on wallpaper switch (legacy / her-bg variants)
 export const allWallpaperClasses: string[] = [
   "her-bg",
   "her-bg-dark",
-  "sonoma-bg",
-  "sonoma-bg-dark",
-  "sequoia-bg",
-  "sequoia-bg-dark",
-  "ventura-bg",
-  "ventura-bg-dark",
 ];
 
 // terminal stuff

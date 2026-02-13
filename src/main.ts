@@ -9,7 +9,7 @@ import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topo
 import { initThrees, destroyThrees } from './games/threes';
 import { initDock, dockBounce, refreshDockItems } from './dock';
 import { animateWindowContent } from './animations';
-import { initParticles, destroyParticles, updateParticleTheme } from './particles';
+import { initVanta, destroyVanta, updateVantaTheme, isVantaActive } from './vanta';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
 import { initTicTacToe, destroyTicTacToe } from './games/tic-tac-toe';
 import { initGame2048, destroyGame2048 } from './games/game-2048';
@@ -62,8 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // initialize dock fish-eye magnification
         initDock();
-        // ambient floating particles
-        initParticles();
 
         // expose sound toggle for settings
         window.toggleSound = toggleSound;
@@ -75,41 +73,43 @@ document.addEventListener("DOMContentLoaded", () => {
           dockContainer.addEventListener('click', () => playClick());
         }
 
+        function applyWallpaperClasses(wp: (typeof wallpapers)[0], isDark: boolean, desktop: HTMLElement) {
+          desktop.style.background = "";
+          allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
+          if (wp.type === "class") {
+            desktop.classList.add(isDark ? wp.dark : wp.light);
+            destroyVanta();
+          } else if (wp.type === "gradient") {
+            desktop.style.background = isDark ? wp.dark : wp.light;
+            destroyVanta();
+          } else if (wp.type === "vanta" && wp.vantaEffect) {
+            desktop.style.background = "";
+            initVanta(wp.vantaEffect, isDark, desktop);
+          }
+        }
+
         function applyWallpaper(animate = false) {
           const isDark = document.documentElement.classList.contains("dark");
           const wp = wallpapers[activeWallpaperIndex];
           const desktop = document.getElementById("desktop");
           if (!desktop) return;
 
-          if (animate) {
+          // If switching away from vanta, no cross-fade needed (canvas unmounts)
+          const skipFade = wp.type === "vanta" || isVantaActive();
+
+          if (animate && !skipFade) {
             // Cross-fade: freeze current look in ::before, swap underneath, then fade ::before out
             desktop.classList.add("wallpaper-transitioning");
             requestAnimationFrame(() => {
-              // swap classes while ::before holds the old look at opacity 1
-              desktop.style.background = "";
-              allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
-              if (wp.type === "class") {
-                desktop.classList.add(isDark ? wp.dark : wp.light);
-              } else {
-                desktop.style.background = isDark ? wp.dark : wp.light;
-              }
-              // On next frame, remove class → ::before transitions to opacity 0
+              applyWallpaperClasses(wp, isDark, desktop);
               requestAnimationFrame(() => {
                 desktop.classList.remove("wallpaper-transitioning");
               });
             });
           } else {
-            desktop.style.background = "";
-            allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
-            if (wp.type === "class") {
-              desktop.classList.add(isDark ? wp.dark : wp.light);
-            } else {
-              desktop.style.background = isDark ? wp.dark : wp.light;
-            }
+            applyWallpaperClasses(wp, isDark, desktop);
           }
 
-          // Sync particle colors to wallpaper
-          updateParticleTheme(activeWallpaperIndex);
         }
 
         // theme + wallpaper
@@ -121,6 +121,10 @@ document.addEventListener("DOMContentLoaded", () => {
             document.documentElement.classList.remove("dark");
           }
           desktop.classList.remove("her-bg", "her-bg-dark");
+          // If a vanta effect is active, update its colors live rather than full reinit
+          if (isVantaActive()) {
+            updateVantaTheme(dark);
+          }
           applyWallpaper();
 
           // notify iframes
@@ -1251,23 +1255,64 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-3 gap-3" id="wallpaper-grid">
-                                        <!-- Sonoma -->
+                                        <!-- Birds -->
                                         <button onclick="setWallpaper(0);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="0">
-                                            <div class="absolute inset-0 sonoma-bg"></div>
+                                            <div class="absolute inset-0" style="background:#f0dfc0"></div>
+                                            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                                                <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="#c0390a" stroke-width="2.2" d="M88,58 Q92,53 96,58 Q100,53 104,58"/>
+                                                <path stroke="#d4510e" stroke-width="2" d="M100,48 Q104,44 107,48 Q110,44 113,48"/>
+                                                <path stroke="#e06820" stroke-width="1.8" d="M78,50 Q81,46 84,50 Q87,46 90,50"/>
+                                                <path stroke="#c0390a" stroke-width="1.6" d="M112,55 Q115,51 117,55 Q119,51 121,55"/>
+                                                <path stroke="#d4510e" stroke-width="1.5" d="M70,62 Q73,58 76,62 Q79,58 82,62"/>
+                                                <path stroke="#e8761a" stroke-width="1.8" d="M108,38 Q111,34 114,38 Q117,34 120,38"/>
+                                                <path stroke="#c0390a" stroke-width="1.4" d="M118,46 Q120,43 122,46 Q124,43 126,46"/>
+                                                <path stroke="#d4510e" stroke-width="1.6" d="M95,38 Q98,34 101,38 Q104,34 107,38"/>
+                                                <path stroke="#e06820" stroke-width="1.3" d="M122,62 Q124,59 126,62 Q128,59 130,62"/>
+                                                <path stroke="#c0390a" stroke-width="1.5" d="M84,40 Q87,36 90,40 Q93,36 96,40"/>
+                                                <path stroke="#d4510e" stroke-width="1.2" d="M128,52 Q130,49 132,52 Q134,49 136,52"/>
+                                                <path stroke="#e8761a" stroke-width="1.4" d="M65,52 Q67,49 69,52 Q71,49 73,52"/>
+                                                <path stroke="#c0390a" stroke-width="1.1" d="M75,38 Q77,35 79,38 Q81,35 83,38"/>
+                                                <path stroke="#d4510e" stroke-width="1.3" d="M134,42 Q136,39 138,42 Q140,39 142,42"/>
+                                                <path stroke="#e06820" stroke-width="1.2" d="M116,30 Q118,27 120,30 Q122,27 124,30"/>
+                                                <path stroke="#c0390a" stroke-width="1" d="M140,58 Q142,55 144,58 Q146,55 148,58"/>
+                                                <path stroke="#d4510e" stroke-width="1.1" d="M102,28 Q104,25 106,28 Q108,25 110,28"/>
+                                                <path stroke="#e8761a" stroke-width="1" d="M58,44 Q60,41 62,44 Q64,41 66,44"/>
+                                                <path stroke="#c0390a" stroke-width="1.2" d="M130,34 Q132,31 134,34 Q136,31 138,34"/>
+                                                <path stroke="#d4510e" stroke-width="0.9" d="M144,68 Q146,65 148,68 Q150,65 152,68"/>
+                                                <path stroke="#e06820" stroke-width="1" d="M88,30 Q90,27 92,30 Q94,27 96,30"/>
+                                                <path stroke="#c0390a" stroke-width="0.9" d="M50,58 Q52,55 54,58 Q56,55 58,58"/>
+                                                <path stroke="#d4510e" stroke-width="1" d="M148,38 Q150,35 152,38 Q154,35 156,38"/>
+                                                <path stroke="#e8761a" stroke-width="0.8" d="M42,50 Q44,47 46,50 Q48,47 50,50"/>
+                                                </g>
+                                            </svg>
                                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
-                                            <div class="absolute bottom-1 left-1 right-1 text-[10px] font-medium text-white drop-shadow-md">Sonoma</div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium drop-shadow-md" style="color:#7a3010">Birds</div>
                                         </button>
-                                        <!-- Sequoia -->
+                                        <!-- Halo -->
                                         <button onclick="setWallpaper(1);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="1">
-                                            <div class="absolute inset-0 sequoia-bg"></div>
+                                            <div class="absolute inset-0" style="background:#060010"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 70% 80% at 50% 55%, rgba(80,0,180,0.55) 0%, transparent 70%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(circle at 50% 48%, rgba(255,255,255,0.97) 0%, rgba(160,220,255,0.85) 6%, rgba(100,180,255,0.7) 12%, rgba(160,80,255,0.55) 20%, rgba(80,0,200,0.25) 32%, transparent 48%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 55% 35% at 50% 75%, rgba(30,0,70,0.85) 0%, transparent 100%)"></div>
                                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
-                                            <div class="absolute bottom-1 left-1 right-1 text-[10px] font-medium text-white drop-shadow-md">Sequoia</div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-yellow-300 drop-shadow-md">Halo</div>
                                         </button>
-                                        <!-- Ventura -->
+                                        <!-- Waves -->
                                         <button onclick="setWallpaper(2);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="2">
-                                            <div class="absolute inset-0 ventura-bg"></div>
+                                            <div class="absolute inset-0" style="background:#2196f3"></div>
+                                            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+                                                <polygon points="0,0 40,0 20,25" fill="#1976d2"/><polygon points="40,0 80,0 60,25" fill="#1565c0"/><polygon points="80,0 120,0 100,25" fill="#1e88e5"/><polygon points="120,0 160,0 140,25" fill="#1976d2"/>
+                                                <polygon points="0,0 20,25 0,50" fill="#1565c0"/><polygon points="20,25 40,0 60,25" fill="#42a5f5"/><polygon points="40,0 80,0 60,25" fill="#1565c0"/><polygon points="60,25 80,0 100,25" fill="#1e88e5"/><polygon points="80,0 120,0 100,25" fill="#1976d2"/><polygon points="100,25 120,0 140,25" fill="#42a5f5"/><polygon points="120,0 160,0 140,25" fill="#1565c0"/><polygon points="140,25 160,0 160,50" fill="#1976d2"/>
+                                                <polygon points="0,50 20,25 40,50" fill="#1e88e5"/><polygon points="20,25 60,25 40,50" fill="#1565c0"/><polygon points="40,50 60,25 80,50" fill="#42a5f5"/><polygon points="60,25 100,25 80,50" fill="#1976d2"/><polygon points="80,50 100,25 120,50" fill="#1565c0"/><polygon points="100,25 140,25 120,50" fill="#1e88e5"/><polygon points="120,50 140,25 160,50" fill="#1976d2"/>
+                                                <polygon points="0,50 40,50 20,75" fill="#1565c0"/><polygon points="40,50 80,50 60,75" fill="#1976d2"/><polygon points="80,50 120,50 100,75" fill="#1565c0"/><polygon points="120,50 160,50 140,75" fill="#1e88e5"/>
+                                                <polygon points="0,50 20,75 0,100" fill="#1976d2"/><polygon points="20,75 40,50 60,75" fill="#1e88e5"/><polygon points="40,50 80,50 60,75" fill="#1565c0"/><polygon points="60,75 80,50 100,75" fill="#42a5f5"/><polygon points="80,50 120,50 100,75" fill="#1976d2"/><polygon points="100,75 120,50 140,75" fill="#1565c0"/><polygon points="120,50 160,50 140,75" fill="#1e88e5"/><polygon points="140,75 160,50 160,100" fill="#1565c0"/>
+                                                <polygon points="0,100 20,75 40,100" fill="#1976d2"/><polygon points="20,75 60,75 40,100" fill="#1e88e5"/><polygon points="40,100 60,75 80,100" fill="#1565c0"/><polygon points="60,75 100,75 80,100" fill="#1976d2"/><polygon points="80,100 100,75 120,100" fill="#42a5f5"/><polygon points="100,75 140,75 120,100" fill="#1976d2"/><polygon points="120,100 140,75 160,100" fill="#1565c0"/>
+                                                <polygon points="0,100 40,100 20,120" fill="#1565c0"/><polygon points="40,100 80,100 60,120" fill="#1976d2"/><polygon points="80,100 120,100 100,120" fill="#1e88e5"/><polygon points="120,100 160,100 140,120" fill="#1565c0"/>
+                                                <polygon points="0,100 0,120 20,120" fill="#1976d2"/><polygon points="160,100 160,120 140,120" fill="#1976d2"/>
+                                            </svg>
                                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
-                                            <div class="absolute bottom-1 left-1 right-1 text-[10px] font-medium text-white drop-shadow-md">Ventura</div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-sky-100 drop-shadow-md">Waves</div>
                                         </button>
                                     </div>
                                 </div>

@@ -39,9 +39,14 @@ declare global {
 
 // Wallpaper configuration
 export interface Wallpaper {
-  type: 'class' | 'gradient';
+  type: 'class' | 'gradient' | 'vanta';
   light: string;
   dark: string;
+  label?: string;
+  // vanta-only: the effect name and per-theme config overrides
+  vantaEffect?: string;
+  vantaLight?: Record<string, unknown>;
+  vantaDark?: Record<string, unknown>;
 }
 
 // Active window state
