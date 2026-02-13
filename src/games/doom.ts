@@ -1,62 +1,40 @@
 // DOOM Game for pietrOS
-// Embeds classic DOOM (shareware) via js-dos WebAssembly DOS emulator
+// Uses Cloudflare's doom-wasm (Chocolate Doom WebAssembly port)
+// Runs in an iframe for full isolation (Emscripten requires its own global scope)
+// Source: https://github.com/cloudflare/doom-wasm
 
-declare const Dos: any;
-
-let activeDos: any = null;
-let activeContainer: HTMLElement | null = null;
+let doomIframe: HTMLIFrameElement | null = null;
 
 export function initDoom(container: HTMLElement): void {
-  if (activeDos) destroyDoom();
-  activeContainer = container;
+  if (doomIframe) destroyDoom();
 
-  // Create the js-dos player div
-  const playerDiv = document.createElement('div');
-  playerDiv.id = 'doom-jsdos';
-  playerDiv.style.width = '100%';
-  playerDiv.style.height = '100%';
   container.innerHTML = '';
-  container.appendChild(playerDiv);
+  container.style.backgroundColor = '#000';
 
-  // Initialize js-dos with DOOM shareware bundle
-  try {
-    activeDos = Dos(playerDiv, {
-      url: '/games/doom.jsdos',
-      autoStart: true,
-      kiosk: true,
-    });
-  } catch (err) {
-    console.error('[DOOM] Failed to initialize js-dos:', err);
-    container.innerHTML = `
-      <div class="h-full flex flex-col items-center justify-center text-white text-center p-8">
-        <div class="text-6xl mb-4">💀</div>
-        <h2 class="text-xl font-bold mb-2">DOOM could not load</h2>
-        <p class="text-sm opacity-70">The js-dos emulator failed to initialize.<br>Check the console for details.</p>
-      </div>
-    `;
-  }
+  // Create iframe pointing to the standalone DOOM page
+  const iframe = document.createElement('iframe');
+  iframe.src = '/games/doom.html';
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.border = 'none';
+  iframe.style.display = 'block';
+  iframe.allow = 'autoplay';
+  iframe.title = 'DOOM';
+  container.appendChild(iframe);
+  doomIframe = iframe;
+
+  // Focus the iframe for keyboard input
+  iframe.addEventListener('load', () => {
+    iframe.focus();
+  });
 }
 
 export function destroyDoom(): void {
-  if (activeDos) {
-    try {
-      // js-dos v8 uses .stop() to tear down
-      if (typeof activeDos.stop === 'function') {
-        activeDos.stop();
-      }
-    } catch (err) {
-      console.warn('[DOOM] Error during cleanup:', err);
+  if (doomIframe) {
+    // Removing the iframe kills the entire JS runtime cleanly
+    if (doomIframe.parentNode) {
+      doomIframe.parentNode.removeChild(doomIframe);
     }
-    activeDos = null;
+    doomIframe = null;
   }
-
-  // Clean up DOM
-  if (activeContainer) {
-    activeContainer.innerHTML = '';
-    activeContainer = null;
-  }
-
-  // Remove any leftover js-dos iframes or canvases
-  const leftover = document.getElementById('doom-jsdos');
-  if (leftover) leftover.innerHTML = '';
 }

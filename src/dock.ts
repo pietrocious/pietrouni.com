@@ -226,3 +226,31 @@ export function destroyDock(): void {
   dockItems = [];
   isHoveringDock = false;
 }
+
+// Refresh dock items list (call after dynamic add/remove)
+export function refreshDockItems(): void {
+  if (!dockContainer) {
+    dockContainer = document.querySelector('.dock-container');
+  }
+  if (!dockContainer) return;
+
+  const isMobile = window.innerWidth < 768;
+  if (isMobile) return;
+
+  const items = dockContainer.querySelectorAll('.dock-item');
+  dockItems = Array.from(items).map(el => ({
+    element: el as HTMLElement,
+    currentScale: DOCK_CONFIG.baseScale,
+    targetScale: DOCK_CONFIG.baseScale,
+    currentY: 0,
+    targetY: 0,
+    centerX: 0,
+  }));
+
+  // Disable CSS hover transforms on new items
+  dockItems.forEach(item => {
+    item.element.style.transition = 'none';
+  });
+
+  updateItemPositions();
+}

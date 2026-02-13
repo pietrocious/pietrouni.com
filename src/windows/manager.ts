@@ -3,6 +3,7 @@
 
 import { activeWindows, incrementZIndex, setMonitorInterval, monitorInterval } from '../state';
 import { playWindowClose } from '../audio';
+import { refreshDockItems } from '../dock';
 
 // drag state - keep these local since they're only used here
 let isDragging = false;
@@ -52,7 +53,19 @@ export function closeWindow(id: string): void {
 
   // update dock state
   const dockItem = document.getElementById(`dock-${id}`);
-  if (dockItem) dockItem.classList.remove('active');
+  if (dockItem) {
+    dockItem.classList.remove('active');
+    // Remove dynamically created dock items with exit animation
+    if (dockItem.classList.contains('dock-item-dynamic')) {
+      dockItem.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+      dockItem.style.opacity = '0';
+      dockItem.style.transform = 'scale(0.3) translateY(20px)';
+      setTimeout(() => {
+        dockItem.remove();
+        refreshDockItems();
+      }, 250);
+    }
+  }
   // Call onClose callback from window config if defined
   if (activeWindows[id]?.config?.onClose) {
     activeWindows[id].config.onClose();

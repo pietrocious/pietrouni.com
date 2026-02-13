@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DOOM</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      canvas {
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        aspect-ratio: 4 / 3;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="canvas"
+      oncontextmenu="event.preventDefault()"
+      tabindex="-1"
+    ></canvas>
+    <script>
+      var commonArgs = [
+        "-iwad",
+        "doom1.wad",
+        "-window",
+        "-nogui",
+        "-nomusic",
+        "-config",
+        "default.cfg",
+      ];
+
+      var Module = {
+        noInitialRun: true,
+        onRuntimeInitialized: function () {
+          callMain(commonArgs);
+        },
+        preRun: function () {
+          Module.FS.createPreloadedFile(
+            "",
+            "doom1.wad",
+            "doom1.wad",
+            true,
+            true,
+          );
+          Module.FS.createPreloadedFile(
+            "",
+            "default.cfg",
+            "default.cfg",
+            true,
+            true,
+          );
+        },
+        canvas: (function () {
+          var canvas = document.getElementById("canvas");
+          canvas.addEventListener(
+            "webglcontextlost",
+            function (e) {
+              e.preventDefault();
+            },
+            false,
+          );
+          return canvas;
+        })(),
+        print: function (text) {
+          console.log("[DOOM]", text);
+        },
+        printErr: function (text) {
+          if (arguments.length > 1)
+            text = Array.prototype.slice.call(arguments).join(" ");
+          console.error("[DOOM]", text);
+        },
+        setStatus: function (text) {
+          if (text) console.log("[DOOM Status]", text);
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function (left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(
+            left
+              ? "Preparing... (" +
+                  (this.totalDependencies - left) +
+                  "/" +
+                  this.totalDependencies +
+                  ")"
+              : "All downloads complete.",
+          );
+        },
+      };
+
+      window.onerror = function (event) {
+        console.error("[DOOM Error]", event);
+      };
+    </script>
+    <script src="websockets-doom.js"></script>
+  </body>
+</html>

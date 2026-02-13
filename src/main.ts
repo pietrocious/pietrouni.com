@@ -7,7 +7,7 @@ import { initTetris, destroyTetris } from './games/tetris';
 import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
 import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topology';
 import { initThrees, destroyThrees } from './games/threes';
-import { initDock, dockBounce } from './dock';
+import { initDock, dockBounce, refreshDockItems } from './dock';
 import { animateWindowContent } from './animations';
 import { initParticles } from './particles';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
@@ -334,10 +334,13 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
             { id: "monitor", title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
             { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
-            { id: "tictactoe", title: "Tic Tac Toe", icon: "assets/icons/kmines.svg" },
-            { id: "game2048", title: "2048", icon: "assets/icons/gnome-sudoku.svg" },
+            { id: "tictactoe", title: "Tic Tac Toe", icon: "assets/icons/org.gnome.Extensions.svg" },
+            { id: "game2048", title: "2048", icon: "assets/icons/org.gnome.Extensions.svg" },
             { id: "sysinfo", title: "About pietrOS", icon: "assets/icons/contacts.svg" },
-            { id: "doom", title: "DOOM", icon: "assets/icons/kmines.svg" },
+            { id: "doom", title: "DOOM", icon: "assets/icons/org.gnome.Extensions.svg" },
+            { id: "snake", title: "Snake", icon: "assets/icons/org.gnome.Extensions.svg" },
+            { id: "tetris", title: "Tetris", icon: "assets/icons/org.gnome.Extensions.svg" },
+            { id: "threes", title: "Threes!", icon: "assets/icons/org.gnome.Extensions.svg" },
           ];
 
           // If no search term, show app grid (like macOS 26 Siri/Spotlight)
@@ -890,8 +893,8 @@ document.addEventListener("DOMContentLoaded", () => {
             content: `
                     <div id="doom-container" class="h-full w-full bg-black"></div>
                 `,
-            width: 640,
-            height: 480,
+            width: 960,
+            height: 720,
             onOpen: () => {
               setTimeout(() => {
                 const container = document.getElementById("doom-container");
@@ -926,7 +929,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <!-- Snake -->
                                 <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.openWindow('snake');">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">🐍 Snake</h3>
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M13 3c-1.1 0-2 .9-2 2 0 .4.1.7.3 1H9.5C9.2 5.4 8.6 5 8 5H6.7c.2-.3.3-.6.3-1 0-1.1-.9-2-2-2s-2 .9-2 2c0 .7.4 1.4 1 1.7v.8C3.4 6.8 3 7.4 3 8v2c0 1.7 1.3 3 3 3h4c1.7 0 3-1.3 3-3V7c0-.6-.4-1.2-1-1.5V5c0-1.1-.9-2-2-2zM5 3.5a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1zm6 6.5c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V8c0-.6.4-1 1-1h3c.6 0 1 .4 1 1v2z"/></svg>Snake</h3>
                                         <div class="flex items-center gap-2">
                                             <span id="lab-hs-snake" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
@@ -944,7 +947,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <!-- 2048 -->
                                 <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.openWindow('game2048');">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">🔢 2048</h3>
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1" opacity=".6"/><rect x="1" y="9" width="6" height="6" rx="1" opacity=".6"/><rect x="9" y="9" width="6" height="6" rx="1" opacity=".3"/></svg>2048</h3>
                                         <div class="flex items-center gap-2">
                                             <span id="lab-hs-2048" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
@@ -962,7 +965,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <!-- Tic Tac Toe -->
                                 <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 150ms" onclick="window.openWindow('tictactoe');">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">⭕❌ Tic Tac Toe</h3>
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5.5" y1="1" x2="5.5" y2="15"/><line x1="10.5" y1="1" x2="10.5" y2="15"/><line x1="1" y1="5.5" x2="15" y2="5.5"/><line x1="1" y1="10.5" x2="15" y2="10.5"/><circle cx="3" cy="8" r="1.3" fill="currentColor" stroke="none"/><line x1="11.5" y1="2" x2="14" y2="4.5"/><line x1="14" y1="2" x2="11.5" y2="4.5"/></svg>Tic Tac Toe</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
                                     </div>
                                     <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Strategy game with Minimax AI. Choose Easy, Medium, or Hard difficulty. Can you beat the machine?</p>
@@ -977,7 +980,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <!-- Tetris -->
                                 <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 200ms" onclick="window.openWindow('tetris');">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">🎮 Tetris</h3>
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><rect x="5" y="1" width="4" height="4" rx=".5"/><rect x="1" y="5" width="4" height="4" rx=".5"/><rect x="5" y="5" width="4" height="4" rx=".5"/><rect x="9" y="5" width="4" height="4" rx=".5" opacity=".7"/><rect x="5" y="9" width="4" height="4" rx=".5" opacity=".5"/><rect x="9" y="9" width="4" height="4" rx=".5" opacity=".3"/></svg>Tetris</h3>
                                         <div class="flex items-center gap-2">
                                             <span id="lab-hs-tetris" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
@@ -995,7 +998,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <!-- Threes -->
                                 <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 250ms" onclick="window.openWindow('threes');">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">🔢 Threes!</h3>
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" font-size="10" font-weight="bold" fill="currentColor">3</text></svg>Threes!</h3>
                                         <div class="flex items-center gap-2">
                                             <span id="lab-hs-threes" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
@@ -1013,7 +1016,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <!-- DOOM -->
                                 <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 300ms" onclick="window.openWindow('doom');">
                                     <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">💀 DOOM</h3>
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1C4.7 1 2 3.7 2 7c0 2 1 3.8 2.5 4.9V14c0 .6.4 1 1 1h5c.6 0 1-.4 1-1v-2.1C13 10.8 14 9 14 7c0-3.3-2.7-6-6-6zM6 10a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm4 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm-2 2.5c-.8 0-1.5-.3-1.5-.7h3c0 .4-.7.7-1.5.7z"/></svg>DOOM</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
                                     </div>
                                     <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">The legendary 1993 FPS running via DOSBox WebAssembly. Shareware Episode 1: Knee-Deep in the Dead.</p>
@@ -1845,7 +1848,52 @@ document.addEventListener("DOMContentLoaded", () => {
           }, 450);
 
           // Dock State + Launch Bounce
-          const dockItem = document.getElementById(`dock-${id}`);
+          // Icon map for apps that don't have a static dock item
+          const dockIconMap: Record<string, { title: string; icon: string }> = {
+            snake: { title: "Snake", icon: "assets/icons/org.gnome.Extensions.svg" },
+            game2048: { title: "2048", icon: "assets/icons/org.gnome.Extensions.svg" },
+            tictactoe: { title: "Tic Tac Toe", icon: "assets/icons/org.gnome.Extensions.svg" },
+            tetris: { title: "Tetris", icon: "assets/icons/org.gnome.Extensions.svg" },
+            threes: { title: "Threes!", icon: "assets/icons/org.gnome.Extensions.svg" },
+            doom: { title: "DOOM", icon: "assets/icons/org.gnome.Extensions.svg" },
+            experiments: { title: "Lab", icon: "assets/icons/characters.svg" },
+            sysinfo: { title: "About pietrOS", icon: "assets/icons/contacts.svg" },
+            finder: { title: "Finder", icon: "assets/icons/org.gnome.Nautilus.svg" },
+            launchpad: { title: "Launchpad", icon: "assets/icons/org.gnome.Extensions.svg" },
+          };
+
+          let dockItem = document.getElementById(`dock-${id}`);
+          if (!dockItem && dockIconMap[id]) {
+            // Dynamically create a dock item for this app
+            const dockContainer = document.querySelector('.dock-container');
+            if (dockContainer) {
+              const info = dockIconMap[id];
+              const div = document.createElement('div');
+              div.id = `dock-${id}`;
+              div.className = 'dock-item dock-item-dynamic cursor-pointer group';
+              div.setAttribute('onclick', `restoreWindow('${id}')`);
+              div.setAttribute('title', info.title);
+              div.setAttribute('role', 'button');
+              div.setAttribute('aria-label', `Open ${info.title}`);
+              div.innerHTML = `
+                <span class="dock-label">${info.title}</span>
+                <img class="dock-icon" src="${info.icon}" alt="${info.title}" aria-hidden="true" />
+              `;
+              // Add entry animation
+              div.style.opacity = '0';
+              div.style.transform = 'scale(0.3) translateY(20px)';
+              dockContainer.appendChild(div);
+              // Trigger animation
+              requestAnimationFrame(() => {
+                div.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                div.style.opacity = '1';
+                div.style.transform = 'scale(1) translateY(0)';
+                setTimeout(() => { div.style.transition = ''; div.style.transform = ''; }, 350);
+              });
+              refreshDockItems();
+              dockItem = div;
+            }
+          }
           if (dockItem) {
             dockItem.classList.add("active");
             dockBounce(id);
