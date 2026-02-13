@@ -1,9 +1,11 @@
 // Snake Game for pietrOS
 // Vanilla TypeScript implementation using Canvas API
 
+import { playClick, playNotification, isSoundEnabled } from '../audio';
+
 const GRID = 20;        // number of cells per row/col
-const CELL = 20;        // pixel size of each cell
-const BOARD = GRID * CELL; // total canvas size
+const CELL = 24;        // pixel size of each cell
+const BOARD = GRID * CELL; // total canvas size (480)
 
 type Dir = { x: number; y: number };
 type Point = { x: number; y: number };
@@ -158,6 +160,7 @@ export class SnakeGame {
     // Eat food?
     if (newHead.x === this.food.x && newHead.y === this.food.y) {
       this.score += 10;
+      if (isSoundEnabled()) playClick();
       this.updateScoreUI();
       this.spawnFood();
 
@@ -185,6 +188,7 @@ export class SnakeGame {
       this.updateScoreUI();
     }
 
+    if (isSoundEnabled()) playNotification();
     this.showGameOver();
   }
 

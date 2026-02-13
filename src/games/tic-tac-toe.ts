@@ -1,8 +1,11 @@
 // Tic-Tac-Toe Game for pietrOS
 // Vanilla TypeScript implementation using Canvas API
 
+import { playKeyTick, playNotification, isSoundEnabled } from '../audio';
+
 type Player = "X" | "O" | null;
 type GameMode = "human" | "ai";
+type Difficulty = "easy" | "medium" | "hard";
 
 const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 600;
@@ -18,6 +21,7 @@ export class TicTacToeGame {
   private currentPlayer: Player;
   private winner: Player | "tie" | null;
   private gameMode: GameMode;
+  private difficulty: Difficulty;
   private scores: { X: number; O: number; ties: number };
   private isThinking: boolean;
   private themeColor: string;
@@ -31,6 +35,7 @@ export class TicTacToeGame {
     this.currentPlayer = "X";
     this.winner = null;
     this.gameMode = "ai";
+    this.difficulty = (localStorage.getItem('ttt-difficulty') as Difficulty) || "hard";
     this.scores = { X: 0, O: 0, ties: 0 };
     this.isThinking = false;
     this.themeColor = "#ef4444"; // Default red theme
@@ -196,7 +201,8 @@ export class TicTacToeGame {
     if (this.board[index]) return;
 
     this.board[index] = this.currentPlayer;
-    
+    if (isSoundEnabled()) playKeyTick();
+
     // Check win/tie
     const winInfo = this.checkWinner(this.board);
     if (winInfo.winner) {
@@ -205,7 +211,8 @@ export class TicTacToeGame {
       if (winInfo.winner === "X") this.scores.X++;
       else if (winInfo.winner === "O") this.scores.O++;
       else this.scores.ties++;
-      
+
+      if (isSoundEnabled()) playNotification();
       this.updateStats();
       setTimeout(() => this.showGameOver(winInfo.winner as string), 1000);
       return;
@@ -284,23 +291,34 @@ export class TicTacToeGame {
   }
 
   private getBestMove(board: Player[]): number {
-    let bestScore = -Infinity;
-    let bestMove = -1;
+    const empty = board.map((v, i) => v === null ? i : -1).filter(i => i !== -1);
+    if (empty.length === 0) return -1;
 
-    // First move optimization: take center if available
-    if (board.filter(c => c !== null).length === 0 || (board.filter(c => c !== null).length === 1 && !board[4])) {
-      if (!board[4]) return 4;
+    // Easy: 80% random, 20% minimax
+    // Medium: 50% random, 50% minimax
+    // Hard: always minimax
+    const randomChance = this.difficulty === 'easy' ? 0.8 : this.difficulty === 'medium' ? 0.5 : 0;
+    if (Math.random() < randomChance) {
+      return empty[Math.floor(Math.random() * empty.length)];
     }
 
-    for (let i = 0; i < 9; i++) {
-      if (!board[i]) {
-        board[i] = "O";
-        const score = this.minimax(board, 0, false);
-        board[i] = null;
-        if (score > bestScore) {
-          bestScore = score;
-          bestMove = i;
-        }
+    // First move optimization: take center if available (only on Hard)
+    if (this.difficulty === 'hard') {
+      if (board.filter(c => c !== null).length === 0 || (board.filter(c => c !== null).length === 1 && !board[4])) {
+        if (!board[4]) return 4;
+      }
+    }
+
+    let bestScore = -Infinity;
+    let bestMove = empty[0];
+
+    for (const i of empty) {
+      board[i] = "O";
+      const score = this.minimax(board, 0, false);
+      board[i] = null;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = i;
       }
     }
     return bestMove;
@@ -314,13 +332,38 @@ export class TicTacToeGame {
     menu.className = "bg-white/95 backdrop-blur rounded-lg p-6 shadow-lg border border-gray-200 text-center pointer-events-auto w-64 animate-in fade-in zoom-in duration-300";
     menu.innerHTML = `
       <h1 class="text-2xl font-bold text-gray-800 mb-2">Tic Tac Toe</h1>
-      <p class="text-sm text-gray-500 mb-6">Unbeatable AI Challenge</p>
+      <p class="text-sm text-gray-500 mb-4">Challenge the AI</p>
+      <div class="mb-4">
+        <p class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-2">Difficulty</p>
+        <div class="flex gap-1 justify-center">
+          <button data-diff="easy" class="ttt-diff-btn flex-1 py-1 text-xs rounded font-medium border transition-colors">Easy</button>
+          <button data-diff="medium" class="ttt-diff-btn flex-1 py-1 text-xs rounded font-medium border transition-colors">Medium</button>
+          <button data-diff="hard" class="ttt-diff-btn flex-1 py-1 text-xs rounded font-medium border transition-colors">Hard</button>
+        </div>
+      </div>
       <div class="space-y-3">
         <button id="btn-ai" class="w-full py-2 px-4 bg-her-red text-white rounded font-medium hover:bg-red-600 transition-colors">Play vs AI</button>
         <button id="btn-human" class="w-full py-2 px-4 bg-gray-100 text-gray-700 rounded font-medium hover:bg-gray-200 transition-colors">Play vs Human</button>
       </div>
     `;
     this.uiLayer.appendChild(menu);
+
+    // Highlight current difficulty
+    const updateDiffBtns = () => {
+      menu.querySelectorAll<HTMLElement>('.ttt-diff-btn').forEach(btn => {
+        const active = btn.dataset.diff === this.difficulty;
+        btn.className = `ttt-diff-btn flex-1 py-1 text-xs rounded font-medium border transition-colors ${active ? 'bg-her-red text-white border-her-red' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`;
+      });
+    };
+    updateDiffBtns();
+
+    menu.querySelectorAll<HTMLElement>('.ttt-diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.difficulty = btn.dataset.diff as Difficulty;
+        localStorage.setItem('ttt-difficulty', this.difficulty);
+        updateDiffBtns();
+      });
+    });
 
     menu.querySelector('#btn-ai')?.addEventListener('click', () => this.startGame("ai"));
     menu.querySelector('#btn-human')?.addEventListener('click', () => this.startGame("human"));

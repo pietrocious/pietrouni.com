@@ -1,6 +1,8 @@
 // Tetris Game for pietrOS
 // Vanilla TypeScript implementation using Canvas API
 
+import { playClick, playNotification, playWindowClose, isSoundEnabled } from '../audio';
+
 interface Tetromino {
   shape: number[][];
   color: string;
@@ -10,6 +12,16 @@ interface Piece {
   x: number;
   y: number;
   tetromino: Tetromino;
+}
+
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number; // 0-1, fades to 0
+  color: string;
+  size: number;
 }
 
 const TETROMINOS: Record<string, Tetromino> = {
@@ -26,9 +38,13 @@ const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
 const BUFFER_ROWS = 2;
 const TOTAL_HEIGHT = BOARD_HEIGHT + BUFFER_ROWS;
-const CELL_SIZE = 24;
+const CELL_SIZE = 28;
 const INITIAL_DROP_TIME = 800;
 const SPEED_FACTOR = 0.85;
+
+// DAS constants (standard Tetris values)
+const DAS_DELAY = 167;  // ms before auto-repeat
+const ARR_INTERVAL = 33; // ms between auto-repeats
 
 export class TetrisGame {
   private canvas: HTMLCanvasElement;
@@ -54,6 +70,17 @@ export class TetrisGame {
   private isPaused = false;
   private dropInterval: number | null = null;
   private keyHandler: ((e: KeyboardEvent) => void) | null = null;
+  private keyUpHandler: ((e: KeyboardEvent) => void) | null = null;
+
+  // DAS state
+  private dasTimer: number | null = null;
+  private arrTimer: number | null = null;
+  private dasDirection: 'left' | 'right' | null = null;
+
+  // Particles + shake
+  private particles: Particle[] = [];
+  private shakeEndTime = 0;
+  private shakeIntensity = 0;
 
   private scoreEl: HTMLElement;
   private highScoreEl: HTMLElement;
@@ -110,12 +137,29 @@ export class TetrisGame {
   }
 
   private loadHighScore(): void {
-    const saved = localStorage.getItem('tetris-highscore');
+    const saved = localStorage.getItem('tetris-high');
     if (saved) this.highScore = parseInt(saved, 10);
   }
 
   private saveHighScore(): void {
-    localStorage.setItem('tetris-highscore', this.highScore.toString());
+    localStorage.setItem('tetris-high', this.highScore.toString());
+  }
+
+  private clearDAS(): void {
+    if (this.dasTimer !== null) { clearTimeout(this.dasTimer); this.dasTimer = null; }
+    if (this.arrTimer !== null) { clearInterval(this.arrTimer); this.arrTimer = null; }
+    this.dasDirection = null;
+  }
+
+  private startDAS(dir: 'left' | 'right'): void {
+    this.clearDAS();
+    this.dasDirection = dir;
+    this.dasTimer = window.setTimeout(() => {
+      this.arrTimer = window.setInterval(() => {
+        if (dir === 'left') this.moveLeft();
+        else this.moveRight();
+      }, ARR_INTERVAL);
+    }, DAS_DELAY);
   }
 
   private setupKeyboard(): void {
@@ -126,10 +170,12 @@ export class TetrisGame {
         case 'ArrowLeft':
           e.preventDefault();
           this.moveLeft();
+          this.startDAS('left');
           break;
         case 'ArrowRight':
           e.preventDefault();
           this.moveRight();
+          this.startDAS('right');
           break;
         case 'ArrowDown':
           e.preventDefault();
@@ -155,7 +201,14 @@ export class TetrisGame {
           break;
       }
     };
+
+    this.keyUpHandler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' && this.dasDirection === 'left') this.clearDAS();
+      if (e.key === 'ArrowRight' && this.dasDirection === 'right') this.clearDAS();
+    };
+
     window.addEventListener('keydown', this.keyHandler);
+    window.addEventListener('keyup', this.keyUpHandler);
   }
 
   private spawnPiece(): void {
@@ -172,6 +225,7 @@ export class TetrisGame {
       this.gameOver = true;
       this.stopGameLoop();
       this.updateStatus();
+      if (isSoundEnabled()) playWindowClose();
     }
 
     this.canHold = true;
@@ -243,6 +297,7 @@ export class TetrisGame {
     while (!this.checkCollision(this.currentPiece.x, this.currentPiece.y + 1, this.currentPiece.tetromino.shape)) {
       this.currentPiece.y++;
     }
+    if (isSoundEnabled()) playClick();
     this.lockPiece();
   }
 
@@ -287,6 +342,7 @@ export class TetrisGame {
         this.stopGameLoop();
         this.updateStatus();
         this.render();
+        if (isSoundEnabled()) playWindowClose();
         return;
       }
     }
@@ -296,18 +352,49 @@ export class TetrisGame {
     this.render();
   }
 
+  private spawnLineClearParticles(clearedRows: number[]): void {
+    for (const row of clearedRows) {
+      const drawRow = row - BUFFER_ROWS;
+      if (drawRow < 0) continue;
+      for (let col = 0; col < BOARD_WIDTH; col++) {
+        const color = this.board[row + 1]?.[col] as string || '#ffffff';
+        const count = 2;
+        for (let k = 0; k < count; k++) {
+          this.particles.push({
+            x: (col + 0.5) * CELL_SIZE,
+            y: (drawRow + 0.5) * CELL_SIZE,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 1.5) * 5,
+            life: 1,
+            color: color || '#ffffff',
+            size: Math.random() * 4 + 2,
+          });
+        }
+      }
+    }
+  }
+
   private clearLines(): void {
-    let cleared = 0;
+    const clearedRows: number[] = [];
     for (let row = TOTAL_HEIGHT - 1; row >= BUFFER_ROWS; row--) {
       if (this.board[row].every(cell => cell !== 0)) {
+        clearedRows.push(row);
         this.board.splice(row, 1);
         this.board.unshift(Array(BOARD_WIDTH).fill(0));
-        cleared++;
         row++; // Re-check this row since we shifted
       }
     }
 
+    const cleared = clearedRows.length;
     if (cleared > 0) {
+      this.spawnLineClearParticles(clearedRows);
+
+      // Screen shake — intensity scales with lines
+      this.shakeIntensity = cleared >= 4 ? 5 : cleared >= 3 ? 4 : cleared >= 2 ? 3 : 2;
+      this.shakeEndTime = performance.now() + 220;
+
+      if (isSoundEnabled()) playNotification();
+
       this.lines += cleared;
       this.score += cleared * 100 * this.level;
       if (this.score > this.highScore) {
@@ -362,6 +449,7 @@ export class TetrisGame {
         this.moveDown();
       }
     }, this.dropTime);
+    this.animationLoop();
   }
 
   private stopGameLoop(): void {
@@ -376,6 +464,15 @@ export class TetrisGame {
     this.startGameLoop();
   }
 
+  private animationLoop(): void {
+    if (this.gameOver) {
+      this.render();
+      return;
+    }
+    this.render();
+    requestAnimationFrame(() => this.animationLoop());
+  }
+
   private getGhostY(): number {
     if (!this.currentPiece) return 0;
     let ghostY = this.currentPiece.y;
@@ -386,9 +483,36 @@ export class TetrisGame {
   }
 
   private render(): void {
+    const now = performance.now();
+
+    // Update particles
+    const dt = 1 / 60;
+    this.particles = this.particles
+      .map(p => ({
+        ...p,
+        x: p.x + p.vx,
+        y: p.y + p.vy,
+        vy: p.vy + 0.25,
+        life: p.life - dt * 3,
+      }))
+      .filter(p => p.life > 0);
+
+    // Apply screen shake
+    let shakeX = 0;
+    let shakeY = 0;
+    if (now < this.shakeEndTime) {
+      const progress = (this.shakeEndTime - now) / 220;
+      const intensity = this.shakeIntensity * progress;
+      shakeX = (Math.random() - 0.5) * 2 * intensity;
+      shakeY = (Math.random() - 0.5) * 2 * intensity;
+    }
+
+    this.ctx.save();
+    this.ctx.translate(shakeX, shakeY);
+
     // Clear main canvas
     this.ctx.fillStyle = '#1e1e2e';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.fillRect(-5, -5, this.canvas.width + 10, this.canvas.height + 10);
 
     // Draw grid
     this.ctx.strokeStyle = '#313244';
@@ -449,6 +573,18 @@ export class TetrisGame {
         }
       }
     }
+
+    // Draw particles
+    for (const p of this.particles) {
+      this.ctx.globalAlpha = p.life;
+      this.ctx.fillStyle = p.color;
+      this.ctx.beginPath();
+      this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      this.ctx.fill();
+    }
+    this.ctx.globalAlpha = 1;
+
+    this.ctx.restore();
 
     // Draw hold piece
     this.holdCtx.fillStyle = '#1e1e2e';
@@ -514,6 +650,7 @@ export class TetrisGame {
 
   reset(): void {
     this.stopGameLoop();
+    this.clearDAS();
     this.board = this.createEmptyBoard();
     this.currentPiece = null;
     this.heldPiece = null;
@@ -525,6 +662,8 @@ export class TetrisGame {
     this.dropTime = INITIAL_DROP_TIME;
     this.gameOver = false;
     this.isPaused = false;
+    this.particles = [];
+    this.shakeEndTime = 0;
     this.statusEl.textContent = '';
     this.spawnPiece();
     this.startGameLoop();
@@ -533,9 +672,14 @@ export class TetrisGame {
 
   destroy(): void {
     this.stopGameLoop();
+    this.clearDAS();
     if (this.keyHandler) {
       window.removeEventListener('keydown', this.keyHandler);
       this.keyHandler = null;
+    }
+    if (this.keyUpHandler) {
+      window.removeEventListener('keyup', this.keyUpHandler);
+      this.keyUpHandler = null;
     }
   }
 }

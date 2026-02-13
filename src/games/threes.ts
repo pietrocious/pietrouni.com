@@ -1,6 +1,8 @@
 // Threes! Game for pietrOS
 // Vanilla TypeScript implementation using Canvas API with smooth animations
 
+import { playClick, playNotification, isSoundEnabled } from '../audio';
+
 interface AnimatedTile {
   id: number;
   value: number;
@@ -18,11 +20,35 @@ interface AnimatedTile {
   isNew: boolean;
 }
 
+interface Particle {
+  x: number; y: number;
+  vx: number; vy: number;
+  life: number; // 1 → 0
+  color: string;
+  size: number;
+}
+
+interface Ripple {
+  x: number; y: number;
+  r: number;
+  maxR: number;
+  life: number; // 1 → 0
+  color: string;
+}
+
+interface ScorePopup {
+  x: number; y: number;
+  vy: number;
+  text: string;
+  life: number; // 1 → 0
+  color: string;
+}
+
 type Direction = 'up' | 'down' | 'left' | 'right';
 
 const GRID_SIZE = 4;
-const CELL_SIZE = 80;
-const CELL_GAP = 8;
+const CELL_SIZE = 90;
+const CELL_GAP = 10;
 const ANIMATION_DURATION = 120; // ms
 const MERGE_POP_SCALE = 1.15;
 
@@ -112,7 +138,13 @@ export class ThreesGame {
 
   private animating = false;
   private animationStartTime = 0;
-  private animationFrameId: number | null = null;
+  private loopId: number | null = null;
+  private lastFrameTime = 0;
+
+  private particles: Particle[] = [];
+  private ripples: Ripple[] = [];
+  private scorePopups: ScorePopup[] = [];
+  private prevScore = 0;
 
   constructor(container: HTMLElement) {
     this.canvas = container.querySelector('#threes-board') as HTMLCanvasElement;
@@ -139,7 +171,7 @@ export class ThreesGame {
     this.loadHighScore();
     this.setupKeyboard();
     this.initializeGrid();
-    this.render();
+    this.startLoop();
   }
 
   private loadHighScore(): void {
@@ -288,6 +320,8 @@ export class ThreesGame {
 
     if (!moved) return;
 
+    if (mergedIds.size > 0 && isSoundEnabled()) playClick();
+
     // Update tiles with new positions and animation targets
     this.tiles = newTiles.map(t => {
       const targetX = gridToPixel(t.col);
@@ -318,68 +352,141 @@ export class ThreesGame {
       this.nextTile = getRandomValue();
     }
 
+    // Spawn merge effects
+    this.tiles.forEach(t => {
+      if (t.merged) this.spawnMergeEffects(t);
+    });
+
     // Start animation
     this.animating = true;
     this.animationStartTime = performance.now();
-    this.animate();
   }
 
-  private animate = (): void => {
-    const elapsed = performance.now() - this.animationStartTime;
-    const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
-    const eased = easeOutQuart(progress);
+  private startLoop(): void {
+    const loop = (now: number): void => {
+      const dt = Math.min((now - (this.lastFrameTime || now)) / 1000, 0.05);
+      this.lastFrameTime = now;
 
-    // Update tile positions
-    for (const tile of this.tiles) {
-      // Position animation
-      tile.displayX = tile.displayX + (tile.targetX - tile.displayX) * eased;
-      tile.displayY = tile.displayY + (tile.targetY - tile.displayY) * eased;
-      
-      // Scale animation for merged tiles
-      if (tile.merged) {
-        if (progress < 0.5) {
-          tile.scale = 1 + (MERGE_POP_SCALE - 1) * easeOutBack(progress * 2);
-        } else {
-          tile.scale = MERGE_POP_SCALE - (MERGE_POP_SCALE - 1) * ((progress - 0.5) * 2);
+      if (this.animating) {
+        const elapsed = now - this.animationStartTime;
+        const progress = Math.min(elapsed / ANIMATION_DURATION, 1);
+        const eased = easeOutQuart(progress);
+
+        for (const tile of this.tiles) {
+          tile.displayX = tile.displayX + (tile.targetX - tile.displayX) * eased;
+          tile.displayY = tile.displayY + (tile.targetY - tile.displayY) * eased;
+
+          if (tile.merged) {
+            if (progress < 0.5) {
+              tile.scale = 1 + (MERGE_POP_SCALE - 1) * easeOutBack(progress * 2);
+            } else {
+              tile.scale = MERGE_POP_SCALE - (MERGE_POP_SCALE - 1) * ((progress - 0.5) * 2);
+            }
+          }
+
+          if (tile.isNew) {
+            tile.opacity = easeOutBack(Math.min(progress * 1.5, 1));
+            tile.scale = easeOutBack(Math.min(progress * 1.5, 1));
+          }
+        }
+
+        if (progress >= 1) {
+          this.animating = false;
+          for (const tile of this.tiles) {
+            tile.displayX = tile.targetX;
+            tile.displayY = tile.targetY;
+            tile.scale = 1;
+            tile.opacity = 1;
+            tile.merged = false;
+            tile.isNew = false;
+          }
+          this.updateScore();
+          if (!this.canMove()) {
+            this.gameOver = true;
+            this.statusEl.textContent = 'GAME OVER';
+            this.statusEl.className = 'text-red-500 font-bold text-lg';
+            if (isSoundEnabled()) playNotification();
+            this.spawnGameOverParticles();
+          }
         }
       }
-      
-      // New tile fade + scale in
-      if (tile.isNew) {
-        tile.opacity = eased;
-        tile.scale = eased;
+
+      // Update particles
+      for (const p of this.particles) {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 180 * dt; // gravity
+        p.life -= dt * 3;
       }
+      this.particles = this.particles.filter(p => p.life > 0);
+
+      // Update ripples
+      for (const r of this.ripples) {
+        r.r += (r.maxR - r.r) * dt * 8;
+        r.life -= dt * 4;
+      }
+      this.ripples = this.ripples.filter(r => r.life > 0);
+
+      // Update score popups
+      for (const sp of this.scorePopups) {
+        sp.y += sp.vy * dt;
+        sp.vy -= 60 * dt; // decelerate
+        sp.life -= dt * 2.5;
+      }
+      this.scorePopups = this.scorePopups.filter(sp => sp.life > 0);
+
+      this.render(now);
+      this.loopId = requestAnimationFrame(loop);
+    };
+    this.loopId = requestAnimationFrame(loop);
+  }
+
+  private spawnMergeEffects(tile: AnimatedTile): void {
+    const cx = gridToPixel(tile.col) + CELL_SIZE / 2;
+    const cy = gridToPixel(tile.row) + CELL_SIZE / 2;
+    const colors = TILE_COLORS[tile.value] || { bg: '#ffffff', text: '#27272a' };
+
+    // Particles
+    const count = tile.value >= 96 ? 12 : 8;
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+      const speed = 80 + Math.random() * 100;
+      this.particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 30,
+        life: 1,
+        color: colors.bg,
+        size: 3 + Math.random() * 4,
+      });
     }
 
-    this.render();
+    // Ripple ring
+    this.ripples.push({
+      x: cx, y: cy,
+      r: CELL_SIZE * 0.3,
+      maxR: CELL_SIZE * 1.1,
+      life: 1,
+      color: colors.bg,
+    });
+  }
 
-    if (progress < 1) {
-      this.animationFrameId = requestAnimationFrame(this.animate);
-    } else {
-      // Animation complete
-      this.animating = false;
-      
-      // Finalize tile states
-      for (const tile of this.tiles) {
-        tile.displayX = tile.targetX;
-        tile.displayY = tile.targetY;
-        tile.scale = 1;
-        tile.opacity = 1;
-        tile.merged = false;
-        tile.isNew = false;
-      }
-
-      this.updateScore();
-
-      if (!this.canMove()) {
-        this.gameOver = true;
-        this.statusEl.textContent = 'GAME OVER';
-        this.statusEl.className = 'text-red-500 font-bold text-lg';
-      }
-
-      this.render();
+  private spawnGameOverParticles(): void {
+    const canvasSize = GRID_SIZE * (CELL_SIZE + CELL_GAP) + CELL_GAP;
+    for (let i = 0; i < 40; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 60 + Math.random() * 160;
+      this.particles.push({
+        x: canvasSize / 2 + (Math.random() - 0.5) * 100,
+        y: canvasSize / 2 + (Math.random() - 0.5) * 100,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 80,
+        life: 1,
+        color: ['#ef4444', '#f97316', '#facc15', '#a855f7', '#38bdf8'][Math.floor(Math.random() * 5)],
+        size: 4 + Math.random() * 6,
+      });
     }
-  };
+  }
 
   private moveTiles(direction: Direction): { newTiles: AnimatedTile[]; moved: boolean; mergedIds: Set<number> } {
     let moved = false;
@@ -481,7 +588,25 @@ export class ThreesGame {
   }
 
   private updateScore(): void {
-    this.score = calculateScore(this.tiles);
+    const newScore = calculateScore(this.tiles);
+    const gained = newScore - this.prevScore;
+    this.score = newScore;
+    this.prevScore = newScore;
+
+    if (gained > 0) {
+      // Find a merged tile to place the popup near
+      const canvasSize = GRID_SIZE * (CELL_SIZE + CELL_GAP) + CELL_GAP;
+      const cx = canvasSize / 2 + (Math.random() - 0.5) * 60;
+      const cy = canvasSize / 2;
+      this.scorePopups.push({
+        x: cx, y: cy,
+        vy: -90,
+        text: `+${gained}`,
+        life: 1,
+        color: gained >= 27 ? '#a855f7' : gained >= 9 ? '#f97316' : '#22c55e',
+      });
+    }
+
     if (this.score > this.highScore) {
       this.highScore = this.score;
       this.saveHighScore();
@@ -496,23 +621,56 @@ export class ThreesGame {
     this.nextTileEl.style.backgroundColor = colors.bg;
     this.nextTileEl.style.color = colors.text;
     this.nextTileEl.textContent = this.nextTile.toString();
+
+    // Bounce animation on change
+    this.nextTileEl.style.transition = 'transform 0s';
+    this.nextTileEl.style.transform = 'scale(1.3)';
+    requestAnimationFrame(() => {
+      this.nextTileEl.style.transition = 'transform 300ms cubic-bezier(0.34,1.56,0.64,1)';
+      this.nextTileEl.style.transform = 'scale(1)';
+    });
+
+    // Update merge hint label (sibling element)
+    const hintEl = this.nextTileEl.parentElement?.querySelector('#threes-next-hint') as HTMLElement | null;
+    if (hintEl) {
+      let mergeWith = '';
+      if (this.nextTile === 1) mergeWith = '+2→3';
+      else if (this.nextTile === 2) mergeWith = '+1→3';
+      else mergeWith = `+${this.nextTile}→${this.nextTile * 2}`;
+      hintEl.textContent = mergeWith;
+    }
   }
 
-  private render(): void {
+  private render(now = 0): void {
     const canvasSize = GRID_SIZE * (CELL_SIZE + CELL_GAP) + CELL_GAP;
-    
+    const ctx = this.ctx;
+
     // Clear canvas
-    this.ctx.fillStyle = '#a1a1aa';
-    this.ctx.fillRect(0, 0, canvasSize, canvasSize);
+    ctx.fillStyle = '#a1a1aa';
+    ctx.fillRect(0, 0, canvasSize, canvasSize);
 
     // Draw empty cells
     for (let r = 0; r < GRID_SIZE; r++) {
       for (let c = 0; c < GRID_SIZE; c++) {
         const x = CELL_GAP + c * (CELL_SIZE + CELL_GAP);
         const y = CELL_GAP + r * (CELL_SIZE + CELL_GAP);
-        this.ctx.fillStyle = '#d4d4d8';
+        ctx.fillStyle = '#d4d4d8';
         this.roundRect(x, y, CELL_SIZE, CELL_SIZE, 8);
       }
+    }
+
+    // Draw ripples (under tiles)
+    for (const rip of this.ripples) {
+      ctx.save();
+      ctx.globalAlpha = rip.life * 0.5;
+      ctx.strokeStyle = rip.color;
+      ctx.lineWidth = 3 * rip.life;
+      ctx.shadowColor = rip.color;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(rip.x, rip.y, rip.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
     }
 
     // Draw tiles (sorted by merge state so merged tiles render on top)
@@ -523,27 +681,54 @@ export class ThreesGame {
     });
 
     for (const tile of sortedTiles) {
-      this.drawTile(tile);
+      this.drawTile(tile, now);
+    }
+
+    // Draw particles (over tiles)
+    for (const p of this.particles) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life) * 0.9;
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Draw score popups
+    for (const sp of this.scorePopups) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, sp.life);
+      ctx.fillStyle = sp.color;
+      ctx.shadowColor = sp.color;
+      ctx.shadowBlur = 10;
+      ctx.font = `bold ${18 + (1 - sp.life) * 8}px Inter, system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(sp.text, sp.x, sp.y);
+      ctx.restore();
     }
 
     // Game over overlay
     if (this.gameOver) {
-      this.ctx.fillStyle = 'rgba(24, 24, 27, 0.85)';
-      this.ctx.fillRect(0, 0, canvasSize, canvasSize);
+      ctx.fillStyle = 'rgba(24, 24, 27, 0.85)';
+      ctx.fillRect(0, 0, canvasSize, canvasSize);
 
-      this.ctx.fillStyle = '#ffffff';
-      this.ctx.font = 'bold 28px Inter, sans-serif';
-      this.ctx.textAlign = 'center';
-      this.ctx.textBaseline = 'middle';
-      this.ctx.fillText('Game Over!', canvasSize / 2, canvasSize / 2 - 20);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Game Over!', canvasSize / 2, canvasSize / 2 - 20);
 
-      this.ctx.font = '18px Inter, sans-serif';
-      this.ctx.fillStyle = '#a1a1aa';
-      this.ctx.fillText(`Final Score: ${this.score}`, canvasSize / 2, canvasSize / 2 + 15);
+      ctx.font = '18px Inter, sans-serif';
+      ctx.fillStyle = '#a1a1aa';
+      ctx.fillText(`Final Score: ${this.score}`, canvasSize / 2, canvasSize / 2 + 15);
     }
   }
 
-  private drawTile(tile: AnimatedTile): void {
+  private drawTile(tile: AnimatedTile, now = 0): void {
     const colors = TILE_COLORS[tile.value] || { bg: '#ffffff', text: '#27272a' };
     const centerX = tile.displayX + CELL_SIZE / 2;
     const centerY = tile.displayY + CELL_SIZE / 2;
@@ -554,10 +739,18 @@ export class ThreesGame {
     this.ctx.save();
     this.ctx.globalAlpha = tile.opacity;
 
-    // Shadow
-    this.ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
-    this.ctx.shadowBlur = 6;
-    this.ctx.shadowOffsetY = 3;
+    // Idle glow for high-value tiles (≥96)
+    if (tile.value >= 96 && !tile.isNew) {
+      const pulse = 0.5 + 0.5 * Math.sin(now / 900 + tile.id * 1.3);
+      const glowIntensity = tile.value >= 768 ? 22 : tile.value >= 192 ? 16 : 10;
+      this.ctx.shadowColor = colors.bg;
+      this.ctx.shadowBlur = glowIntensity * pulse + 4;
+    } else {
+      // Standard shadow
+      this.ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+      this.ctx.shadowBlur = 6;
+      this.ctx.shadowOffsetY = 3;
+    }
 
     // Tile background
     this.ctx.fillStyle = colors.bg;
@@ -567,6 +760,16 @@ export class ThreesGame {
     this.ctx.shadowColor = 'transparent';
     this.ctx.shadowBlur = 0;
     this.ctx.shadowOffsetY = 0;
+
+    // Shine overlay for high tiles
+    if (tile.value >= 192 && tile.scale > 0.8) {
+      const shimmer = 0.5 + 0.5 * Math.sin(now / 700 + tile.id * 2.1);
+      const grad = this.ctx.createLinearGradient(x, y, x + scaledSize, y + scaledSize * 0.5);
+      grad.addColorStop(0, `rgba(255,255,255,${0.15 * shimmer})`);
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      this.ctx.fillStyle = grad;
+      this.roundRect(x, y, scaledSize, scaledSize, 8 * tile.scale);
+    }
 
     // Tile value
     const fontSize = tile.value >= 1000 ? 20 : tile.value >= 100 ? 24 : 28;
@@ -595,21 +798,20 @@ export class ThreesGame {
   }
 
   reset(): void {
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
     this.animating = false;
+    this.particles = [];
+    this.ripples = [];
+    this.scorePopups = [];
+    this.prevScore = 0;
     this.initializeGrid();
     this.statusEl.textContent = '';
     this.statusEl.className = '';
-    this.render();
   }
 
   destroy(): void {
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
+    if (this.loopId) {
+      cancelAnimationFrame(this.loopId);
+      this.loopId = null;
     }
     if (this.keyHandler) {
       window.removeEventListener('keydown', this.keyHandler);

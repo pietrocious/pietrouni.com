@@ -382,6 +382,15 @@ export class NetworkTopologyVisualizer {
   private dragOffsetY = 0;
   private animationId: number | null = null;
 
+  // Zoom/pan state
+  private zoomLevel = 1;
+  private panX = 0;
+  private panY = 0;
+  private isPanning = false;
+  private panStartX = 0;
+  private panStartY = 0;
+  private zoomEl: HTMLElement | null = null;
+
   constructor(container: HTMLElement) {
     this.canvas = container.querySelector('#netmap-canvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
@@ -391,10 +400,15 @@ export class NetworkTopologyVisualizer {
     this.errorEl = container.querySelector('#netmap-errors')!;
     this.detailsEl = container.querySelector('#netmap-details')!;
 
+    this.zoomEl = container.querySelector('#netmap-zoom') as HTMLElement;
+
     // Template buttons
     container.querySelector('#netmap-lldp')?.addEventListener('click', () => this.loadTemplate('lldp'));
     container.querySelector('#netmap-cdp')?.addEventListener('click', () => this.loadTemplate('cdp'));
     container.querySelector('#netmap-routing')?.addEventListener('click', () => this.loadTemplate('routing'));
+
+    // Export PNG
+    container.querySelector('#netmap-export')?.addEventListener('click', () => this.exportPNG());
 
     // Code input
     this.textarea.addEventListener('input', () => this.parseAndRender());
@@ -405,11 +419,36 @@ export class NetworkTopologyVisualizer {
     this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
     this.canvas.addEventListener('mouseleave', () => this.handleMouseUp());
     this.canvas.addEventListener('click', (e) => this.handleClick(e));
+    this.canvas.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
 
     // Initialize
     this.textarea.value = SAMPLE_LLDP;
     this.parseAndRender();
     this.startAnimation();
+  }
+
+  private screenToWorld(sx: number, sy: number): { x: number; y: number } {
+    return { x: (sx - this.panX) / this.zoomLevel, y: (sy - this.panY) / this.zoomLevel };
+  }
+
+  private handleWheel(e: WheelEvent): void {
+    e.preventDefault();
+    const rect = this.canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const factor = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.max(0.2, Math.min(4, this.zoomLevel * factor));
+    this.panX = mx - (mx - this.panX) * (newZoom / this.zoomLevel);
+    this.panY = my - (my - this.panY) * (newZoom / this.zoomLevel);
+    this.zoomLevel = newZoom;
+    if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+  }
+
+  private exportPNG(): void {
+    const link = document.createElement('a');
+    link.download = 'network-topology.png';
+    link.href = this.canvas.toDataURL('image/png');
+    link.click();
   }
 
   private loadTemplate(type: 'lldp' | 'cdp' | 'routing'): void {
@@ -473,8 +512,12 @@ export class NetworkTopologyVisualizer {
     const repulsion = 8000;
     const attraction = 0.006;
     const centerForce = 0.001;
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
+    const worldW = this.canvas.width / this.zoomLevel;
+    const worldH = this.canvas.height / this.zoomLevel;
+    const worldOriginX = -this.panX / this.zoomLevel;
+    const worldOriginY = -this.panY / this.zoomLevel;
+    const centerX = worldOriginX + worldW / 2;
+    const centerY = worldOriginY + worldH / 2;
 
     // Repulsion between devices
     for (let i = 0; i < this.devices.length; i++) {
@@ -519,8 +562,6 @@ export class NetworkTopologyVisualizer {
         device.vy *= damping;
         device.x += device.vx;
         device.y += device.vy;
-        device.x = Math.max(60, Math.min(this.canvas.width - 60, device.x));
-        device.y = Math.max(35, Math.min(this.canvas.height - 35, device.y));
       }
     }
   }
@@ -530,18 +571,27 @@ export class NetworkTopologyVisualizer {
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Grid
+    ctx.save();
+    ctx.translate(this.panX, this.panY);
+    ctx.scale(this.zoomLevel, this.zoomLevel);
+
+    // Grid (world space)
+    const gridStep = 40;
+    const worldX0 = -this.panX / this.zoomLevel;
+    const worldY0 = -this.panY / this.zoomLevel;
+    const worldX1 = worldX0 + this.canvas.width / this.zoomLevel;
+    const worldY1 = worldY0 + this.canvas.height / this.zoomLevel;
     ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < this.canvas.width; x += 40) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, this.canvas.height); ctx.stroke();
+    ctx.lineWidth = 1 / this.zoomLevel;
+    for (let x = Math.floor(worldX0 / gridStep) * gridStep; x < worldX1; x += gridStep) {
+      ctx.beginPath(); ctx.moveTo(x, worldY0); ctx.lineTo(x, worldY1); ctx.stroke();
     }
-    for (let y = 0; y < this.canvas.height; y += 40) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(this.canvas.width, y); ctx.stroke();
+    for (let y = Math.floor(worldY0 / gridStep) * gridStep; y < worldY1; y += gridStep) {
+      ctx.beginPath(); ctx.moveTo(worldX0, y); ctx.lineTo(worldX1, y); ctx.stroke();
     }
 
     // Links
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2 / this.zoomLevel;
     for (const link of this.links) {
       const source = this.devices.find(d => d.id === link.source);
       const target = this.devices.find(d => d.id === link.target);
@@ -607,7 +657,9 @@ export class NetworkTopologyVisualizer {
       }
     }
 
-    // Legend
+    ctx.restore();
+
+    // Legend (screen space)
     this.drawLegend();
 
     // Empty state
@@ -663,8 +715,9 @@ export class NetworkTopologyVisualizer {
 
   private handleMouseDown(e: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const { x, y } = this.screenToWorld(sx, sy);
     const device = this.getDeviceAt(x, y);
 
     if (device) {
@@ -673,19 +726,28 @@ export class NetworkTopologyVisualizer {
       this.dragOffsetX = x - device.x;
       this.dragOffsetY = y - device.y;
       this.canvas.style.cursor = 'grabbing';
+    } else {
+      this.isPanning = true;
+      this.panStartX = sx - this.panX;
+      this.panStartY = sy - this.panY;
+      this.canvas.style.cursor = 'grabbing';
     }
   }
 
   private handleMouseMove(e: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const { x, y } = this.screenToWorld(sx, sy);
 
     if (this.isDragging && this.dragDevice) {
       this.dragDevice.x = x - this.dragOffsetX;
       this.dragDevice.y = y - this.dragOffsetY;
       this.dragDevice.vx = 0;
       this.dragDevice.vy = 0;
+    } else if (this.isPanning) {
+      this.panX = sx - this.panStartX;
+      this.panY = sy - this.panStartY;
     } else {
       this.hoveredDevice = this.getDeviceAt(x, y);
       this.canvas.style.cursor = this.hoveredDevice ? 'grab' : 'default';
@@ -695,13 +757,16 @@ export class NetworkTopologyVisualizer {
   private handleMouseUp(): void {
     this.isDragging = false;
     this.dragDevice = null;
+    this.isPanning = false;
+    this.canvas.style.cursor = 'default';
   }
 
   private handleClick(e: MouseEvent): void {
-    if (this.isDragging) return;
+    if (this.isDragging || this.isPanning) return;
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const { x, y } = this.screenToWorld(sx, sy);
     this.selectedDevice = this.getDeviceAt(x, y);
     this.updateDetails();
   }

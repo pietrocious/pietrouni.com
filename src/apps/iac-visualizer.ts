@@ -358,6 +358,15 @@ export class IaCVisualizer {
   private dragOffsetY = 0;
   private animationId: number | null = null;
 
+  // Zoom/pan state
+  private zoomLevel = 1;
+  private panX = 0;
+  private panY = 0;
+  private isPanning = false;
+  private panStartX = 0;
+  private panStartY = 0;
+  private zoomEl: HTMLElement | null = null;
+
   constructor(container: HTMLElement) {
     this.canvas = container.querySelector('#iac-canvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
@@ -367,10 +376,15 @@ export class IaCVisualizer {
     this.errorEl = container.querySelector('#iac-errors')!;
     this.detailsEl = container.querySelector('#iac-details')!;
 
+    this.zoomEl = container.querySelector('#iac-zoom') as HTMLElement;
+
     // Template buttons
     container.querySelector('#iac-terraform')?.addEventListener('click', () => this.loadTemplate('terraform'));
     container.querySelector('#iac-kubernetes')?.addEventListener('click', () => this.loadTemplate('kubernetes'));
     container.querySelector('#iac-microservices')?.addEventListener('click', () => this.loadTemplate('microservices'));
+
+    // Export PNG
+    container.querySelector('#iac-export')?.addEventListener('click', () => this.exportPNG());
 
     // Code input
     this.textarea.addEventListener('input', () => this.parseAndRender());
@@ -381,6 +395,7 @@ export class IaCVisualizer {
     this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
     this.canvas.addEventListener('mouseleave', () => this.handleMouseUp());
     this.canvas.addEventListener('click', (e) => this.handleClick(e));
+    this.canvas.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
 
     // Initialize
     this.textarea.value = SAMPLE_TERRAFORM;
@@ -396,6 +411,30 @@ export class IaCVisualizer {
     }
     this.selectedNode = null;
     this.parseAndRender();
+  }
+
+  private screenToWorld(sx: number, sy: number): { x: number; y: number } {
+    return { x: (sx - this.panX) / this.zoomLevel, y: (sy - this.panY) / this.zoomLevel };
+  }
+
+  private handleWheel(e: WheelEvent): void {
+    e.preventDefault();
+    const rect = this.canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const factor = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.max(0.2, Math.min(4, this.zoomLevel * factor));
+    this.panX = mx - (mx - this.panX) * (newZoom / this.zoomLevel);
+    this.panY = my - (my - this.panY) * (newZoom / this.zoomLevel);
+    this.zoomLevel = newZoom;
+    if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+  }
+
+  private exportPNG(): void {
+    const link = document.createElement('a');
+    link.download = 'iac-graph.png';
+    link.href = this.canvas.toDataURL('image/png');
+    link.click();
   }
 
   private parseAndRender(): void {
@@ -443,8 +482,13 @@ export class IaCVisualizer {
     const repulsion = 6000;
     const attraction = 0.008;
     const centerForce = 0.0008;
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
+    // World-space center (canvas dims divided by zoom gives world extent)
+    const worldW = this.canvas.width / this.zoomLevel;
+    const worldH = this.canvas.height / this.zoomLevel;
+    const worldOriginX = -this.panX / this.zoomLevel;
+    const worldOriginY = -this.panY / this.zoomLevel;
+    const centerX = worldOriginX + worldW / 2;
+    const centerY = worldOriginY + worldH / 2;
 
     // Repulsion between nodes
     for (let i = 0; i < this.nodes.length; i++) {
@@ -490,8 +534,6 @@ export class IaCVisualizer {
         node.vy *= damping;
         node.x += node.vx;
         node.y += node.vy;
-        node.x = Math.max(70, Math.min(this.canvas.width - 70, node.x));
-        node.y = Math.max(35, Math.min(this.canvas.height - 35, node.y));
       }
     }
   }
@@ -501,18 +543,27 @@ export class IaCVisualizer {
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Grid
+    ctx.save();
+    ctx.translate(this.panX, this.panY);
+    ctx.scale(this.zoomLevel, this.zoomLevel);
+
+    // Grid (in world space)
+    const gridStep = 40;
+    const worldX0 = -this.panX / this.zoomLevel;
+    const worldY0 = -this.panY / this.zoomLevel;
+    const worldX1 = worldX0 + this.canvas.width / this.zoomLevel;
+    const worldY1 = worldY0 + this.canvas.height / this.zoomLevel;
     ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < this.canvas.width; x += 40) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, this.canvas.height); ctx.stroke();
+    ctx.lineWidth = 1 / this.zoomLevel;
+    for (let x = Math.floor(worldX0 / gridStep) * gridStep; x < worldX1; x += gridStep) {
+      ctx.beginPath(); ctx.moveTo(x, worldY0); ctx.lineTo(x, worldY1); ctx.stroke();
     }
-    for (let y = 0; y < this.canvas.height; y += 40) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(this.canvas.width, y); ctx.stroke();
+    for (let y = Math.floor(worldY0 / gridStep) * gridStep; y < worldY1; y += gridStep) {
+      ctx.beginPath(); ctx.moveTo(worldX0, y); ctx.lineTo(worldX1, y); ctx.stroke();
     }
 
     // Connections
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 2 / this.zoomLevel;
     for (const node of this.nodes) {
       for (const connId of node.connections) {
         const target = this.nodes.find(n => n.id === connId);
@@ -577,7 +628,9 @@ export class IaCVisualizer {
       ctx.fillText(node.name.slice(0, 16), node.x, node.y + 8);
     }
 
-    // Legend
+    ctx.restore();
+
+    // Legend (screen space)
     this.drawLegend();
 
     // Empty state
@@ -634,8 +687,9 @@ export class IaCVisualizer {
 
   private handleMouseDown(e: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const { x, y } = this.screenToWorld(sx, sy);
     const node = this.getNodeAt(x, y);
 
     if (node) {
@@ -644,19 +698,28 @@ export class IaCVisualizer {
       this.dragOffsetX = x - node.x;
       this.dragOffsetY = y - node.y;
       this.canvas.style.cursor = 'grabbing';
+    } else {
+      this.isPanning = true;
+      this.panStartX = sx - this.panX;
+      this.panStartY = sy - this.panY;
+      this.canvas.style.cursor = 'grabbing';
     }
   }
 
   private handleMouseMove(e: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const { x, y } = this.screenToWorld(sx, sy);
 
     if (this.isDragging && this.dragNode) {
       this.dragNode.x = x - this.dragOffsetX;
       this.dragNode.y = y - this.dragOffsetY;
       this.dragNode.vx = 0;
       this.dragNode.vy = 0;
+    } else if (this.isPanning) {
+      this.panX = sx - this.panStartX;
+      this.panY = sy - this.panStartY;
     } else {
       this.hoveredNode = this.getNodeAt(x, y);
       this.canvas.style.cursor = this.hoveredNode ? 'grab' : 'default';
@@ -666,13 +729,16 @@ export class IaCVisualizer {
   private handleMouseUp(): void {
     this.isDragging = false;
     this.dragNode = null;
+    this.isPanning = false;
+    this.canvas.style.cursor = 'default';
   }
 
   private handleClick(e: MouseEvent): void {
-    if (this.isDragging) return;
+    if (this.isDragging || this.isPanning) return;
     const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    const { x, y } = this.screenToWorld(sx, sy);
     this.selectedNode = this.getNodeAt(x, y);
     this.updateDetails();
   }
