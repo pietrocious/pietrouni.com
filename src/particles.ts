@@ -32,28 +32,30 @@ const FRICTION = 0.98;
 const INTERACTION_RADIUS = 150;
 const INTERACTION_FORCE = 3.5;
 
-// Site-themed palette — muted, elegant tones
-const COLORS_LIGHT = [
-  '#4a7c9d', // primary blue
-  '#5b9ab8', // lighter blue
-  '#d4a574', // warm amber
-  '#8fb8a0', // sage green
-  '#c4917a', // terracotta
-  '#b8ccd8', // pale blue
+// Per-wallpaper palettes (index matches wallpapers array: 0=Sonoma, 1=Sequoia, 2=Ventura)
+const PALETTES_LIGHT = [
+  // Sonoma — cool blues & lavender
+  ['#93c5fd', '#c4b5fd', '#a5b4fc', '#818cf8', '#bfdbfe', '#ddd6fe'],
+  // Sequoia — warm ambers & rose
+  ['#fdba74', '#fb923c', '#fca5a5', '#fde047', '#f97316', '#fbbf24'],
+  // Ventura — teal, mint & periwinkle
+  ['#99f6e4', '#a7f3d0', '#c4b5fd', '#a5b4fc', '#6ee7b7', '#c7d2fe'],
 ];
 
-const COLORS_DARK = [
-  '#5b9ab8', // blue
-  '#7ab5cc', // lighter blue
-  '#d4a574', // warm amber
-  '#a0c9b2', // sage green
-  '#d9a48f', // soft terracotta
-  '#8aa8b8', // steel blue
+const PALETTES_DARK = [
+  // Sonoma dark — deep blues & purple
+  ['#3b82f6', '#8b5cf6', '#6366f1', '#60a5fa', '#7c3aed', '#4f46e5'],
+  // Sequoia dark — forest & navy
+  ['#166534', '#064e3b', '#1e3a8a', '#14532d', '#1e40af', '#15803d'],
+  // Ventura dark — teal & violet
+  ['#14b8a6', '#06b6d4', '#8b5cf6', '#7c3aed', '#0891b2', '#6d28d9'],
 ];
+
+let currentPaletteIndex = 0;
 
 function createParticle(randomY = true): Particle {
   const isDark = document.documentElement.classList.contains('dark');
-  const colors = isDark ? COLORS_DARK : COLORS_LIGHT;
+  const colors = isDark ? PALETTES_DARK[currentPaletteIndex] : PALETTES_LIGHT[currentPaletteIndex];
 
   return {
     x: Math.random() * width,
@@ -188,6 +190,16 @@ function handleTouchMove(e: TouchEvent): void {
 function handleMouseLeave(): void {
   mouseX = -1000;
   mouseY = -1000;
+}
+
+export function updateParticleTheme(wallpaperIndex: number): void {
+  currentPaletteIndex = Math.min(wallpaperIndex, PALETTES_LIGHT.length - 1);
+  // Recolor existing particles gradually — reassign colors so new ones match
+  const isDark = document.documentElement.classList.contains('dark');
+  const colors = isDark ? PALETTES_DARK[currentPaletteIndex] : PALETTES_LIGHT[currentPaletteIndex];
+  for (const p of particles) {
+    p.color = colors[Math.floor(Math.random() * colors.length)];
+  }
 }
 
 export function initParticles(): void {

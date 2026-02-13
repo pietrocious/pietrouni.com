@@ -165,24 +165,44 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
       0% 50%,
       100% 50%,
       50% 100%;
+    background-size:
+      200% 200%,
+      200% 200%,
+      200% 200%,
+      100% 100%;
   }
   25% {
     background-position:
       50% 0%,
       0% 100%,
       100% 50%;
+    background-size:
+      240% 220%,
+      180% 250%,
+      220% 200%,
+      100% 100%;
   }
   50% {
     background-position:
       100% 50%,
       50% 0%,
       0% 50%;
+    background-size:
+      260% 200%,
+      200% 180%,
+      180% 260%,
+      100% 100%;
   }
   75% {
     background-position:
       50% 100%,
       100% 50%,
       50% 0%;
+    background-size:
+      200% 250%,
+      240% 200%,
+      210% 220%,
+      100% 100%;
   }
 }
 
@@ -204,12 +224,8 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
       transparent 50%
     ),
     linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f0fdff 100%);
-  background-size:
-    200% 200%,
-    200% 200%,
-    200% 200%,
-    100% 100%;
   animation: sonomaFlow 20s ease-in-out infinite;
+  will-change: background-position, background-size;
 }
 
 .sonoma-bg-dark {
@@ -230,12 +246,8 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
       transparent 50%
     ),
     linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0c4a6e 100%);
-  background-size:
-    200% 200%,
-    200% 200%,
-    200% 200%,
-    100% 100%;
   animation: sonomaFlow 20s ease-in-out infinite;
+  will-change: background-position, background-size;
 }
 
 /* Sequoia Gradient - Rich Layered Diagonals */
@@ -245,11 +257,19 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
     background-position:
       0% 0%,
       100% 100%;
+    background-size:
+      200% 200%,
+      200% 200%,
+      100% 100%;
   }
   50% {
     background-position:
       100% 100%,
       0% 0%;
+    background-size:
+      260% 230%,
+      230% 260%,
+      100% 100%;
   }
 }
 
@@ -268,11 +288,8 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
       transparent 70%
     ),
     linear-gradient(180deg, #fffbeb 0%, #fef3c7 50%, #ffedd5 100%);
-  background-size:
-    200% 200%,
-    200% 200%,
-    100% 100%;
-  animation: sequoiaShift 15s ease-in-out infinite;
+  animation: sequoiaShift 15s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: background-position, background-size;
 }
 
 .sequoia-bg-dark {
@@ -290,11 +307,8 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
       transparent 70%
     ),
     linear-gradient(180deg, #052e16 0%, #0c1629 50%, #0a0a0a 100%);
-  background-size:
-    200% 200%,
-    200% 200%,
-    100% 100%;
-  animation: sequoiaShift 15s ease-in-out infinite;
+  animation: sequoiaShift 15s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: background-position, background-size;
 }
 
 /* Ventura Waves - Smooth Flowing Layers */
@@ -305,18 +319,33 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
       0% 50%,
       50% 0%,
       100% 50%;
+    background-size:
+      300% 300%,
+      300% 300%,
+      300% 300%,
+      100% 100%;
   }
   33% {
     background-position:
       100% 50%,
       0% 50%,
       50% 100%;
+    background-size:
+      350% 280%,
+      280% 350%,
+      320% 300%,
+      100% 100%;
   }
   66% {
     background-position:
       50% 100%,
       100% 50%,
       0% 50%;
+    background-size:
+      280% 350%,
+      330% 290%,
+      290% 340%,
+      100% 100%;
   }
 }
 
@@ -341,12 +370,8 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
       transparent 80%
     ),
     linear-gradient(135deg, #f0fdfa 0%, #faf5ff 50%, #eef2ff 100%);
-  background-size:
-    300% 300%,
-    300% 300%,
-    300% 300%,
-    100% 100%;
-  animation: venturaWave 18s ease-in-out infinite;
+  animation: venturaWave 18s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  will-change: background-position, background-size;
 }
 
 .ventura-bg-dark {
@@ -370,12 +395,8 @@ html.dark *:hover::-webkit-scrollbar-thumb:hover {
       transparent 80%
     ),
     linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #134e4a 100%);
-  background-size:
-    300% 300%,
-    300% 300%,
-    300% 300%,
-    100% 100%;
-  animation: venturaWave 18s ease-in-out infinite;
+  animation: venturaWave 18s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  will-change: background-position, background-size;
 }
 
 /* Wallpaper Picker Thumbnails - Dark Mode Overrides */
@@ -451,6 +472,23 @@ html.dark .ventura-bg {
     300% 300%,
     300% 300%,
     100% 100%;
+}
+
+/* Wallpaper cross-fade overlay */
+#desktop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background: inherit;
+}
+
+#desktop.wallpaper-transitioning::before {
+  opacity: 1;
+  transition: opacity 0s; /* snap visible instantly */
 }
 
 /* Cards / Windows (Tactile, not Glass) */

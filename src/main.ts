@@ -9,7 +9,7 @@ import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topo
 import { initThrees, destroyThrees } from './games/threes';
 import { initDock, dockBounce, refreshDockItems } from './dock';
 import { animateWindowContent } from './animations';
-import { initParticles } from './particles';
+import { initParticles, destroyParticles, updateParticleTheme } from './particles';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
 import { initTicTacToe, destroyTicTacToe } from './games/tic-tac-toe';
 import { initGame2048, destroyGame2048 } from './games/game-2048';
@@ -75,20 +75,41 @@ document.addEventListener("DOMContentLoaded", () => {
           dockContainer.addEventListener('click', () => playClick());
         }
 
-        function applyWallpaper() {
+        function applyWallpaper(animate = false) {
           const isDark = document.documentElement.classList.contains("dark");
           const wp = wallpapers[activeWallpaperIndex];
           const desktop = document.getElementById("desktop");
+          if (!desktop) return;
 
-          // Reset - remove all wallpaper classes and inline styles
-          desktop.style.background = "";
-          allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
-
-          if (wp.type === "class") {
-            desktop.classList.add(isDark ? wp.dark : wp.light);
+          if (animate) {
+            // Cross-fade: freeze current look in ::before, swap underneath, then fade ::before out
+            desktop.classList.add("wallpaper-transitioning");
+            requestAnimationFrame(() => {
+              // swap classes while ::before holds the old look at opacity 1
+              desktop.style.background = "";
+              allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
+              if (wp.type === "class") {
+                desktop.classList.add(isDark ? wp.dark : wp.light);
+              } else {
+                desktop.style.background = isDark ? wp.dark : wp.light;
+              }
+              // On next frame, remove class → ::before transitions to opacity 0
+              requestAnimationFrame(() => {
+                desktop.classList.remove("wallpaper-transitioning");
+              });
+            });
           } else {
-            desktop.style.background = isDark ? wp.dark : wp.light;
+            desktop.style.background = "";
+            allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
+            if (wp.type === "class") {
+              desktop.classList.add(isDark ? wp.dark : wp.light);
+            } else {
+              desktop.style.background = isDark ? wp.dark : wp.light;
+            }
           }
+
+          // Sync particle colors to wallpaper
+          updateParticleTheme(activeWallpaperIndex);
         }
 
         // theme + wallpaper
@@ -193,14 +214,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         window.cycleWallpaper = function () {
           setActiveWallpaperIndex((activeWallpaperIndex + 1) % wallpapers.length);
-          applyWallpaper();
+          applyWallpaper(true);
         };
 
         // set wallpaper by index (for settings grid)
         window.setWallpaper = function (index: number) {
           if (index >= 0 && index < wallpapers.length) {
             setActiveWallpaperIndex(index);
-            applyWallpaper();
+            applyWallpaper(true);
           }
         };
 
