@@ -3,14 +3,17 @@ import { marked } from 'marked';
 // config - static data
 import { vaultData, fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
 import { getVaultContent } from './vault';
-import { initTetris, destroyTetris } from './apps/tetris';
+import { initTetris, destroyTetris } from './games/tetris';
 import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
 import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topology';
-import { initThrees, destroyThrees } from './apps/threes';
+import { initThrees, destroyThrees } from './games/threes';
 import { initDock, dockBounce } from './dock';
 import { animateWindowContent } from './animations';
 import { initParticles } from './particles';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
+import { initTicTacToe, destroyTicTacToe } from './games/tic-tac-toe';
+import { initGame2048, destroyGame2048 } from './games/game-2048';
+import { initSnake, destroySnake } from './games/snake';
 
 
 // state - shared app state with setters for mutations
@@ -305,6 +308,8 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
             { id: "monitor", title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
             { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
+            { id: "tictactoe", title: "Tic Tac Toe", icon: "assets/icons/kmines.svg" },
+            { id: "game2048", title: "2048", icon: "assets/icons/gnome-sudoku.svg" },
             { id: "sysinfo", title: "About pietrOS", icon: "assets/icons/contacts.svg" },
           ];
 
@@ -791,6 +796,68 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 1000,
             height: 700,
           },
+
+          tictactoe: {
+            title: "Tic Tac Toe",
+            content: `
+                    <div id="ttt-container" class="h-full flex flex-col items-center justify-center bg-gray-50 select-none p-4 w-full">
+                        <!-- Canvas injected by TS -->
+                    </div>
+                `,
+            width: 500,
+            height: 620,
+            onOpen: () => {
+              // slight delay to ensure DOM is ready
+              setTimeout(() => {
+                const container = document.getElementById("ttt-container");
+                if (container) initTicTacToe(container);
+              }, 50);
+            },
+            onClose: () => {
+              destroyTicTacToe();
+            },
+          },
+
+          game2048: {
+            title: "2048",
+            content: `
+                    <div id="game2048-container" class="h-full flex flex-col items-center justify-center bg-[#faf8ef] select-none p-4 w-full">
+                        <!-- Canvas injected by TS -->
+                    </div>
+                `,
+            width: 500,
+            height: 650,
+            onOpen: () => {
+              setTimeout(() => {
+                const container = document.getElementById("game2048-container");
+                if (container) initGame2048(container);
+              }, 50);
+            },
+            onClose: () => {
+              destroyGame2048();
+            },
+          },
+
+          snake: {
+            title: "Snake",
+            content: `
+                    <div id="snake-container" class="h-full flex flex-col items-center justify-center bg-[#578a34] select-none p-4 w-full">
+                        <!-- Canvas injected by TS -->
+                    </div>
+                `,
+            width: 480,
+            height: 600,
+            onOpen: () => {
+              setTimeout(() => {
+                const container = document.getElementById("snake-container");
+                if (container) initSnake(container);
+              }, 50);
+            },
+            onClose: () => {
+              destroySnake();
+            },
+          },
+
           experiments: {
             title: "Experiments Lab",
             content: `
@@ -810,6 +877,51 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
+                                    <!-- Snake -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:shadow-lg transition-all cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.openWindow('snake');">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">🐍 Snake</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Classic arcade snake game. Eat food, grow longer, avoid walls and yourself!</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5">
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">ARCADE</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 2048 -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:shadow-lg transition-all cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.openWindow('game2048');">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">🔢 2048</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Addictive number merging puzzle. Reach the 2048 tile!</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5">
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PUZZLE</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tic Tac Toe -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:shadow-lg transition-all cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.openWindow('tictactoe');">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">⭕❌ Tic Tac Toe</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">A classic strategy game with Minimax AI. Can you beat the computer? Features smart AI and clean UI.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5">
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">MINIMAX</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- Tetris -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:shadow-lg transition-all cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.openWindow('tetris');">
                                         <div class="flex justify-between items-start mb-2">
@@ -1681,6 +1793,11 @@ document.addEventListener("DOMContentLoaded", () => {
               const container = document.getElementById('threes-app');
               if (container) initThrees(container);
             }, 100);
+          }
+
+          // Generic onOpen callback from window config
+          if (winConfig.onOpen) {
+            winConfig.onOpen();
           }
         };
 

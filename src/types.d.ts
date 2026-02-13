@@ -67,6 +67,7 @@ export interface WindowConfig {
   y?: string;
   body: string | (() => string);
   onOpen?: (win: HTMLElement) => void;
+  onClose?: () => void;
 }
 
 // Terminal mode state

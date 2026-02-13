@@ -53,6 +53,10 @@ export function closeWindow(id: string): void {
   // update dock state
   const dockItem = document.getElementById(`dock-${id}`);
   if (dockItem) dockItem.classList.remove('active');
+  // Call onClose callback from window config if defined
+  if (activeWindows[id]?.config?.onClose) {
+    activeWindows[id].config.onClose();
+  }
 
   // cleanup monitor interval if we're closing that window
   if (id === 'monitor' && monitorInterval) {
