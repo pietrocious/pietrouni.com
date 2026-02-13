@@ -355,13 +355,8 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
             { id: "monitor", title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
             { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
-            { id: "tictactoe", title: "Tic Tac Toe", icon: "assets/icons/org.gnome.Extensions.svg" },
-            { id: "game2048", title: "2048", icon: "assets/icons/org.gnome.Extensions.svg" },
-            { id: "sysinfo", title: "About pietrOS", icon: "assets/icons/contacts.svg" },
-            { id: "doom", title: "DOOM", icon: "assets/icons/org.gnome.Extensions.svg" },
-            { id: "snake", title: "Snake", icon: "assets/icons/org.gnome.Extensions.svg" },
-            { id: "tetris", title: "Tetris", icon: "assets/icons/org.gnome.Extensions.svg" },
-            { id: "threes", title: "Threes!", icon: "assets/icons/org.gnome.Extensions.svg" },
+            { id: "experiments", title: "Lab", icon: "assets/icons/characters.svg" },
+            { id: "sysinfo", title: "About", icon: "assets/icons/contacts.svg" },
           ];
 
           // If no search term, show app grid (like macOS 26 Siri/Spotlight)
@@ -537,19 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
                                 <p class="opacity-90 mb-4">
-                                    I build production-grade AWS infrastructure that demonstrates real cloud engineering capabilities:
-                                </p>
-                                <ul class="list-none space-y-4 font-serif font-normal">
-                                    <li class="pl-4 border-l-2 border-her-red">
-                                        <a href="https://github.com/pietrocious/terraform-aws-pietrouni" target="_blank" class="content-link font-semibold">Terraform AWS Infrastructure</a>: Complete AWS infrastructure deployment using Terraform IaC. Multi-AZ VPC networking, Auto Scaling Groups with ALB, CloudFront CDN, Route53 DNS, and ACM certificates. Includes S3 backend state management with DynamoDB locking. GitHub Actions automates validation and deployment.
-                                        <div class="text-xs opacity-70 mt-1">Tech: AWS (VPC, EC2, ALB, ASG, S3, CloudFront, Route53, ACM), Terraform, GitHub Actions</div>
-                                    </li>
-                                    <li class="pl-4 border-l-2 border-her-red">
-                                        <a href="https://github.com/pietrocious/pietrouni.com" target="_blank" class="content-link font-semibold">pietrouni.com</a>: The interactive portfolio website you're viewing right now, running on the AWS infrastructure above. Desktop OS mockup built with Vite, TypeScript and Tailwind CSS. Hosted on the AWS infrastructure above.
-                                        <div class="text-xs opacity-70 mt-1">Tech: Vite, TypeScript, Tailwind v4</div>
-                                    </li>
-                                </ul>
-                                <p class="mt-4 italic opacity-70">More projects coming soon. Check my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a> for updates.</p>
+                                    I have several projects here, please check <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a> to see what I'm working on.</p>
                             </div>
 
                             <!-- Why Cloud Engineering -->
@@ -651,55 +634,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                             </div>
 
-                            <!-- Personal Projects -->
-                            <div>
-                                <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                    Personal Projects
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                    <!-- suprsymmetry.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://suprsymmetry.com/', '_blank')">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">suprsymmetry.com</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">AI art studio for generative art and concept art. Features Gemini-powered image generation with a sleek nocturne-themed interface.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">GEMINI</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AI</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-60">
-                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>Live Site</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- cerebralwwaves.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://cerebralwwaves.com/', '_blank')">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">cerebralwwaves.com</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Creative experimental space with an obsidian cinema aesthetic. Features AI-powered content generation with a dark, cinematic interface.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">GEMINI</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AI</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-60">
-                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>Live Site</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
                             <!-- Coming Soon -->
                             <div>
                                 <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
@@ -780,6 +714,55 @@ document.addEventListener("DOMContentLoaded", () => {
                                             </div>
                                             <div class="flex gap-3 text-xs opacity-50">
                                                 <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Personal Projects -->
+                            <div>
+                                <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                    Personal Projects
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                    <!-- suprsymmetry.com -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://suprsymmetry.com/', '_blank')">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">suprsymmetry.com</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">AI art studio for generative art and concept art. Features Gemini-powered image generation with a sleek nocturne-themed interface.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">GEMINI</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AI</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-60">
+                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>Live Site</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- cerebralwwaves.com -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://cerebralwwaves.com/', '_blank')">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">cerebralwwaves.com</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Creative experimental space with an obsidian cinema aesthetic. Features AI-powered content generation with a dark, cinematic interface.</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">GEMINI</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AI</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-60">
+                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>Live Site</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1878,7 +1861,7 @@ document.addEventListener("DOMContentLoaded", () => {
             threes: { title: "Threes!", icon: "assets/icons/org.gnome.Extensions.svg" },
             doom: { title: "DOOM", icon: "assets/icons/org.gnome.Extensions.svg" },
             experiments: { title: "Lab", icon: "assets/icons/characters.svg" },
-            sysinfo: { title: "About pietrOS", icon: "assets/icons/contacts.svg" },
+            sysinfo: { title: "About", icon: "assets/icons/contacts.svg" },
             finder: { title: "Finder", icon: "assets/icons/org.gnome.Nautilus.svg" },
             launchpad: { title: "Launchpad", icon: "assets/icons/org.gnome.Extensions.svg" },
           };
@@ -3387,7 +3370,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
               window.openWindow("about");
               break;
             case "contact":
-              window.openWindow("contact");
+              window.openWindow("sysinfo");
               break;
             case "projects":
               window.openWindow("projects");
@@ -3977,7 +3960,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
           { id: "finder", title: "Finder", icon: "📂", color: "bg-blue-400" },
           { id: "monitor", title: "Monitoring", icon: "📊", color: "bg-teal-500" },
           { id: "settings", title: "Settings", icon: "⚙️", color: "bg-gray-500" },
-          { id: "sysinfo", title: "About pietrOS", icon: "ℹ️", color: "bg-rose-500" },
+          { id: "sysinfo", title: "About", icon: "ℹ️", color: "bg-rose-500" },
           { id: "experiments", title: "Lab", icon: "🧪", color: "bg-lime-500" },
         ];
 

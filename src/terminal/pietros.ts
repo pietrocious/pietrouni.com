@@ -1011,7 +1011,7 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
       break;
 
     case "contact":
-      window.openWindow("contact");
+      window.openWindow("sysinfo");
       break;
 
     case "projects":
