@@ -19,10 +19,7 @@ describe('config module', () => {
         expect(item.id).toBeDefined();
         expect(item.title).toBeDefined();
         expect(item.desc).toBeDefined();
-        expect(item.type).toBeDefined();
-        expect(item.category).toBeDefined();
-        expect(item.status).toBeDefined();
-        expect(['ready', 'soon']).toContain(item.status);
+        expect(item.icon).toBeDefined();
       });
     });
   });

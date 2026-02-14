@@ -1,8 +1,8 @@
 import { marked } from 'marked';
 
 // config - static data
-import { vaultData, fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
-import { getVaultContent } from './vault';
+import { fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
+import { vaultData } from './vault';
 import { initTetris, destroyTetris } from './games/tetris';
 import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
 import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topology';
@@ -355,7 +355,6 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "about", title: "README.md", icon: "assets/icons/org.gnome.Logs.svg" },
             { id: "projects", title: "Projects", icon: "assets/icons/org.gnome.tweaks.svg" },
             { id: "vault", title: "Vault", icon: "assets/icons/org.gnome.FileRoller.svg" },
-            { id: "techstack", title: "Tech Stack", icon: "assets/icons/org.gnome.TextEditor.svg" },
             { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
             { id: "monitor", title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
             { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
@@ -409,10 +408,10 @@ document.addEventListener("DOMContentLoaded", () => {
             ) {
               results.push({
                 title: item.title,
-                desc: `Vault • ${item.category}`,
-                action: item.action
-                  ? `${item.action}; toggleSpotlight();`
-                  : null,
+                desc: `Vault • ${item.desc}`,
+                action: item.url
+                  ? `window.open('${item.url}', '_blank'); toggleSpotlight();`
+                  : `restoreWindow('vault'); toggleSpotlight();`,
                 icon: `<div class="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>`,
               });
             }
@@ -789,49 +788,33 @@ document.addEventListener("DOMContentLoaded", () => {
           vault: {
             title: "Personal Vault",
             content: `
-                    <div id="vault-app" class="h-full flex flex-col" style="min-width: 400px;">
-                        <!-- Header with Back Button -->
-                        <div class="px-6 py-4 flex items-center justify-between border-b border-her-text/10">
-                            <div class="flex items-center gap-3">
-                                <button id="vault-back-btn" onclick="window.vaultShowGrid()" class="hidden p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" title="Back to files">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                                </button>
+                    <div id="vault-app" class="h-full flex flex-col font-ui" style="min-width: 400px;">
+                        <!-- Header -->
+                        <div class="px-6 py-4 border-b border-her-text/10 flex items-center gap-3">
+                            <button id="vault-back-btn" onclick="window.vaultShowGrid()" class="hidden p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" title="Back to files">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                            <div>
                                 <h2 id="vault-title" class="text-lg font-serif font-extrabold text-her-red dark:text-her-red flex items-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                    <span class="hidden md:inline">Personal Vault</span>
-                                    <span class="md:hidden">Vault</span>
+                                    Personal Vault
                                 </h2>
-                            </div>
-                            <div id="vault-search" class="relative">
-                                <input type="text" placeholder="Search..." oninput="window.renderVault(this.value)" class="pl-9 pr-4 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-transparent focus:border-her-red outline-none text-sm transition-all w-32 md:w-64">
-                                <svg class="w-4 h-4 absolute left-3 top-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <p id="vault-subtitle" class="text-xs opacity-50 mt-1">Skills, resources & things I like</p>
                             </div>
                         </div>
-                        
-                        <!-- Filter Tabs (hidden when viewing file) -->
-                        <div id="vault-filters" class="px-6 py-3 flex gap-2 overflow-x-auto border-b border-her-text/5 no-scrollbar">
-                            <button onclick="window.filterVault('all')" class="vault-tab active px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors bg-her-red text-white flex-shrink-0">All</button>
-                            <button onclick="window.filterVault('Professional')" class="vault-tab px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-70 flex-shrink-0">Professional</button>
-                            <button onclick="window.filterVault('Lifestyle')" class="vault-tab px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-70 flex-shrink-0">Lifestyle</button>
-                            <button onclick="window.filterVault('Creative')" class="vault-tab px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-70 flex-shrink-0">Creative</button>
-                            <button onclick="window.filterVault('Resources')" class="vault-tab px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide transition-colors hover:bg-black/5 dark:hover:bg-white/5 opacity-70 flex-shrink-0">Resources</button>
-                        </div>
-                        
+
                         <!-- Grid View -->
-                        <div id="vault-grid" class="flex-1 overflow-y-auto p-3 md:p-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-3 content-start">
+                        <div id="vault-grid" class="flex-1 overflow-y-auto p-3 md:p-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 content-start">
                             <!-- Items Injected Here -->
                         </div>
-                        
-                        <!-- Content View (hidden by default) -->
-                        <div id="vault-content" class="flex-1 overflow-y-auto p-6 md:p-8 hidden">
-                            <article class="markdown-body prose prose-sm dark:prose-invert max-w-none">
-                                <!-- Markdown content injected here -->
-                            </article>
+
+                        <!-- Detail View (hidden by default) -->
+                        <div id="vault-detail" class="flex-1 overflow-y-auto p-4 md:p-6 hidden">
                         </div>
                     </div>
                 `,
-            width: 1000,
-            height: 700,
+            width: 800,
+            height: 600,
           },
 
           tictactoe: {
@@ -1347,89 +1330,7 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 380,
             height: 600,
           },
-          techstack: {
-            title: "Tech Stack",
-            content: `
-                    <div class="h-full flex flex-col text-her-text dark:text-her-textLight p-6 select-none font-ui overflow-y-auto">
-                        <h1 class="text-xl font-bold mb-1 font-serif">Tech Stack</h1>
-                        <div class="text-xs opacity-60 mb-4 font-mono">Skills & Technologies</div>
-                        <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-6"></div>
-                        
-                        <div class="space-y-6 text-sm">
-                            <!-- Cloud Platforms -->
-                            <div>
-                                <div class="font-bold opacity-40 mb-3 text-xs uppercase tracking-wider flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                                    Cloud Platforms
-                                </div>
-                                
-                                <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg mb-3">
-                                        <div class="font-semibold mb-3">AWS</div>
-                                    <div class="space-y-2 opacity-80">
-                                        <div><span class="font-medium text-her-red">Compute:</span> EC2, Auto Scaling, ELB/ALB</div>
-                                        <div><span class="font-medium text-her-red">Networking:</span> VPC, Route53, CloudFront, Direct Connect</div>
-                                        <div><span class="font-medium text-her-red">Storage:</span> S3, EBS, EFS</div>
-                                        <div><span class="font-medium text-her-red">Security:</span> IAM, ACM, Security Groups, NACLs</div>
-                                        <div><span class="font-medium text-her-red">Monitoring:</span> CloudWatch, CloudTrail, Config</div>
-                                        <div><span class="font-medium text-her-red">Databases:</span> RDS, DynamoDB</div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Infrastructure & Automation -->
-                            <div>
-                                <div class="font-bold opacity-40 mb-3 text-xs uppercase tracking-wider flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                    Infrastructure & Automation
-                                </div>
-                                
-                                <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg space-y-2 opacity-80">
-                                    <div><span class="font-medium text-her-red">IaC:</span> Terraform, CloudFormation</div>
-                                    <div><span class="font-medium text-her-red">CI/CD:</span> GitHub Actions, Jenkins</div>
-                                    <div><span class="font-medium text-her-red">Scripting:</span> Python, Bash, PowerShell</div>
-                                    <div><span class="font-medium text-her-red">Version Control:</span> Git, GitHub</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Networking -->
-                            <div>
-                                <div class="font-bold opacity-40 mb-3 text-xs uppercase tracking-wider flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
-                                    Networking
-                                </div>
-                                
-                                <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg space-y-2 opacity-80">
-                                    <div><span class="font-medium text-her-red">Protocols:</span> TCP/IP, BGP, OSPF, EIGRP, STP</div>
-                                    <div><span class="font-medium text-her-red">Certifications:</span> CCNA, CCNP (ENARSI)</div>
-                                    <div><span class="font-medium text-her-red">Platforms:</span> Cisco Catalyst, DNA Center</div>
-                                    <div><span class="font-medium text-her-red">Concepts:</span> VPN, routing, switching, network security</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Additional Skills -->
-                            <div>
-                                <div class="font-bold opacity-40 mb-3 text-xs uppercase tracking-wider flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                                    Additional Skills
-                                </div>
-                                
-                                <div class="p-4 bg-black/5 dark:bg-white/5 rounded-lg space-y-2 opacity-80">
-                                    <div><span class="font-medium text-her-red">Containers:</span> Docker, Kubernetes (learning)</div>
-                                    <div><span class="font-medium text-her-red">Config Mgmt:</span> Ansible</div>
-                                    <div><span class="font-medium text-her-red">Monitoring:</span> Splunk, Nagios, Prometheus, Grafana</div>
-                                    <div><span class="font-medium text-her-red">OS:</span> Linux (Ubuntu, CentOS), Windows Server</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6 pt-4 border-t border-her-text/10 dark:border-white/10 text-center text-xs opacity-40 font-mono">
-                            Always learning, always building
-                        </div>
-                    </div>
-                `,
-            width: 450,
-            height: 700,
-          },
           tetris: {
             title: "Tetris",
             content: `
@@ -1951,7 +1852,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (id === "monitor") startMonitor();
           if (id === "terminal")
             setTimeout(() => document.getElementById("cmd-input").focus(), 100);
-          if (id === "vault") window.renderVault();
+          if (id === "vault") window.renderVault?.();
           if (id === "resume") {
             // Inject theme via URL param first
             const theme = document.documentElement.classList.contains("dark")
@@ -3691,190 +3592,86 @@ ${digTarget}.          300     IN      A       151.101.65.140
           output.scrollTop = output.scrollHeight;
         };
 
-        window.renderVault = function (filter = "") {
+        window.renderVault = function () {
           const grid = document.getElementById("vault-grid");
           if (!grid) return;
           grid.innerHTML = "";
 
-          const term = filter.toLowerCase();
-          const activeCategory = document
-            .querySelector(".vault-tab.active")
-            ?.innerText.toUpperCase();
-
-          vaultData.forEach((item) => {
-            // Filter Logic
-            if (
-              activeCategory &&
-              activeCategory !== "ALL" &&
-              item.category.toUpperCase() !== activeCategory
-            )
-              return;
-            if (
-              term &&
-              !item.title.toLowerCase().includes(term) &&
-              !item.desc.toLowerCase().includes(term)
-            )
-              return;
-
-            // Render Card
+          vaultData.forEach((item, i) => {
             const card = document.createElement("div");
+            const hasItems = item.items && item.items.length > 0;
+            const isClickable = !!(item.url || hasItems);
             card.className =
-              "p-3 md:p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-orange/50 transition-all cursor-pointer group min-h-[120px] md:min-h-[144px] vault-card-animate";
-            card.style.animationDelay = `${grid.children.length * 50}ms`;
-            if (item.action) card.setAttribute("onclick", item.action);
+              "p-3 md:p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-red/50 hover:-translate-y-0.5 transition-all group vault-card-animate" +
+              (isClickable ? " cursor-pointer" : "");
+            card.style.animationDelay = `${i * 50}ms`;
+            if (item.url) card.setAttribute("onclick", `window.open('${item.url}', '_blank')`);
+            else if (hasItems) card.setAttribute("onclick", `window.vaultShowDetail('${item.id}')`);
 
-            // Icon based on type - Custom Icons for variety
-            let icon = "";
-            switch (item.type) {
-              case "doc":
-                icon =
-                  '<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>';
-                break;
-              case "food":
-                icon =
-                  '<svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75-1.5.75a3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0L3 16.5m15-3.379a48.474 48.474 0 0 0-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.169c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 0 1 3 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 0 1 6 13.12M12.265 3.11a.375.375 0 1 1-.53 0L12 2.845l.265.265Z"></path></svg>'; // Heroicons cake
-                break;
-              case "music":
-                icon =
-                  '<svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>';
-                break;
-              case "book":
-                icon =
-                  '<svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>';
-                break;
-              case "game":
-                icon =
-                  '<svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 0 1-.657.643 48.39 48.39 0 0 1-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 0 1-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 0 0-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 0 1-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 0 0 .657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 0 1-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 0 0 5.427-.63 48.05 48.05 0 0 0 .582-4.717.532.532 0 0 0-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 0 0 .658-.663 48.422 48.422 0 0 0-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 0 1-.61-.58v0Z"></path></svg>'; // Heroicons puzzle-piece
-                break;
-              case "app":
-                icon =
-                  '<svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>';
-                break;
-              case "video":
-                icon =
-                  '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-                break;
-              case "link":
-                icon =
-                  '<svg class="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>';
-                break;
-              case "location":
-                icon =
-                  '<svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>';
-                break;
-              default:
-                icon =
-                  '<svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>';
+            // Badge icon
+            let badge = '';
+            if (item.url) {
+              badge = '<svg class="w-3 h-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>';
+            } else if (hasItems) {
+              badge = '<svg class="w-3 h-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
             }
 
             card.innerHTML = `
                     <div class="flex items-start justify-between mb-2 md:mb-3">
-                        ${icon}
-                        ${
-                          item.status === "soon"
-                            ? '<span class="px-1.5 md:px-2 py-0.5 text-[9px] md:text-[10px] font-bold bg-yellow-100 text-yellow-800 rounded">Soon</span>'
-                            : ""
-                        }
+                        ${item.icon}
+                        ${badge}
                     </div>
-                    <div class="font-bold text-xs md:text-sm mb-1 group-hover:text-her-red transition-colors truncate">${
-                      item.title
-                    }</div>
-                    <div class="text-[10px] md:text-xs opacity-60 mb-2 md:mb-3 line-clamp-2">${
-                      item.desc
-                    }</div>
-                    <div class="flex items-center gap-2">
-                        <span class="px-1.5 md:px-2 py-0.5 md:py-1 bg-black/5 dark:bg-white/10 rounded text-[8px] md:text-[10px] uppercase font-bold opacity-50">${
-                          item.category
-                        }</span>
-                        ${
-                          item.status === "ready"
-                            ? '<svg class="w-3 h-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>'
-                            : ""
-                        }
-                    </div>
+                    <div class="font-bold text-xs md:text-sm mb-1 group-hover:text-her-red transition-colors">${item.title}</div>
+                    <div class="text-[10px] md:text-xs opacity-60 line-clamp-2">${item.desc}</div>
                 `;
             grid.appendChild(card);
           });
         };
 
-        // vault nav
-        window.vaultShowGrid = function () {
+        // Show vault detail view for a category
+        window.vaultShowDetail = function (id: string) {
+          const item = vaultData.find(v => v.id === id);
+          if (!item || !item.items) return;
           const grid = document.getElementById("vault-grid");
-          const content = document.getElementById("vault-content");
+          const detail = document.getElementById("vault-detail");
           const backBtn = document.getElementById("vault-back-btn");
-          const filters = document.getElementById("vault-filters");
-          const search = document.getElementById("vault-search");
-          const title = document.getElementById("vault-title");
-
-          if (!grid || !content) return;
-
-          // Show grid, hide content
-          grid.classList.remove("hidden");
-          content.classList.add("hidden");
-          backBtn.classList.add("hidden");
-          filters.classList.remove("hidden");
-          search.classList.remove("hidden");
-
-          // Reset title
-          title.innerHTML = `
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    <span class="hidden md:inline">Personal Vault</span>
-                    <span class="md:hidden">Vault</span>
-                `;
-        };
-
-        window.vaultShowFile = function (fileName) {
-          const grid = document.getElementById("vault-grid");
-          const content = document.getElementById("vault-content");
-          const backBtn = document.getElementById("vault-back-btn");
-          const filters = document.getElementById("vault-filters");
-          const search = document.getElementById("vault-search");
-          const title = document.getElementById("vault-title");
-          const article = content.querySelector(".markdown-body");
-
-          if (!grid || !content || !article) return;
-
-          // Show loading state
-          article.innerHTML =
-            '<div class="text-center p-8 opacity-50">Loading...</div>';
-
-          // Hide grid, show content
-          grid.classList.add("hidden");
-          content.classList.remove("hidden");
-          backBtn.classList.remove("hidden");
-          filters.classList.add("hidden");
-          search.classList.add("hidden");
-
-          // Update title to filename
-          title.innerHTML = `<span>${fileName}</span>`;
-
-          // Fetch and parse markdown
-          // Fetch and parse markdown
-          const markdown = getVaultContent(fileName);
-          
-          if (markdown) {
-            article.innerHTML = marked.parse(markdown);
-          } else {
-             article.innerHTML = `<div class="text-red-500 p-4">Error loading file: File not found in bundle</div>`;
+          const titleEl = document.getElementById("vault-title");
+          const subtitleEl = document.getElementById("vault-subtitle");
+          if (grid) grid.classList.add("hidden");
+          if (backBtn) backBtn.classList.remove("hidden");
+          if (titleEl) titleEl.innerHTML = `${item.icon} ${item.title}`;
+          if (subtitleEl) subtitleEl.textContent = item.desc;
+          if (detail) {
+            detail.classList.remove("hidden");
+            detail.innerHTML = `<div class="flex flex-col gap-1.5">
+              ${item.items.map((sub: { name: string; desc?: string; url?: string }) => {
+                if (sub.url) {
+                  return `<a href="${sub.url}" target="_blank" rel="noopener" class="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg bg-black/5 dark:bg-white/5 hover:bg-her-red/10 hover:text-her-red transition-colors">
+                    <div class="flex-1 min-w-0">
+                      <div class="font-medium">${sub.name}</div>
+                      ${sub.desc ? `<div class="text-xs opacity-50 mt-0.5 truncate">${sub.desc}</div>` : ''}
+                    </div>
+                    <svg class="w-3.5 h-3.5 opacity-30 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                  </a>`;
+                }
+                return `<div class="px-3 py-2 text-sm rounded-lg bg-black/5 dark:bg-white/5">${sub.name}</div>`;
+              }).join('')}
+            </div>`;
           }
         };
 
-        // vault filtering
-        window.filterVault = function (category) {
-          // Update active tab styling
-          const tabs = document.querySelectorAll(".vault-tab");
-          tabs.forEach((tab) => {
-            if (tab.innerText.toUpperCase() === category.toUpperCase()) {
-              tab.classList.add("active", "bg-her-red", "text-white");
-              tab.classList.remove("opacity-70");
-            } else {
-              tab.classList.remove("active", "bg-her-red", "text-white");
-              tab.classList.add("opacity-70");
-            }
-          });
-
-          // Re-render the vault with the new filter
-          window.renderVault("");
+        // Return to vault grid view
+        window.vaultShowGrid = function () {
+          const grid = document.getElementById("vault-grid");
+          const detail = document.getElementById("vault-detail");
+          const backBtn = document.getElementById("vault-back-btn");
+          const titleEl = document.getElementById("vault-title");
+          const subtitleEl = document.getElementById("vault-subtitle");
+          if (grid) grid.classList.remove("hidden");
+          if (detail) detail.classList.add("hidden");
+          if (backBtn) backBtn.classList.add("hidden");
+          if (titleEl) titleEl.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Personal Vault';
+          if (subtitleEl) subtitleEl.textContent = 'Skills, resources & things I like';
         };
 
         // =====================================
@@ -3999,7 +3796,6 @@ ${digTarget}.          300     IN      A       151.101.65.140
           { id: "about", title: "README.md", icon: "📄", color: "bg-blue-500" },
           { id: "projects", title: "Projects", icon: "📁", color: "bg-purple-500" },
           { id: "vault", title: "Vault", icon: "🔒", color: "bg-amber-500" },
-          { id: "techstack", title: "Tech Stack", icon: "⚡", color: "bg-green-500" },
           { id: "terminal", title: "Terminal", icon: "💻", color: "bg-gray-700" },
           { id: "finder", title: "Finder", icon: "📂", color: "bg-blue-400" },
           { id: "monitor", title: "Monitoring", icon: "📊", color: "bg-teal-500" },

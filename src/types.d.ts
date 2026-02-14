@@ -20,7 +20,8 @@ declare global {
     setWallpaper: (index: number) => void;
 
     // Vault
-    vaultShowFile: (filename: string) => void;
+    vaultShowDetail: (id: string) => void;
+    vaultShowGrid: () => void;
 
     // Terminal command handlers
     handleTerminalCommand: (e: KeyboardEvent) => void;
@@ -87,10 +88,10 @@ export interface VaultItem {
   id: string;
   title: string;
   desc: string;
-  type: string;
-  category: string;
-  status: 'ready' | 'soon';
-  action: string;
+  icon: string;
+  url?: string;
+  action?: string;
+  file?: string;
 }
 
 // Guess game state
