@@ -520,7 +520,7 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
     }
 
     case "version":
-      output.innerHTML += `<div class="my-2"><div class="text-her-red font-bold mb-2">📋 pietrOS Version History</div><div class="font-mono text-xs space-y-1"><div class="flex gap-4"><span class="text-gray-500">1.0</span><span class="text-red-400">Scarlet-Samantha</span></div><div class="flex gap-4"><span class="text-gray-500">1.1</span><span class="text-teal-400">Teal-Twombly</span></div><div class="flex gap-4"><span class="text-gray-500">1.2</span><span class="text-orange-400">Coral-Catherine</span></div><div class="flex gap-4"><span class="text-gray-500">1.3</span><span class="text-amber-700">Walnut-Watts</span></div><div class="flex gap-4"><span class="text-green-400 font-bold">1.4</span><span class="text-emerald-400 font-bold">Jade-Jonze</span><span class="text-gray-400">Current ✔</span></div></div></div>`;
+      output.innerHTML += `<div class="my-2"><div class="text-her-red font-bold mb-2">📋 pietrOS Version History</div><div class="font-mono text-xs space-y-1"><div class="flex gap-4"><span class="text-gray-500">1.0</span><span class="text-red-400">Scarlet-Samantha</span></div><div class="flex gap-4"><span class="text-gray-500">1.1</span><span class="text-teal-400">Teal-Twombly</span></div><div class="flex gap-4"><span class="text-gray-500">1.2</span><span class="text-orange-400">Coral-Catherine</span></div><div class="flex gap-4"><span class="text-gray-500">1.3</span><span class="text-amber-700">Walnut-Watts</span></div><div class="flex gap-4"><span class="text-gray-500">1.4</span><span class="text-emerald-400">Jade-Jonze</span></div><div class="flex gap-4"><span class="text-amber-500 font-bold">1.5</span><span class="text-amber-400 font-bold">Amber-Amy</span><span class="text-gray-400">Current ✔</span></div></div></div>`;
       break;
 
     case "uptime":
@@ -549,7 +549,7 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
       const info = `
 <span class="text-blue-400">guest@pietrOS</span>
 --------------------
-<span class="text-her-red">OS</span>: pietrOS Version 1.4 (Jade-Jonze)
+<span class="text-her-red">OS</span>: pietrOS Version 1.5 (Amber-Amy)
 <span class="text-her-red">Host</span>: Browser Virtual Machine
 <span class="text-her-red">Kernel</span>: Linux micro-kernel 6.8.0-45
 <span class="text-her-red">Uptime</span>: ${Math.floor(performance.now() / 60000)} mins

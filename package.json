@@ -1,6 +1,6 @@
 {
   "name": "pietrouni.com",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "type": "module",
   "description": "An OS-inspired interactive portfolio showcasing DevOps and Infrastructure projects.",
   "scripts": {

@@ -470,7 +470,7 @@ document.addEventListener("DOMContentLoaded", () => {
             content: `
                      <div class="h-full flex flex-col text-her-text dark:text-her-textLight p-6 select-none font-ui">
                         <h1 class="text-xl font-bold mb-1 font-serif">About pietrOS</h1>
-                        <div class="text-xs opacity-60 mb-4 font-mono">Version 1.4 (Jade-Jonze)</div>
+                        <div class="text-xs opacity-60 mb-4 font-mono">Version 1.5 (Amber-Amy)</div>
                         <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-4"></div>
 
                         <div class="flex-1 overflow-y-auto pr-2 space-y-4 text-sm">
@@ -1139,11 +1139,11 @@ document.addEventListener("DOMContentLoaded", () => {
 |  _|_|___|_| |_| |_____|_____|
 |_|                            
                             </pre>
-                            <div class="text-gray-400 hidden md:block">v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
+                            <div class="text-gray-400 hidden md:block">v1.5 (Amber-Amy) | Linux micro-kernel 6.8.0-45</div>
                             <div class="text-gray-500 hidden md:block">Type 'help' for commands, 'man &lt;cmd&gt;' for details</div>
                         </div>
                         <div class="md:border-t border-white/20 md:pt-2">
-                            <div class="text-gray-400 text-xs md:hidden">pietrOS v1.4 (Jade-Jonze) | Linux micro-kernel 6.8.0-45</div>
+                            <div class="text-gray-400 text-xs md:hidden">pietrOS v1.5 (Amber-Amy) | Linux micro-kernel 6.8.0-45</div>
                             <div class="text-gray-500 text-xs mb-2 md:hidden">Type 'help' for commands</div>
                             <div class="flex items-center gap-2 text-white">
                                 <span id="term-prompt" class="text-green-400 font-semibold whitespace-nowrap">guest@pietrOS</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>
@@ -1350,7 +1350,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
                                         <div>
                                             <div class="font-semibold text-sm">pietrOS</div>
-                                            <div class="text-xs opacity-60">Version 1.4 (Jade-Jonze)</div>
+                                            <div class="text-xs opacity-60">Version 1.5 (Amber-Amy)</div>
                                         </div>
                                     </div>
                                     <button onclick="openWindow('sysinfo'); closeWindow('settings');" class="w-full px-4 py-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-her-text/10 dark:border-white/10 rounded-lg text-sm font-medium transition-colors">
@@ -2155,7 +2155,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const prompt = document.getElementById("term-prompt");
           if (prompt) {
             prompt.outerHTML =
-              '<span id="term-prompt" class="text-green-400 font-semibold">guest@OS93</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>';
+              '<span id="term-prompt" class="text-green-400 font-semibold">guest@pietrOS</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>';
           }
         };
 
@@ -2335,7 +2335,7 @@ document.addEventListener("DOMContentLoaded", () => {
               ciscoMode.active = false;
               const promptContainer = prompt.parentNode;
               prompt.outerHTML =
-                '<span id="term-prompt" class="text-green-400 font-semibold">guest@OS93</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>';
+                '<span id="term-prompt" class="text-green-400 font-semibold">guest@pietrOS</span><span class="text-blue-400 font-semibold">~</span><span class="text-white">$</span>';
               output.innerHTML += `<div class="text-gray-500">[Connection to CORE-RTR-01 closed]</div>`;
             } else if (ciscoCmd === "?" || ciscoCmd === "help") {
               output.innerHTML += `<div class="text-cyan-400 my-2"><pre class="text-xs">Exec commands:\n  show, ping, exit, enable, configure\n</pre></div>`;
@@ -2738,7 +2738,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
               break;
             }
             case "version":
-              output.innerHTML += `<div class="my-2"><div class="text-her-red font-bold mb-2">📋 OS93 Version History</div><div class="font-mono text-xs space-y-1"><div class="flex gap-4"><span class="text-gray-500">1.0</span><span class="text-red-400">Scarlet-Samantha</span></div><div class="flex gap-4"><span class="text-gray-500">1.1</span><span class="text-teal-400">Teal-Twombly</span></div><div class="flex gap-4"><span class="text-gray-500">1.2</span><span class="text-orange-400">Coral-Catherine</span></div><div class="flex gap-4"><span class="text-gray-500">1.3</span><span class="text-amber-700">Walnut-Watts</span></div><div class="flex gap-4"><span class="text-green-400 font-bold">1.4</span><span class="text-emerald-400 font-bold">Jade-Jonze</span><span class="text-gray-400">Current ✓</span></div></div></div>`;
+              output.innerHTML += `<div class="my-2"><div class="text-her-red font-bold mb-2">📋 pietrOS Version History</div><div class="font-mono text-xs space-y-1"><div class="flex gap-4"><span class="text-gray-500">1.0</span><span class="text-red-400">Scarlet-Samantha</span></div><div class="flex gap-4"><span class="text-gray-500">1.1</span><span class="text-teal-400">Teal-Twombly</span></div><div class="flex gap-4"><span class="text-gray-500">1.2</span><span class="text-orange-400">Coral-Catherine</span></div><div class="flex gap-4"><span class="text-gray-500">1.3</span><span class="text-amber-700">Walnut-Watts</span></div><div class="flex gap-4"><span class="text-gray-500">1.4</span><span class="text-emerald-400">Jade-Jonze</span></div><div class="flex gap-4"><span class="text-amber-500 font-bold">1.5</span><span class="text-amber-400 font-bold">Amber-Amy</span><span class="text-gray-400">Current ✔</span></div></div></div>`;
               break;
             case "uptime":
               output.innerHTML += `<div class="my-2"><div class="text-green-400 font-bold">⏱️ Session Uptime</div><div class="text-blue-300 mt-1">Visitor has been exploring for <span class="font-bold">${Math.floor(
@@ -2762,9 +2762,9 @@ ${digTarget}.          300     IN      A       151.101.65.140
               break;
             case "neofetch":
               const info = `
-<span class="text-blue-400">guest@OS93</span>
+<span class="text-blue-400">guest@pietrOS</span>
 --------------------
-<span class="text-her-red">OS</span>: OS93 Version 1.4 (Jade-Jonze)
+<span class="text-her-red">OS</span>: pietrOS Version 1.5 (Amber-Amy)
 <span class="text-her-red">Host</span>: Browser Virtual Machine
 <span class="text-her-red">Kernel</span>: Linux micro-kernel 6.8.0-45
 <span class="text-her-red">Uptime</span>: ${Math.floor(
@@ -3121,7 +3121,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
               const hours = nowTime.getHours();
               const minutes = nowTime.getMinutes();
               const uptime = `${years} years, ${daysDiff} days, ${hours}h ${minutes}m`;
-              const pietroInfo = `<span class="text-purple-400 font-bold">pietro@OS93</span>\n<span class="text-gray-500">──────────────────────────────</span>\n<span class="text-her-red">Resolution</span>: 5120x1440\n<span class="text-her-red">CPU</span>: Intel(R) Core(TM) i9-14900 @ 1.997GHz\n<span class="text-her-red">GPU</span>: NVIDIA GeForce RTX 4090\n<span class="text-her-red">Uptime</span>: ${uptime}\n<span class="text-gray-500">──────────────────────────────</span>\n<span class="text-her-red">Role</span>: Infrastructure Engineer\n<span class="text-her-red">Location</span>: Barcelona\n<span class="text-her-red">Languages</span>: Spanish, English, Italian\n<span class="text-her-red">Stack</span>: AWS, Terraform, Docker, K8s, Python\n<span class="text-gray-500">──────────────────────────────</span>`;
+              const pietroInfo = `<span class="text-purple-400 font-bold">pietro@pietrOS</span>\n<span class="text-gray-500">──────────────────────────────</span>\n<span class="text-her-red">Resolution</span>: 5120x1440\n<span class="text-her-red">CPU</span>: Intel(R) Core(TM) i9-14900 @ 1.997GHz\n<span class="text-her-red">GPU</span>: NVIDIA GeForce RTX 4090\n<span class="text-her-red">Uptime</span>: ${uptime}\n<span class="text-gray-500">──────────────────────────────</span>\n<span class="text-her-red">Role</span>: Infrastructure Engineer\n<span class="text-her-red">Location</span>: Barcelona\n<span class="text-her-red">Languages</span>: Spanish, English, Italian\n<span class="text-her-red">Stack</span>: AWS, Terraform, Docker, K8s, Python\n<span class="text-gray-500">──────────────────────────────</span>`;
               output.innerHTML += `<div class="flex gap-4 my-2 font-mono text-xs"><pre class="text-purple-400 hidden sm:block">${pietroLogo}</pre><pre>${pietroInfo}</pre></div>`;
               break;
             case "matrix":
