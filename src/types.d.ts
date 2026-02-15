@@ -6,10 +6,26 @@ declare global {
     // Window management
     closeWindow: (id: string) => void;
     minimizeWindow: (id: string) => void;
-    restoreWindow: (id: string) => void;
+    restoreWindow: (id: string, openFn?: (id: string) => void) => void;
     toggleMaximize: (id: string) => void;
     startDrag: (e: MouseEvent | TouchEvent, id: string) => void;
     openWindow: (id: string) => void;
+    openMarkdownViewer: (title: string, file: string) => void;
+
+    // Finder
+    initFinder: () => void;
+    finderNavigate: (path: string) => void;
+    finderBack: () => void;
+    finderForward: () => void;
+    finderUp: () => void;
+    finderToggleView: (mode: string) => void;
+    finderSelect: (name: string) => void;
+    finderOpenFile: (name: string) => void;
+    finderRender: () => void;
+
+    // Launchpad
+    initLaunchpad: () => void;
+    filterLaunchpad: (query: string) => void;
 
     // Theme
     toggleTheme: () => void;
@@ -66,12 +82,12 @@ export interface WindowState {
 // Window configuration
 export interface WindowConfig {
   title: string;
-  icon: string;
-  width: string;
-  height: string;
+  icon?: string;
+  width: number;
+  height: number;
   x?: string;
   y?: string;
-  body: string | (() => string);
+  content: string | (() => string);
   onOpen?: (win: HTMLElement) => void;
   onClose?: () => void;
 }

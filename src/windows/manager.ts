@@ -125,10 +125,10 @@ export function minimizeWindow(id: string): void {
 }
 
 // restore window from minimized state
-export function restoreWindow(id: string, openWindowFn: (id: string) => void): void {
+export function restoreWindow(id: string, openWindowFn?: (id: string) => void): void {
   if (!activeWindows[id]) {
     // window doesnt exist yet, open it
-    openWindowFn(id);
+    if (openWindowFn) openWindowFn(id);
     return;
   }
 

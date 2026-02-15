@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:s3.us-east-1.amazonaws.com)"
+    ]
+  }
+}

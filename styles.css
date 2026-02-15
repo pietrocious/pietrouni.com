@@ -16,10 +16,11 @@
   --color-her-textLight: #efebe9;
 
   /* Font Families */
-  --font-sans: "Playfair Display", serif;
-  --font-serif: "Lora", serif;
-  --font-headline: "Playfair Display", serif;
-  --font-ui: "Noto Sans", sans-serif;
+  --font-sans: "DM Sans", sans-serif;
+  --font-serif: "Tiempos Text", serif;
+  --font-headline: "Outfit", sans-serif;
+  --font-display: "Copernicus", serif;
+  --font-ui: "DM Sans", sans-serif;
   --font-kernel: "Fixedsys", monospace;
   --font-mono: "JetBrains Mono", monospace;
 
@@ -50,9 +51,68 @@
   }
 }
 
-/* Fonts: Google Fonts (Playfair Display, Lora) + Custom (Fixedsys for terminal) */
-/* Google Fonts loaded via <link> in HTML head */
+/* Fonts: Copernicus (headlines) + Tiempos (body) from S3, terminal fonts from Google Fonts */
 
+/* Copernicus — Display/Headline */
+@font-face {
+  font-family: "Copernicus";
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Copernicus";
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Extrabold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Copernicus";
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Heavy.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Tiempos Headline — Large display serif */
+@font-face {
+  font-family: "Tiempos Headline";
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposHeadline-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Tiempos Text — Body/UI */
+@font-face {
+  font-family: "Tiempos Text";
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Tiempos Text";
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Tiempos Text";
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fixedsys — Terminal fallback */
 @font-face {
   font-family: "Fixedsys";
   src: url("/fonts/fixedsys.ttf") format("truetype");
@@ -62,7 +122,7 @@
 }
 
 body {
-  font-family: "Noto Sans", sans-serif;
+  font-family: "DM Sans", sans-serif;
   overflow: hidden;
   user-select: none;
   cursor: default;
@@ -808,7 +868,7 @@ html.dark .window-header {
 }
 
 .window-title {
-  font-family: "Noto Sans", sans-serif;
+  font-family: "DM Sans", sans-serif;
   font-size: 13px;
   font-weight: 500;
   opacity: 0.7;
@@ -1087,7 +1147,7 @@ html.dark .dock-item {
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 11px;
-  font-family: "Noto Sans", sans-serif;
+  font-family: "DM Sans", sans-serif;
   font-weight: 700;
   white-space: nowrap;
   opacity: 0;
@@ -1300,7 +1360,7 @@ canvas {
   background: transparent;
   border-bottom: 2px solid #4a7c9d;
   color: inherit;
-  font-family: "Playfair Display", sans-serif;
+  font-family: "Outfit", sans-serif;
   font-weight: 700;
 }
 
@@ -1313,11 +1373,11 @@ canvas {
 h1,
 h2,
 h3 {
-  font-family: "Playfair Display", sans-serif;
+  font-family: "Outfit", sans-serif;
 }
 
 p {
-  font-family: "Lora", serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 /* Link styling in content */
@@ -1342,7 +1402,7 @@ html.dark .content-link:hover {
 
 /* Markdown Body Styling (GitHub-style) */
 .markdown-body {
-  font-family: "Noto Sans", sans-serif;
+  font-family: "Tiempos Text", serif;
   font-size: 14px;
   line-height: 1.7;
   color: #4e342e;
@@ -1353,7 +1413,7 @@ html.dark .markdown-body {
 }
 
 .markdown-body h1 {
-  font-family: "Playfair Display", sans-serif;
+  font-family: "Copernicus", serif;
   font-size: 2em;
   font-weight: 700;
   margin-bottom: 0.5em;
@@ -1363,7 +1423,7 @@ html.dark .markdown-body {
 }
 
 .markdown-body h2 {
-  font-family: "Playfair Display", sans-serif;
+  font-family: "Copernicus", serif;
   font-size: 1.5em;
   font-weight: 700;
   margin-top: 1.5em;
@@ -1373,7 +1433,7 @@ html.dark .markdown-body {
 }
 
 .markdown-body h3 {
-  font-family: "Playfair Display", sans-serif;
+  font-family: "Copernicus", serif;
   font-size: 1.25em;
   font-weight: 600;
   margin-top: 1.25em;

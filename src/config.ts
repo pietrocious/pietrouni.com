@@ -21,9 +21,13 @@ export const fileSystem: { root: FileSystemNode } = {
         experiments: {
           "prototype-1.html": "FILE",
           "test-render.html": "FILE",
+          "script.js": "FILE",
+          "styles.css": "FILE",
+          "data.json": "FILE",
         },
         "readme.md": "FILE",
         "todo.txt": "FILE",
+        "notes.txt": "FILE",
         ".config": "FILE",
         ".secrets": "FILE",
       },

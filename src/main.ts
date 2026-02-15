@@ -488,16 +488,20 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="font-bold opacity-40 mb-2 text-xs uppercase tracking-wider">Typography</div>
                                 <ul class="space-y-3 opacity-80">
                                     <li class="flex flex-col">
-                                        <span class="text-[10px] uppercase opacity-50">Display/Headline</span>
-                                        <span class="font-headline font-bold text-base">Playfair Display</span>
-                                    </li>
-                                    <li class="flex flex-col">
-                                        <span class="text-[10px] uppercase opacity-50">Serif (Body)</span>
-                                        <span class="font-serif text-base">Lora</span>
+                                        <span class="text-[10px] uppercase opacity-50">Headlines</span>
+                                        <span class="font-headline font-bold text-base">Outfit</span>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">System UI</span>
-                                        <span class="font-ui text-base">Noto Sans</span>
+                                        <span class="font-ui text-base">DM Sans</span>
+                                    </li>
+                                    <li class="flex flex-col">
+                                        <span class="text-[10px] uppercase opacity-50">README (Display)</span>
+                                        <span class="font-display font-bold text-base">Copernicus</span>
+                                    </li>
+                                    <li class="flex flex-col">
+                                        <span class="text-[10px] uppercase opacity-50">README (Body)</span>
+                                        <span class="font-serif text-base">Tiempos Text</span>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">Terminal</span>
@@ -524,14 +528,14 @@ document.addEventListener("DOMContentLoaded", () => {
           about: {
             title: "README.md",
             content: `
-                    <div class="h-full p-6 font-sans text-sm overflow-y-auto window-content selection:bg-her-red selection:text-white transition-colors">
+                    <div class="h-full p-6 font-serif text-sm overflow-y-auto window-content selection:bg-her-red selection:text-white transition-colors">
                         <!-- Header -->
-                        <h1 class="text-4xl font-serif font-extrabold text-her-red dark:text-her-red tracking-tight mb-4">Hi, I'm Pietro</h1>
+                        <h1 class="text-4xl font-display font-extrabold text-her-red dark:text-her-red tracking-tight mb-4">Hi, I'm Pietro</h1>
                         
                         <div class="space-y-4">
                             <!-- My Journey -->
                             <div>
-                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">My Journey</h2>
+                                <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">My Journey</h2>
                                 <p class="opacity-90">
                                     I'm an Infrastructure Engineer specializing in AWS architecture and infrastructure-as-code automation. My path into cloud started with enterprise infrastructure, I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers. That foundation taught me how distributed systems actually work under the hood.
                                 </p>
@@ -542,14 +546,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             <!-- What I'm Building -->
                             <div>
-                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
+                                <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
                                 <p class="opacity-90 mb-4">
                                     I have several projects here, please check <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a> to see what I'm working on.</p>
                             </div>
 
                             <!-- Why Cloud Engineering -->
                             <div>
-                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Why Cloud Engineering?</h2>
+                                <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Why Cloud Engineering?</h2>
                                 <p class="opacity-90">
                                     After years of troubleshooting other people's infrastructure, I want to be the one designing and building it. Cloud engineering lets me leverage that infrastructure foundation while learning modern automation patterns like IaC, containers, orchestration, and CI/CD.
                                 </p>
@@ -557,7 +561,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             <!-- Beyond Work -->
                             <div>
-                                <h2 class="text-lg font-serif font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">Beyond Work</h2>
+                                <h2 class="text-lg font-display font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">Beyond Work</h2>
                                 <p class="opacity-90">
                                     Outside of infrastructure work, I listen to music across pretty much every genre, play games when I have time, and enjoy understanding how complex systems get built. I'm fascinated by how architecture decisions make something actually work at such a scale, and how much we're all standing on the shoulders of giants.
                                 </p>
@@ -565,7 +569,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             <!-- Let's Connect -->
                             <div>
-                                <h2 class="text-lg font-serif font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Let's Connect</h2>
+                                <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Let's Connect</h2>
                                 <p class="opacity-90">
                                     If you'd like to talk, please reach out:
                                 </p>
@@ -1010,6 +1014,24 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">RETRO</span>
                                         </div>
                                     </div>
+
+                                </div>
+                                <!-- Threes -->
+                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 500ms" onclick="window.openWindow('threes');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${threesIcon}" class="w-5 h-5 object-contain" alt="Threes" />Threes!</h3>
+                                        <div class="flex items-center gap-2">
+                                            <span id="lab-hs-threes" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Combine 1+2 to make 3, then match pairs. Addictive puzzle with smooth tile animations.</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Snake -->
@@ -1073,24 +1095,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
                                     </div>
                                     <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Classic falling blocks with DAS movement, ghost pieces, hold queue, particles, and screen shake!</p>
-                                    <div class="mt-auto">
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Threes -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 500ms" onclick="window.openWindow('threes');">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${threesIcon}" class="w-5 h-5 object-contain" alt="Threes" />Threes!</h3>
-                                        <div class="flex items-center gap-2">
-                                            <span id="lab-hs-threes" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Combine 1+2 to make 3, then match pairs. Addictive puzzle with smooth tile animations.</p>
                                     <div class="mt-auto">
                                         <div class="flex flex-wrap gap-1.5">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
@@ -1650,6 +1654,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </button>
                                     <button onclick="window.finderForward()" class="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" title="Forward">
                                         <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                    </button>
+                                    <button onclick="window.finderUp()" class="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" title="Up">
+                                        <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
                                     </button>
                                 </div>
                                 <div id="finder-path" class="text-sm font-medium opacity-70 truncate max-w-[200px] md:max-w-none">/home/guest</div>
@@ -3721,6 +3728,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
         let finderHistory: string[] = ["/home/guest"];
         let finderHistoryIndex = 0;
         let finderViewMode = "grid";
+        let finderSelectedFile: string | null = null;
 
         window.initFinder = function () {
           window.finderNavigate("/home/guest");
@@ -3728,6 +3736,7 @@ ${digTarget}.          300     IN      A       151.101.65.140
 
         window.finderNavigate = function (path: string) {
           finderCurrentPath = path;
+          finderSelectedFile = null; // Clear selection on nav
           
           // Add to history if navigating forward
           if (finderHistoryIndex < finderHistory.length - 1) {
@@ -3757,9 +3766,168 @@ ${digTarget}.          300     IN      A       151.101.65.140
           }
         };
 
+        window.finderUp = function () {
+          const parts = finderCurrentPath.split("/").filter(p => p);
+          if (parts.length > 0) {
+            parts.pop();
+            const parentPath = "/" + parts.join("/");
+            window.finderNavigate(parentPath || "/");
+          }
+        };
+
         window.finderToggleView = function (mode: string) {
           finderViewMode = mode;
           window.finderRender();
+        };
+
+        window.finderSelect = function (fileName: string) {
+            finderSelectedFile = fileName;
+            // visual update only to avoid full re-render
+            const items = document.querySelectorAll(".finder-item");
+            items.forEach(el => {
+                if (el.getAttribute("data-name") === fileName) {
+                    el.classList.add("bg-blue-500/20", "border-blue-500/50");
+                } else {
+                    el.classList.remove("bg-blue-500/20", "border-blue-500/50");
+                }
+            });
+            // Update status bar
+            const countEl = document.getElementById("finder-item-count");
+            if (countEl) countEl.textContent = `Selected: ${fileName}`;
+        };
+
+        window.finderOpenFile = function (fileName: string) {
+            const ext = fileName.split('.').pop()?.toLowerCase();
+            
+            if (ext === 'md') {
+                if (fileName.toLowerCase() === 'readme.md') {
+                    window.openWindow('about'); 
+                } else {
+                    window.openMarkdownViewer(fileName, `/home/guest/${fileName}`); 
+                }
+            } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext || '')) {
+                 const viewerId = `img-${fileName.replace(/[^a-z0-9]/gi, '')}`;
+                 if (activeWindows[viewerId]) {
+                    restoreWindow(viewerId, undefined);
+                    return;
+                 }
+                 let imgSrc = '';
+                 if (fileName === 'vacation.jpg') imgSrc = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
+                 else if (fileName === 'setup.png') imgSrc = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
+                 else imgSrc = 'https://via.placeholder.com/400x300?text=' + fileName;
+
+                 const winContent = `<div class="h-full flex items-center justify-center bg-black/90 p-4"><img src="${imgSrc}" class="max-w-full max-h-full rounded shadow-lg"></div>`;
+                 
+                const winId = viewerId;
+                const winEl = document.createElement("div");
+                winEl.className = "window absolute flex flex-col active-window window-opening";
+                winEl.id = `win-${winId}`;
+                winEl.style.width = "600px";
+                winEl.style.height = "500px";
+                winEl.style.left = "100px";
+                winEl.style.top = "100px";
+                winEl.style.zIndex = incrementZIndex().toString();
+                winEl.innerHTML = `
+                    <div class="window-header" onmousedown="window.startDrag(event, '${winId}')" ondblclick="window.toggleMaximize('${winId}')">
+                        <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                             <button class="btn-neon close" onclick="window.closeWindow('${winId}')"></button>
+                             <button class="btn-neon min" onclick="window.minimizeWindow('${winId}')"></button>
+                             <button class="btn-neon max" onclick="window.toggleMaximize('${winId}')"></button>
+                        </div>
+                        <span class="window-title">${fileName}</span>
+                    </div>
+                    <div class="flex-1 relative overflow-hidden">${winContent}</div>
+                `;
+                winEl.onmousedown = () => bringToFront(winId);
+                const container = document.getElementById("windows-container");
+                if (container) container.appendChild(winEl);
+                activeWindows[winId] = { element: winEl, config: { title: fileName, content: winContent, width: 600, height: 500 }, maximized: false };
+                setTimeout(() => winEl.classList.remove("window-opening"), 350);
+
+            } else {
+                const content = `Preview of ${fileName}\n\nThis is a simulated file content.`;
+                const viewerId = `txt-${fileName.replace(/[^a-z0-9]/gi, '')}`;
+                 if (activeWindows[viewerId]) {
+                    restoreWindow(viewerId, undefined);
+                    return;
+                 }
+                const winId = viewerId;
+                const winEl = document.createElement("div");
+                winEl.className = "window absolute flex flex-col active-window window-opening";
+                winEl.id = `win-${winId}`;
+                winEl.style.width = "500px";
+                winEl.style.height = "400px";
+                winEl.style.left = "150px";
+                winEl.style.top = "150px";
+                winEl.style.zIndex = incrementZIndex().toString();
+                winEl.innerHTML = `
+                    <div class="window-header" onmousedown="window.startDrag(event, '${winId}')" ondblclick="window.toggleMaximize('${winId}')">
+                        <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                             <button class="btn-neon close" onclick="window.closeWindow('${winId}')"></button>
+                             <button class="btn-neon min" onclick="window.minimizeWindow('${winId}')"></button>
+                             <button class="btn-neon max" onclick="window.toggleMaximize('${winId}')"></button>
+                        </div>
+                        <span class="window-title">${fileName}</span>
+                    </div>
+                    <div class="flex-1 relative overflow-hidden bg-[#1e1e1e] text-gray-300 p-4 font-mono text-xs whitespace-pre-wrap">${content}</div>
+                `;
+                winEl.onmousedown = () => bringToFront(winId);
+                const container = document.getElementById("windows-container");
+                if (container) container.appendChild(winEl);
+                activeWindows[winId] = { element: winEl, config: { title: fileName, content: content, width: 500, height: 400 }, maximized: false };
+                setTimeout(() => winEl.classList.remove("window-opening"), 350);
+            }
+        };
+
+        window.openMarkdownViewer = function(title: string, file: string) {
+             const viewerId = `md-${title.replace(/[^a-z0-9]/gi, '')}`;
+             if (activeWindows[viewerId]) {
+                restoreWindow(viewerId, undefined);
+                return;
+             }
+             
+             // Mock markdown content since we don't have a real file reader yet
+             const mdContent = `# ${title}\n\nThis is a markdown preview for **${title}**.\n\n- Feature 1\n- Feature 2\n\n*Simulated markdown content.*`;
+             // In a real app we would parse `mdContent` with marked()
+             // but here we will just wrap it in a pre for now, or basic HTML
+             
+             const winContent = `
+                <div class="h-full bg-[#0d1117] text-[#c9d1d9] p-6 overflow-y-auto font-ui markdown-body">
+                    <h1 class="text-2xl font-bold mb-4 border-b border-[#30363d] pb-2">${title}</h1>
+                    <p class="mb-4">This is a markdown preview for <strong class="text-white">${title}</strong>.</p>
+                    <ul class="list-disc pl-5 mb-4 space-y-1">
+                        <li>Feature 1</li>
+                        <li>Feature 2</li>
+                    </ul>
+                    <p class="italic opacity-70">Simulated markdown content.</p>
+                </div>
+             `;
+             
+             const winId = viewerId;
+             const winEl = document.createElement("div");
+             winEl.className = "window absolute flex flex-col active-window window-opening";
+             winEl.id = `win-${winId}`;
+             winEl.style.width = "600px";
+             winEl.style.height = "500px";
+             winEl.style.left = "120px";
+             winEl.style.top = "120px";
+             winEl.style.zIndex = incrementZIndex().toString();
+             winEl.innerHTML = `
+                <div class="window-header" onmousedown="window.startDrag(event, '${winId}')" ondblclick="window.toggleMaximize('${winId}')">
+                    <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                         <button class="btn-neon close" onclick="window.closeWindow('${winId}')"></button>
+                         <button class="btn-neon min" onclick="window.minimizeWindow('${winId}')"></button>
+                         <button class="btn-neon max" onclick="window.toggleMaximize('${winId}')"></button>
+                    </div>
+                    <span class="window-title">${title}</span>
+                </div>
+                <div class="flex-1 relative overflow-hidden">${winContent}</div>
+            `;
+            winEl.onmousedown = () => bringToFront(winId);
+            const container = document.getElementById("windows-container");
+            if (container) container.appendChild(winEl);
+            activeWindows[winId] = { element: winEl, config: { title: title, content: winContent, width: 600, height: 500 }, maximized: false };
+            setTimeout(() => winEl.classList.remove("window-opening"), 350);
         };
 
         window.finderRender = function () {
@@ -3810,20 +3978,49 @@ ${digTarget}.          300     IN      A       151.101.65.140
             const isHidden = name.startsWith(".");
             
             const item = document.createElement("div");
-            item.className = `finder-item flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition-colors ${isHidden ? 'opacity-50' : ''}`;
+            item.className = `finder-item flex flex-col items-center gap-2 p-3 rounded-lg border border-transparent hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition-all duration-200 ${isHidden ? 'opacity-50' : ''}`;
+            item.setAttribute("data-name", name);
             
-            const icon = isFile 
-              ? `<svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`
-              : `<svg class="w-10 h-10 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
+            // Icon selection based on extension/type
+            let icon = '';
+            if (!isFile) {
+                // Directory
+                icon = `<svg class="w-10 h-10 text-blue-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
+            } else {
+                // File icons
+                const ext = name.split('.').pop()?.toLowerCase();
+                if (['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].includes(ext || '')) {
+                     icon = `<svg class="w-10 h-10 text-purple-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
+                } else if (['js', 'ts', 'jsx', 'tsx', 'json', 'html', 'css', 'py', 'c', 'cpp'].includes(ext || '')) {
+                     icon = `<svg class="w-10 h-10 text-yellow-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+                } else if (['md', 'txt', 'rtf'].includes(ext || '')) {
+                     icon = `<svg class="w-10 h-10 text-gray-400 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+                } else {
+                     // Default file
+                     icon = `<svg class="w-10 h-10 text-gray-400 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`;
+                }
+            }
             
             item.innerHTML = `
               ${icon}
               <span class="text-xs text-center truncate w-full">${name}</span>
             `;
             
-            if (!isFile) {
-              item.onclick = () => window.finderNavigate(`${finderCurrentPath}/${name}`.replace("//", "/"));
-            }
+            item.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.finderSelect(name);
+            };
+            
+            item.ondblclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isFile) {
+                    window.finderOpenFile(name);
+                } else {
+                    window.finderNavigate(`${finderCurrentPath}/${name}`.replace("//", "/"));
+                }
+            };
             
             filesEl.appendChild(item);
           });
