@@ -1,5 +1,15 @@
 import { marked } from 'marked';
 
+// Lab Icons
+import snakeIcon from './assets/icons/lab/snake.png';
+import game2048Icon from './assets/icons/lab/2048.png';
+import tictactoeIcon from './assets/icons/lab/tictactoe.png';
+import tetrisIcon from './assets/icons/lab/tetris.png';
+import threesIcon from './assets/icons/lab/threes.png';
+import doomIcon from './assets/icons/lab/doom.png';
+
+
+
 // config - static data
 import { fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
 import { vaultData } from './vault';
@@ -194,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Menu bar button — simple light/dark flip (pins the choice)
         // Lab filter for experiments window
         (window as any).labFilter = function (filter: string) {
-          const cards = document.querySelectorAll<HTMLElement>('#lab-grid .lab-card');
+          const items = document.querySelectorAll<HTMLElement>('#lab-grid [data-category]');
           const btns = document.querySelectorAll<HTMLElement>('.lab-filter-btn');
           btns.forEach(b => {
             const active = b.dataset.filter === filter;
@@ -205,9 +215,9 @@ document.addEventListener("DOMContentLoaded", () => {
             b.classList.toggle('text-her-dark/60', !active);
             b.classList.toggle('dark:text-her-textLight/60', !active);
           });
-          cards.forEach(card => {
-            const show = filter === 'all' || card.dataset.category === filter;
-            card.style.display = show ? '' : 'none';
+          items.forEach(item => {
+            const show = filter === 'all' || item.dataset.category === filter;
+            item.style.display = show ? '' : 'none';
           });
         };
 
@@ -356,7 +366,6 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "projects", title: "Projects", icon: "assets/icons/org.gnome.tweaks.svg" },
             { id: "vault", title: "Vault", icon: "assets/icons/org.gnome.FileRoller.svg" },
             { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
-            { id: "monitor", title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
             { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
             { id: "experiments", title: "Lab", icon: "assets/icons/characters.svg" },
             { id: "sysinfo", title: "About", icon: "assets/icons/contacts.svg" },
@@ -916,110 +925,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="p-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="lab-grid">
 
-                                <!-- Snake -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.openWindow('snake');">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M13 3c-1.1 0-2 .9-2 2 0 .4.1.7.3 1H9.5C9.2 5.4 8.6 5 8 5H6.7c.2-.3.3-.6.3-1 0-1.1-.9-2-2-2s-2 .9-2 2c0 .7.4 1.4 1 1.7v.8C3.4 6.8 3 7.4 3 8v2c0 1.7 1.3 3 3 3h4c1.7 0 3-1.3 3-3V7c0-.6-.4-1.2-1-1.5V5c0-1.1-.9-2-2-2zM5 3.5a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1zm6 6.5c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V8c0-.6.4-1 1-1h3c.6 0 1 .4 1 1v2z"/></svg>Snake</h3>
-                                        <div class="flex items-center gap-2">
-                                            <span id="lab-hs-snake" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Classic arcade snake game. Eat food, grow longer, avoid walls and yourself!</p>
-                                    <div class="mt-auto">
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">ARCADE</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 2048 -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.openWindow('game2048');">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1" opacity=".6"/><rect x="1" y="9" width="6" height="6" rx="1" opacity=".6"/><rect x="9" y="9" width="6" height="6" rx="1" opacity=".3"/></svg>2048</h3>
-                                        <div class="flex items-center gap-2">
-                                            <span id="lab-hs-2048" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Addictive number merging puzzle. Reach the 2048 tile!</p>
-                                    <div class="mt-auto">
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PUZZLE</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Tic Tac Toe -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 150ms" onclick="window.openWindow('tictactoe');">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="5.5" y1="1" x2="5.5" y2="15"/><line x1="10.5" y1="1" x2="10.5" y2="15"/><line x1="1" y1="5.5" x2="15" y2="5.5"/><line x1="1" y1="10.5" x2="15" y2="10.5"/><circle cx="3" cy="8" r="1.3" fill="currentColor" stroke="none"/><line x1="11.5" y1="2" x2="14" y2="4.5"/><line x1="14" y1="2" x2="11.5" y2="4.5"/></svg>Tic Tac Toe</h3>
-                                        <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
-                                    </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Strategy game with Minimax AI. Choose Easy, Medium, or Hard difficulty. Can you beat the machine?</p>
-                                    <div class="mt-auto">
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">MINIMAX</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Tetris -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 200ms" onclick="window.openWindow('tetris');">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><rect x="5" y="1" width="4" height="4" rx=".5"/><rect x="1" y="5" width="4" height="4" rx=".5"/><rect x="5" y="5" width="4" height="4" rx=".5"/><rect x="9" y="5" width="4" height="4" rx=".5" opacity=".7"/><rect x="5" y="9" width="4" height="4" rx=".5" opacity=".5"/><rect x="9" y="9" width="4" height="4" rx=".5" opacity=".3"/></svg>Tetris</h3>
-                                        <div class="flex items-center gap-2">
-                                            <span id="lab-hs-tetris" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Classic falling blocks with DAS movement, ghost pieces, hold queue, particles, and screen shake!</p>
-                                    <div class="mt-auto">
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Threes -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 250ms" onclick="window.openWindow('threes');">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><text x="8" y="12" text-anchor="middle" font-size="10" font-weight="bold" fill="currentColor">3</text></svg>Threes!</h3>
-                                        <div class="flex items-center gap-2">
-                                            <span id="lab-hs-threes" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Combine 1+2 to make 3, then match pairs. Addictive puzzle with smooth tile animations.</p>
-                                    <div class="mt-auto">
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- DOOM -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 300ms" onclick="window.openWindow('doom');">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1C4.7 1 2 3.7 2 7c0 2 1 3.8 2.5 4.9V14c0 .6.4 1 1 1h5c.6 0 1-.4 1-1v-2.1C13 10.8 14 9 14 7c0-3.3-2.7-6-6-6zM6 10a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm4 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm-2 2.5c-.8 0-1.5-.3-1.5-.7h3c0 .4-.7.7-1.5.7z"/></svg>DOOM</h3>
-                                        <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
-                                    </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">The legendary 1993 FPS running via DOSBox WebAssembly. Shareware Episode 1: Knee-Deep in the Dead.</p>
-                                    <div class="mt-auto">
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">WASM</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">RETRO</span>
-                                        </div>
-                                    </div>
+                                <!-- ═══ Dev Tools ═══ -->
+                                <div class="col-span-full" data-category="tools">
+                                    <h2 class="text-xs font-bold uppercase tracking-widest text-her-dark/40 dark:text-her-textLight/40 mb-1">Dev Tools</h2>
                                 </div>
 
                                 <!-- IaC Visualizer -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 300ms" onclick="window.openWindow('iacvisualizer');">
+                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.openWindow('iacvisualizer');">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gaphor.Gaphor.svg" class="inline w-5 h-5 mr-1" alt="" /> IaC Visualizer</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">INTERACTIVE</span>
@@ -1035,7 +947,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
 
                                 <!-- Network Topology -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 350ms" onclick="window.openWindow('networktopology');">
+                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.openWindow('networktopology');">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/network-wired.svg" class="inline w-5 h-5 mr-1" alt="" /> Network Topology</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">INTERACTIVE</span>
@@ -1051,7 +963,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
 
                                 <!-- Finder -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 400ms" onclick="window.openWindow('finder');">
+                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 150ms" onclick="window.openWindow('finder');">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">📁 Finder</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-bold border border-purple-200 dark:border-purple-800">PROTOTYPE</span>
@@ -1061,6 +973,128 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <div class="flex flex-wrap gap-1.5">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">FILE SYSTEM</span>
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">UI</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Monitoring -->
+                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 200ms" onclick="window.openWindow('monitor');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gnome.SystemMonitor.svg" class="inline w-5 h-5 mr-1" alt="" /> Monitoring</h3>
+                                        <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">WIP</span>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Live AWS infrastructure metrics dashboard. Currently under construction.</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CLOUDWATCH</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ═══ Games ═══ -->
+                                <div class="col-span-full mt-4" data-category="games">
+                                    <h2 class="text-xs font-bold uppercase tracking-widest text-her-dark/40 dark:text-her-textLight/40 mb-1">Games</h2>
+                                </div>
+
+                                <!-- DOOM -->
+                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 250ms" onclick="window.openWindow('doom');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${doomIcon}" class="w-5 h-5 object-contain" alt="DOOM" />DOOM</h3>
+                                        <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">The legendary 1993 FPS running via DOSBox WebAssembly. Shareware Episode 1: Knee-Deep in the Dead.</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">WASM</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">RETRO</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Snake -->
+                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 300ms" onclick="window.openWindow('snake');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${snakeIcon}" class="w-5 h-5 object-contain" alt="Snake" />Snake</h3>
+                                        <div class="flex items-center gap-2">
+                                            <span id="lab-hs-snake" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Classic arcade snake game. Eat food, grow longer, avoid walls and yourself!</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">ARCADE</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 2048 -->
+                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 350ms" onclick="window.openWindow('game2048');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${game2048Icon}" class="w-5 h-5 object-contain" alt="2048" />2048</h3>
+                                        <div class="flex items-center gap-2">
+                                            <span id="lab-hs-2048" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Addictive number merging puzzle. Reach the 2048 tile!</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PUZZLE</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tic Tac Toe -->
+                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 400ms" onclick="window.openWindow('tictactoe');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${tictactoeIcon}" class="w-5 h-5 object-contain" alt="Tic Tac Toe" />Tic Tac Toe</h3>
+                                        <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Strategy game with Minimax AI. Choose Easy, Medium, or Hard difficulty. Can you beat the machine?</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">MINIMAX</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tetris -->
+                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 450ms" onclick="window.openWindow('tetris');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${tetrisIcon}" class="w-5 h-5 object-contain" alt="Tetris" />Tetris</h3>
+                                        <div class="flex items-center gap-2">
+                                            <span id="lab-hs-tetris" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Classic falling blocks with DAS movement, ghost pieces, hold queue, particles, and screen shake!</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Threes -->
+                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 500ms" onclick="window.openWindow('threes');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${threesIcon}" class="w-5 h-5 object-contain" alt="Threes" />Threes!</h3>
+                                        <div class="flex items-center gap-2">
+                                            <span id="lab-hs-threes" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Combine 1+2 to make 3, then match pairs. Addictive puzzle with smooth tile animations.</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1799,12 +1833,15 @@ document.addEventListener("DOMContentLoaded", () => {
           // Dock State + Launch Bounce
           // Icon map for apps that don't have a static dock item
           const dockIconMap: Record<string, { title: string; icon: string }> = {
-            snake: { title: "Snake", icon: "assets/icons/org.gnome.Extensions.svg" },
-            game2048: { title: "2048", icon: "assets/icons/org.gnome.Extensions.svg" },
-            tictactoe: { title: "Tic Tac Toe", icon: "assets/icons/org.gnome.Extensions.svg" },
-            tetris: { title: "Tetris", icon: "assets/icons/org.gnome.Extensions.svg" },
-            threes: { title: "Threes!", icon: "assets/icons/org.gnome.Extensions.svg" },
-            doom: { title: "DOOM", icon: "assets/icons/org.gnome.Extensions.svg" },
+            snake: { title: "Snake", icon: snakeIcon },
+            game2048: { title: "2048", icon: game2048Icon },
+            tictactoe: { title: "Tic Tac Toe", icon: tictactoeIcon },
+            tetris: { title: "Tetris", icon: tetrisIcon },
+            threes: { title: "Threes!", icon: threesIcon },
+            doom: { title: "DOOM", icon: doomIcon },
+            iacvisualizer: { title: "IaC Visualizer", icon: "assets/icons/org.gaphor.Gaphor.svg" },
+            networktopology: { title: "Network Topology", icon: "assets/icons/network-wired.svg" },
+            monitor: { title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
             experiments: { title: "Lab", icon: "assets/icons/characters.svg" },
             sysinfo: { title: "About", icon: "assets/icons/contacts.svg" },
             finder: { title: "Finder", icon: "assets/icons/org.gnome.Nautilus.svg" },
@@ -1826,7 +1863,10 @@ document.addEventListener("DOMContentLoaded", () => {
               div.setAttribute('aria-label', `Open ${info.title}`);
               div.innerHTML = `
                 <span class="dock-label">${info.title}</span>
-                <img class="dock-icon" src="${info.icon}" alt="${info.title}" aria-hidden="true" />
+                ${['snake', 'game2048', 'tictactoe', 'tetris', 'threes', 'doom'].includes(id) 
+                  ? `<div style="transform: scale(1.2); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"><img class="dock-icon" src="${info.icon}" alt="${info.title}" aria-hidden="true" /></div>`
+                  : `<img class="dock-icon" src="${info.icon}" alt="${info.title}" aria-hidden="true" />`
+                }
               `;
               // Add entry animation
               div.style.opacity = '0';
