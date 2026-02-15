@@ -56,7 +56,8 @@
 /* Copernicus — Display/Headline */
 @font-face {
   font-family: "Copernicus";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Medium.ttf") format("truetype");
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Medium.ttf")
+    format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -64,7 +65,8 @@
 
 @font-face {
   font-family: "Copernicus";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Extrabold.ttf") format("truetype");
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Extrabold.ttf")
+    format("truetype");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
@@ -72,7 +74,8 @@
 
 @font-face {
   font-family: "Copernicus";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Heavy.ttf") format("truetype");
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Heavy.ttf")
+    format("truetype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -81,7 +84,8 @@
 /* Tiempos Headline — Large display serif */
 @font-face {
   font-family: "Tiempos Headline";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposHeadline-Regular.otf") format("opentype");
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposHeadline-Regular.otf")
+    format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -90,7 +94,8 @@
 /* Tiempos Text — Body/UI */
 @font-face {
   font-family: "Tiempos Text";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Regular.otf") format("opentype");
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Regular.otf")
+    format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -98,7 +103,8 @@
 
 @font-face {
   font-family: "Tiempos Text";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Medium.otf") format("opentype");
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Medium.otf")
+    format("opentype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -106,7 +112,8 @@
 
 @font-face {
   font-family: "Tiempos Text";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Bold.otf") format("opentype");
+  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Bold.otf")
+    format("opentype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -536,7 +543,7 @@ html.dark .ventura-bg {
 
 /* Wallpaper cross-fade overlay */
 #desktop::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -1194,6 +1201,7 @@ html.dark .dock-container {
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   background: rgba(244, 235, 217, 0.45);
   border-bottom: 1px solid rgba(74, 124, 157, 0.1);
+  font-family: "Noto Sans", sans-serif;
   transition:
     background 0.4s ease,
     backdrop-filter 0.4s ease;
@@ -1221,6 +1229,16 @@ html.dark #menubar {
 .clock-flip {
   display: inline-flex;
   overflow: hidden;
+  font-family: "Noto Sans", sans-serif;
+  font-weight: 700;
+  letter-spacing: normal;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  gap: 2px;
+}
+
+.clock-char[data-char=" "] {
+  width: 0.4em;
 }
 
 .clock-char {

@@ -2068,12 +2068,16 @@ document.addEventListener("DOMContentLoaded", () => {
         function updateClock() {
           const now = new Date();
           const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+          const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
           const day = days[now.getDay()];
-          const time = now.toLocaleTimeString("en-GB", {
-            hour: "2-digit",
+          const month = months[now.getMonth()];
+          const date = now.getDate();
+          const time = now.toLocaleTimeString("en-US", {
+            hour: "numeric",
             minute: "2-digit",
+            hour12: false,
           });
-          const text = `${day} ${time}`;
+          const text = `${day} ${month} ${date} ${time}`;
           const clockEl = document.getElementById("clock");
           if (!clockEl) return;
 
