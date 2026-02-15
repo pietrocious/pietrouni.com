@@ -158,24 +158,7 @@ export function handlePietrOSCommand(
     }
 
     case "help":
-      output.innerHTML += `
-        <div class="opacity-80 mt-1 mb-2">
-          <div class="font-bold text-her-red mb-1">Available Commands:</div>
-          <div class="pl-2">
-            <div class="text-blue-400 font-bold text-xs uppercase mt-2">System</div>
-            <div>help, about, clear, neofetch, version</div>
-            <div class="text-blue-400 font-bold text-xs uppercase mt-2">File Operations</div>
-            <div>ls [-a], cd, pwd, mkdir, touch, rmdir, cat</div>
-            <div class="text-blue-400 font-bold text-xs uppercase mt-2">Applications</div>
-            <div>open [app], about, projects, resume</div>
-            <div class="text-blue-400 font-bold text-xs uppercase mt-2">Network & DevOps</div>
-            <div>traceroute, dig, curl, docker, terraform, ssh, cisco</div>
-            <div class="text-blue-400 font-bold text-xs uppercase mt-2">Utilities</div>
-            <div>calc, uptime, clock, version, quote</div>
-            <div class="text-blue-400 font-bold text-xs uppercase mt-2">Fun & Games</div>
-            <div>💡 Try 'help-fun' for some fun commands!</div>
-          </div>
-        </div>`;
+      output.innerHTML += `<div class="my-2 font-mono text-xs"><div class="text-her-red font-bold mb-2">Available Commands</div><div class="grid gap-y-1"><div><span class="text-blue-400 font-bold w-20 inline-block">SYSTEM</span> <span class="text-gray-300">help, clear, neofetch, version, uptime, history</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">FILE OPS</span> <span class="text-gray-300">ls [-a], cd, pwd, mkdir, touch, rmdir, cat</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">APPS</span> <span class="text-gray-300">open [app], about, projects, resume, contact</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">NETWORK</span> <span class="text-gray-300">cisco, ssh, traceroute, dig, curl</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">DEVOPS</span> <span class="text-gray-300">docker, terraform</span></div><div><span class="text-blue-400 font-bold w-20 inline-block">UTILS</span> <span class="text-gray-300">calc, clock, quote, whoami, skills, timeline</span></div><div><span class="text-pink-400 font-bold w-20 inline-block">TEXT ART</span> <span class="text-gray-300">ascii, figlet, cowsay, flip</span></div><div><span class="text-green-400 font-bold w-20 inline-block">GAMES</span> <span class="text-gray-300">guess, rps, 8ball</span></div><div><span class="text-cyan-400 font-bold w-20 inline-block">VISUALS</span> <span class="text-gray-300">matrix, rain, sl, hack, hlx</span></div><div><span class="text-yellow-400 font-bold w-20 inline-block">THEMES</span> <span class="text-gray-300">cyberpunk, fallout</span></div></div><div class="text-gray-500 mt-2">Type <span class="text-white">man &lt;cmd&gt;</span> for details. <span class="text-gray-600">Ctrl+C</span> cancels running commands.</div></div>`;
       break;
 
     case "help-fun":
@@ -956,14 +939,21 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
       ];
       const lambdaArt = `
 <pre class="hlx-lambda text-orange-500 font-bold my-2" style="text-shadow: 0 0 10px rgba(255,165,0,0.5);">
-         .--.
-        |λλλ|
-       /|   |\\
-      / |   | \\
-     /  |   |  \\
-    /   |   |   \\
-   /    |___|    \\
-  /_____/_____\\____\\
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣤⣴⣦⣤⣤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⠿⠿⠿⠿⣿⣿⣿⣿⣶⣤⡀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⣠⣾⣿⣿⡿⠛⠉⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⢿⣿⣿⣶⡀⠀⠀⠀⠀
+⠀⠀⠀⣴⣿⣿⠟⠁⠀⠀⠀⣶⣶⣶⣶⡆⠀⠀⠀⠀⠀⠀⠈⠻⣿⣿⣦⠀⠀⠀
+⠀⠀⣼⣿⣿⠋⠀⠀⠀⠀⠀⠛⠛⢻⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠙⣿⣿⣧⠀⠀
+⠀⢸⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠸⣿⣿⡇⠀
+⠀⣿⣿⡿⠀⠀⠀⠀⠀⠀⠀⠀⢀⣾⣿⣿⣿⣇⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⠀
+⠀⣿⣿⡇⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⡟⢹⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⣹⣿⣿⠀
+⠀⣿⣿⣷⠀⠀⠀⠀⠀⠀⣰⣿⣿⠏⠀⠀⢻⣿⣿⡄⠀⠀⠀⠀⠀⠀⣿⣿⡿⠀
+⠀⢸⣿⣿⡆⠀⠀⠀⠀⣴⣿⡿⠃⠀⠀⠀⠈⢿⣿⣷⣤⣤⡆⠀⠀⣰⣿⣿⠇⠀
+⠀⠀⢻⣿⣿⣄⠀⠀⠾⠿⠿⠁⠀⠀⠀⠀⠀⠘⣿⣿⡿⠿⠛⠀⣰⣿⣿⡟⠀⠀
+⠀⠀⠀⠻⣿⣿⣧⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣾⣿⣿⠏⠀⠀⠀
+⠀⠀⠀⠀⠈⠻⣿⣿⣷⣤⣄⡀⠀⠀⠀⠀⠀⠀⢀⣠⣴⣾⣿⣿⠟⠁⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠈⠛⠿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠛⠛⠛⠛⠛⠛⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 </pre>`;
       let hlxIndex = 0;
       function showNextHlx(): void {

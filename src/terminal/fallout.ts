@@ -61,7 +61,7 @@ export function handleFalloutCommand(input: string, output: HTMLElement, inputEl
         const titleEl = termWin.querySelector(".window-title");
         if (titleEl) titleEl.textContent = "Terminal";
       }
-      TERMINAL_STATE.mode = "os93";
+      TERMINAL_STATE.mode = "pietros";
       TERMINAL_STATE.user = "guest";
       // Clear terminal and show goodbye
       output.innerHTML = `<div class="text-blue-400">RobCo Terminal Shutdown. Goodbye.</div>`;

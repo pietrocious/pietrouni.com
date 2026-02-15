@@ -170,7 +170,7 @@ export function handleTerminalCommand(e: KeyboardEvent): void {
     } else if (TERMINAL_STATE.mode === "fallout") {
       window.handleFalloutCommand(input, output, inputEl);
     } else {
-      window.handlePietrOSCommand(input, output, inputEl);
+      (window as any).handlePietrOSCommand(input, output, inputEl, (window as any).activeWindows);
     }
   }
 }
