@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import {
-  vaultData,
   fileSystem,
   asciiAlpha,
   PIETROS_COMMANDS,
   CYBERPUNK_COMMANDS,
   FALLOUT_COMMANDS,
 } from './config';
+import { vaultData } from './vault';
 
 describe('config module', () => {
   describe('vaultData', () => {

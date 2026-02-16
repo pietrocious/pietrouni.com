@@ -53,7 +53,7 @@ describe('state module', () => {
     it('should have type property for each wallpaper', () => {
       wallpapers.forEach((wp) => {
         expect(wp.type).toBeDefined();
-        expect(['class', 'gradient']).toContain(wp.type);
+        expect(['class', 'gradient', 'vanta']).toContain(wp.type);
       });
     });
 
