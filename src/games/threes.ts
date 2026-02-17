@@ -9,6 +9,8 @@ interface AnimatedTile {
   row: number;
   col: number;
   // Animation state
+  startX: number;
+  startY: number;
   displayX: number;
   displayY: number;
   targetX: number;
@@ -263,6 +265,8 @@ export class ThreesGame {
       value,
       row,
       col,
+      startX: x,
+      startY: y,
       displayX: x,
       displayY: y,
       targetX: x,
@@ -355,6 +359,8 @@ export class ThreesGame {
       const wasMerged = mergedIds.has(t.id);
       return {
         ...t,
+        startX: t.displayX,
+        startY: t.displayY,
         targetX,
         targetY,
         targetScale: wasMerged ? MERGE_POP_SCALE : 1,
@@ -373,7 +379,9 @@ export class ThreesGame {
       else if (direction === 'down') newTile.displayY = gridToPixel(-1);
       else if (direction === 'left') newTile.displayX = gridToPixel(GRID_SIZE);
       else if (direction === 'right') newTile.displayX = gridToPixel(-1);
-      
+      newTile.startX = newTile.displayX;
+      newTile.startY = newTile.displayY;
+
       this.tiles.push(newTile);
       this.nextTile = getRandomValue();
     }
@@ -399,8 +407,8 @@ export class ThreesGame {
         const eased = easeOutQuart(progress);
 
         for (const tile of this.tiles) {
-          tile.displayX = tile.displayX + (tile.targetX - tile.displayX) * eased;
-          tile.displayY = tile.displayY + (tile.targetY - tile.displayY) * eased;
+          tile.displayX = tile.startX + (tile.targetX - tile.startX) * eased;
+          tile.displayY = tile.startY + (tile.targetY - tile.startY) * eased;
 
           if (tile.merged) {
             if (progress < 0.5) {
@@ -517,7 +525,8 @@ export class ThreesGame {
   private moveTiles(direction: Direction): { newTiles: AnimatedTile[]; moved: boolean; mergedIds: Set<number> } {
     let moved = false;
     const mergedIds = new Set<number>();
-    const newTiles = this.tiles.map(t => ({ ...t }));
+    const allTiles = this.tiles.map(t => ({ ...t }));
+    const finalTiles: AnimatedTile[] = [];
 
     const processLine = (line: AnimatedTile[], reverse: boolean): AnimatedTile[] => {
       if (reverse) line = [...line].reverse();
@@ -553,7 +562,7 @@ export class ThreesGame {
 
     if (direction === 'up' || direction === 'down') {
       for (let c = 0; c < GRID_SIZE; c++) {
-        let column = newTiles.filter(t => t.col === c).sort((a, b) => a.row - b.row);
+        let column = allTiles.filter(t => t.col === c).sort((a, b) => a.row - b.row);
         column = processLine(column, direction === 'down');
 
         if (direction === 'up') {
@@ -568,10 +577,11 @@ export class ThreesGame {
             t.row = newRow;
           });
         }
+        finalTiles.push(...column);
       }
     } else {
       for (let r = 0; r < GRID_SIZE; r++) {
-        let row = newTiles.filter(t => t.row === r).sort((a, b) => a.col - b.col);
+        let row = allTiles.filter(t => t.row === r).sort((a, b) => a.col - b.col);
         row = processLine(row, direction === 'right');
 
         if (direction === 'left') {
@@ -586,18 +596,7 @@ export class ThreesGame {
             t.col = newCol;
           });
         }
-      }
-    }
-
-    // Remove duplicates at same position
-    const finalTiles: AnimatedTile[] = [];
-    const seen = new Set<string>();
-
-    for (const t of newTiles) {
-      const key = `${t.row},${t.col}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        finalTiles.push(t);
+        finalTiles.push(...row);
       }
     }
 
@@ -861,6 +860,8 @@ export class ThreesGame {
       const y = gridToPixel(t.row);
       return {
         ...t,
+        startX: x,
+        startY: y,
         displayX: x,
         displayY: y,
         targetX: x,
