@@ -2,7 +2,6 @@ import { marked } from 'marked';
 
 // Lab Icons
 import snakeIcon from './assets/icons/lab/snake.png';
-import game2048Icon from './assets/icons/lab/2048.png';
 import tictactoeIcon from './assets/icons/lab/tictactoe.png';
 import tetrisIcon from './assets/icons/lab/tetris.png';
 import threesIcon from './assets/icons/lab/threes.png';
@@ -22,7 +21,6 @@ import { animateWindowContent } from './animations';
 import { initVanta, destroyVanta, updateVantaTheme, isVantaActive } from './vanta';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
 import { initTicTacToe, destroyTicTacToe } from './games/tic-tac-toe';
-import { initGame2048, destroyGame2048 } from './games/game-2048';
 import { initSnake, destroySnake } from './games/snake';
 import { initDoom, destroyDoom } from './games/doom';
 import { handleTerminalCommand } from './terminal/core';
@@ -864,26 +862,6 @@ document.addEventListener("DOMContentLoaded", () => {
             },
           },
 
-          game2048: {
-            title: "2048",
-            content: `
-                    <div id="game2048-container" class="h-full flex flex-col items-center justify-center bg-[#faf8ef] select-none p-4 w-full">
-                        <!-- Canvas injected by TS -->
-                    </div>
-                `,
-            width: 580,
-            height: 720,
-            onOpen: () => {
-              setTimeout(() => {
-                const container = document.getElementById("game2048-container");
-                if (container) initGame2048(container);
-              }, 50);
-            },
-            onClose: () => {
-              destroyGame2048();
-            },
-          },
-
           snake: {
             title: "Snake",
             content: `
@@ -1065,24 +1043,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <div class="flex flex-wrap gap-1.5">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">ARCADE</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 2048 -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 350ms" onclick="window.openWindow('game2048');">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${game2048Icon}" class="w-5 h-5 object-contain" alt="2048" />2048</h3>
-                                        <div class="flex items-center gap-2">
-                                            <span id="lab-hs-2048" class="text-[10px] font-mono opacity-50 text-her-dark dark:text-her-textLight hidden"></span>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Addictive number merging puzzle. Reach the 2048 tile!</p>
-                                    <div class="mt-auto">
-                                        <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PUZZLE</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1556,67 +1516,45 @@ document.addEventListener("DOMContentLoaded", () => {
           threes: {
             title: "Threes!",
             content: `
-                    <div id="threes-app" class="h-full flex flex-col bg-zinc-100 text-zinc-800 select-none font-ui p-4 items-center">
-                        <!-- Header -->
-                        <div class="text-center mb-4">
-                            <h1 class="text-2xl font-bold">Threes!</h1>
-                            <p class="text-zinc-500 text-xs">Combine 1+2 to make 3, then match pairs!</p>
-                        </div>
-                        
-                        <!-- Score Section -->
-                        <div class="flex justify-between items-center mb-3 w-full max-w-[360px]">
-                            <div class="flex items-center gap-2">
-                                <span class="text-zinc-500 text-xs">Next:</span>
-                                <div class="flex flex-col items-center gap-0.5">
-                                    <div id="threes-next" class="w-8 h-8 rounded flex items-center justify-center font-bold text-sm shadow-md bg-sky-400 text-white">1</div>
-                                    <span id="threes-next-hint" class="text-[9px] text-zinc-400 font-mono leading-none">+2→3</span>
-                                </div>
-                            </div>
+                    <div id="threes-app" class="h-full flex flex-col items-center justify-center bg-[#faf8ef] select-none p-4 w-full">
+                        <!-- Header / UI -->
+                        <div class="flex justify-between items-center mb-4 w-full max-w-md mx-auto">
                             <div class="flex gap-4">
-                                <div class="text-center">
-                                    <div class="text-[10px] text-zinc-500 uppercase">Score</div>
-                                    <div class="text-lg font-bold" id="threes-score">0</div>
+                                <div class="bg-[#bbada0] p-2 rounded text-center min-w-[70px]">
+                                    <div class="text-[#eee4da] text-[10px] font-bold uppercase">Next</div>
+                                    <div id="threes-next" class="text-white font-bold text-lg leading-tight h-7 flex items-center justify-center">1</div>
+                                    <div id="threes-next-hint" class="text-[9px] text-[#eee4da] opacity-70 font-mono">+2→3</div>
                                 </div>
-                                <div class="text-center">
-                                    <div class="text-[10px] text-zinc-500 uppercase">Best</div>
-                                    <div class="text-lg font-bold" id="threes-highscore">0</div>
+                                <div class="bg-[#bbada0] p-2 rounded text-center min-w-[80px]">
+                                    <div class="text-[#eee4da] text-[10px] font-bold uppercase">Score</div>
+                                    <div id="threes-score" class="text-white font-bold text-lg">0</div>
+                                </div>
+                                <div class="bg-[#bbada0] p-2 rounded text-center min-w-[80px]">
+                                    <div class="text-[#eee4da] text-[10px] font-bold uppercase">Best</div>
+                                    <div id="threes-highscore" class="text-white font-bold text-lg">0</div>
                                 </div>
                             </div>
+                            <div class="flex gap-2">
+                                <button id="threes-undo" class="bg-[#8f7a66] text-white px-3 py-2 rounded font-bold hover:bg-[#9c8470] text-sm shadow-sm transition-colors">Undo</button>
+                                <button id="threes-reset" class="bg-[#8f7a66] text-white px-3 py-2 rounded font-bold hover:bg-[#9c8470] text-sm shadow-sm transition-colors">New Game</button>
+                            </div>
                         </div>
-                        
+
                         <!-- Game Board -->
-                        <canvas id="threes-board" width="410" height="410" class="rounded-xl shadow-lg"></canvas>
-                        <div id="threes-status" class="h-6 flex items-center justify-center mt-2"></div>
-                        
-                        <!-- Mobile Controls -->
-                        <div class="mt-3 grid grid-cols-3 gap-2 max-w-[160px] md:hidden">
-                            <div></div>
-                            <button id="threes-up" class="bg-zinc-200 hover:bg-zinc-300 rounded-lg p-2 flex items-center justify-center transition-colors">
-                                <svg class="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
-                            </button>
-                            <div></div>
-                            <button id="threes-left" class="bg-zinc-200 hover:bg-zinc-300 rounded-lg p-2 flex items-center justify-center transition-colors">
-                                <svg class="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                            </button>
-                            <button id="threes-down" class="bg-zinc-200 hover:bg-zinc-300 rounded-lg p-2 flex items-center justify-center transition-colors">
-                                <svg class="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                            </button>
-                            <button id="threes-right" class="bg-zinc-200 hover:bg-zinc-300 rounded-lg p-2 flex items-center justify-center transition-colors">
-                                <svg class="w-5 h-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                            </button>
+                        <div class="relative w-full max-w-md mx-auto aspect-square bg-[#bbada0] rounded-lg p-2 shadow-inner">
+                            <canvas id="threes-board" width="410" height="410" class="w-full h-full rounded-md shadow-lg"></canvas>
                         </div>
                         
-                        <!-- Reset Button -->
-                        <button id="threes-reset" class="mt-4 bg-zinc-800 text-white px-5 py-1.5 rounded-lg font-semibold text-sm hover:bg-zinc-700 transition-colors">New Game</button>
-                        
+                        <div id="threes-status" class="h-6 flex items-center justify-center mt-2 font-bold uppercase tracking-widest text-[#776e65]"></div>
+
                         <!-- Controls Help -->
-                        <div class="mt-3 text-center text-zinc-500 text-xs hidden md:block">
-                            <p>Use arrow keys or swipe to move tiles</p>
+                        <div class="mt-2 text-center text-[#776e65] text-xs opacity-70">
+                            <p>Arrows / WASD to move · Ctrl+Z or U to undo</p>
                         </div>
                     </div>
                 `,
-            width: 490,
-            height: 660,
+            width: 580,
+            height: 720,
             onOpen: () => {
               setTimeout(() => {
                 const container = document.getElementById('threes-app');
@@ -1858,7 +1796,6 @@ document.addEventListener("DOMContentLoaded", () => {
           // Icon map for apps that don't have a static dock item
           const dockIconMap: Record<string, { title: string; icon: string }> = {
             snake: { title: "Snake", icon: snakeIcon },
-            game2048: { title: "2048", icon: game2048Icon },
             tictactoe: { title: "Tic Tac Toe", icon: tictactoeIcon },
             tetris: { title: "Tetris", icon: tetrisIcon },
             threes: { title: "Threes!", icon: threesIcon },
@@ -1887,7 +1824,7 @@ document.addEventListener("DOMContentLoaded", () => {
               div.setAttribute('aria-label', `Open ${info.title}`);
               div.innerHTML = `
                 <span class="dock-label">${info.title}</span>
-                ${['snake', 'game2048', 'tictactoe', 'tetris', 'threes', 'doom'].includes(id) 
+                ${['snake', 'tictactoe', 'tetris', 'threes', 'doom'].includes(id) 
                   ? `<div style="transform: scale(1.2); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"><img class="dock-icon" src="${info.icon}" alt="${info.title}" aria-hidden="true" /></div>`
                   : `<img class="dock-icon" src="${info.icon}" alt="${info.title}" aria-hidden="true" />`
                 }

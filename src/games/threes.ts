@@ -46,6 +46,12 @@ interface ScorePopup {
 
 type Direction = 'up' | 'down' | 'left' | 'right';
 
+interface HistoryEntry {
+  tiles: string; // JSON snapshot of tiles
+  score: number;
+  nextTile: number;
+}
+
 const GRID_SIZE = 4;
 const CELL_SIZE = 90;
 const CELL_GAP = 10;
@@ -131,6 +137,9 @@ export class ThreesGame {
   private highScoreEl: HTMLElement;
   private statusEl: HTMLElement;
   private nextTileEl: HTMLElement;
+  private undoEl: HTMLElement | null;
+
+  private history: HistoryEntry | null = null;
 
   private keyHandler: ((e: KeyboardEvent) => void) | null = null;
   private touchStartX = 0;
@@ -157,6 +166,8 @@ export class ThreesGame {
 
     // Buttons
     container.querySelector('#threes-reset')?.addEventListener('click', () => this.reset());
+    this.undoEl = container.querySelector('#threes-undo');
+    this.undoEl?.addEventListener('click', () => this.undo());
 
     // Touch controls
     this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e));
@@ -203,6 +214,18 @@ export class ThreesGame {
         case 'ArrowRight':
           e.preventDefault();
           this.move('right');
+          break;
+        case 'z':
+        case 'Z':
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            this.undo();
+          }
+          break;
+        case 'u':
+        case 'U':
+          e.preventDefault();
+          this.undo();
           break;
       }
     };
@@ -315,6 +338,9 @@ export class ThreesGame {
 
   private move(direction: Direction): void {
     if (this.gameOver || this.animating) return;
+
+    // Snapshot for undo before moving
+    this.history = this.snapshotState();
 
     const { newTiles, moved, mergedIds } = this.moveTiles(direction);
 
@@ -798,6 +824,7 @@ export class ThreesGame {
   }
 
   reset(): void {
+    this.history = null;
     this.animating = false;
     this.particles = [];
     this.ripples = [];
@@ -806,6 +833,55 @@ export class ThreesGame {
     this.initializeGrid();
     this.statusEl.textContent = '';
     this.statusEl.className = '';
+  }
+
+  private snapshotState(): HistoryEntry {
+    // Deep clone tiles (excluding animation state for simplicity, we'll restore grid pos)
+    const snapshot = this.tiles.map(t => ({
+      id: t.id,
+      value: t.value,
+      row: t.row,
+      col: t.col
+    }));
+    return {
+      tiles: JSON.stringify(snapshot),
+      score: this.score,
+      nextTile: this.nextTile
+    };
+  }
+
+  private undo(): void {
+    if (!this.history || this.animating) return;
+
+    const snap = JSON.parse(this.history.tiles) as { id: number, value: number, row: number, col: number }[];
+    
+    // Restore tiles
+    this.tiles = snap.map(t => {
+      const x = gridToPixel(t.col);
+      const y = gridToPixel(t.row);
+      return {
+        ...t,
+        displayX: x,
+        displayY: y,
+        targetX: x,
+        targetY: y,
+        scale: 1,
+        targetScale: 1,
+        opacity: 1,
+        merged: false,
+        isNew: false
+      };
+    });
+
+    this.score = this.history.score;
+    this.prevScore = this.score;
+    this.nextTile = this.history.nextTile;
+    this.history = null; // Single-level undo for now to match 2048's logic
+    this.gameOver = false;
+    this.statusEl.textContent = '';
+    
+    this.updateScore();
+    if (isSoundEnabled()) playClick();
   }
 
   destroy(): void {
