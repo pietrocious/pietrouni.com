@@ -603,8 +603,9 @@ document.addEventListener("DOMContentLoaded", () => {
             content: `
                      <div class="h-full dyn-p font-ui overflow-y-auto window-content selection:bg-her-red selection:text-white p-2" style="min-width: 500px;">
                         <!-- Header -->
-                        <div class="mb-6 p-4">
+                        <div class="mb-4 p-4 pb-0">
                             <h1 class="font-ui font-bold text-2xl text-her-dark dark:text-her-textLight">Projects</h1>
+                            <p class="text-sm opacity-60 mt-1 text-her-dark dark:text-her-textLight">Cloud architecture, automation and software projects</p>
                         </div>
 
                         <div class="space-y-8 p-2">
@@ -817,7 +818,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                             </button>
                             <div>
-                                <h2 id="vault-title" class="text-lg font-serif font-extrabold text-her-red dark:text-her-red flex items-center gap-2">
+                                <h2 id="vault-title" class="text-lg font-serif font-extrabold text-her-dark dark:text-her-textLight flex items-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                     Personal Vault
                                 </h2>
