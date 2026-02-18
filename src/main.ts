@@ -1432,12 +1432,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span id="iac-zoom" class="text-xs opacity-30 font-mono">100%</span>
-                                    <button id="iac-export" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">⬇ PNG</button>
-                                    <span class="text-xs opacity-30">Scroll=zoom · Drag=pan/move</span>
+                                    <button id="iac-fit" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Fit to View (F)">Fit</button>
+                                    <button id="iac-export" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Export PNG (Ctrl+E)">⬇ PNG</button>
+                                    <span class="text-xs opacity-30">F=fit · Ctrl+E=export</span>
                                 </div>
                             </div>
                             <div class="flex-1 relative">
-                                <canvas id="iac-canvas" width="700" height="400" class="absolute inset-0 w-full h-full"></canvas>
+                                <canvas id="iac-canvas" class="absolute inset-0 w-full h-full"></canvas>
                             </div>
                             <div id="iac-details" class="h-40 border-t border-white/10 p-3 overflow-y-auto text-sm">
                                 <div class="text-xs opacity-50">Click a node to view details</div>
@@ -1487,12 +1488,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span id="netmap-zoom" class="text-xs opacity-30 font-mono">100%</span>
-                                    <button id="netmap-export" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">⬇ PNG</button>
-                                    <span class="text-xs opacity-30">Scroll=zoom · Drag=pan/move</span>
+                                    <button id="netmap-fit" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Fit to View (F)">Fit</button>
+                                    <button id="netmap-export" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Export PNG (Ctrl+E)">⬇ PNG</button>
+                                    <span class="text-xs opacity-30">F=fit · Ctrl+E=export</span>
                                 </div>
                             </div>
                             <div class="flex-1 relative">
-                                <canvas id="netmap-canvas" width="700" height="450" class="absolute inset-0 w-full h-full"></canvas>
+                                <canvas id="netmap-canvas" class="absolute inset-0 w-full h-full"></canvas>
                             </div>
                             <div id="netmap-details" class="h-40 border-t border-white/10 p-3 overflow-y-auto text-sm">
                                 <div class="text-xs opacity-50">Click a device to view details</div>

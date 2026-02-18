@@ -2,6 +2,8 @@
 // Vanilla TypeScript implementation using Canvas API
 // Force-directed graph visualization for network devices
 
+import { playClick, playNotification, isSoundEnabled } from '../audio';
+
 // ============ Types ============
 interface NetworkDevice {
   id: string;
@@ -14,6 +16,7 @@ interface NetworkDevice {
   y: number;
   vx: number;
   vy: number;
+  scale?: number;
 }
 
 interface NetworkInterface {
@@ -372,6 +375,7 @@ export class NetworkTopologyVisualizer {
   private detailsEl: HTMLElement;
 
   private devices: NetworkDevice[] = [];
+  private deviceMap: Map<string, NetworkDevice> = new Map();
   private links: NetworkLink[] = [];
   private format: ParsedTopology['format'] = 'unknown';
   private selectedDevice: NetworkDevice | null = null;
@@ -381,6 +385,10 @@ export class NetworkTopologyVisualizer {
   private dragOffsetX = 0;
   private dragOffsetY = 0;
   private animationId: number | null = null;
+  private resizeObserver: ResizeObserver | null = null;
+
+  // Bound event handlers
+  private handlers: { [key: string]: (e: any) => void } = {};
 
   // Zoom/pan state
   private zoomLevel = 1;
@@ -390,6 +398,14 @@ export class NetworkTopologyVisualizer {
   private panStartX = 0;
   private panStartY = 0;
   private zoomEl: HTMLElement | null = null;
+
+  // Touch state
+  private lastTouchX = 0;
+  private lastTouchY = 0;
+  private pinchStartDist = 0;
+  private pinchStartZoom = 1;
+  private lineDashOffset = 0;
+  private reducedMotion = false;
 
   constructor(container: HTMLElement) {
     this.canvas = container.querySelector('#netmap-canvas') as HTMLCanvasElement;
@@ -402,29 +418,90 @@ export class NetworkTopologyVisualizer {
 
     this.zoomEl = container.querySelector('#netmap-zoom') as HTMLElement;
 
-    // Template buttons
-    container.querySelector('#netmap-lldp')?.addEventListener('click', () => this.loadTemplate('lldp'));
-    container.querySelector('#netmap-cdp')?.addEventListener('click', () => this.loadTemplate('cdp'));
-    container.querySelector('#netmap-routing')?.addEventListener('click', () => this.loadTemplate('routing'));
+    // Bind handlers
+    this.handlers = {
+      click: this.handleClick.bind(this),
+      mousedown: this.handleMouseDown.bind(this),
+      mousemove: this.handleMouseMove.bind(this),
+      mouseup: this.handleMouseUp.bind(this),
+      mouseleave: this.handleMouseUp.bind(this),
+      wheel: this.handleWheel.bind(this),
+      touchstart: this.handleTouchStart.bind(this),
+      touchmove: this.handleTouchMove.bind(this),
+      touchend: this.handleTouchEnd.bind(this),
+      input: this.handleInput.bind(this),
+      lldp: () => this.loadTemplate('lldp'),
+      cdp: () => this.loadTemplate('cdp'),
+      routing: () => this.loadTemplate('routing'),
+      export: () => this.exportPNG(),
+      fit: () => this.fitToView(),
+      keydown: this.handleKeyDown.bind(this),
+    };
 
-    // Export PNG
-    container.querySelector('#netmap-export')?.addEventListener('click', () => this.exportPNG());
+    // Template buttons
+    container.querySelector('#netmap-lldp')?.addEventListener('click', this.handlers.lldp);
+    container.querySelector('#netmap-cdp')?.addEventListener('click', this.handlers.cdp);
+    container.querySelector('#netmap-routing')?.addEventListener('click', this.handlers.routing);
+
+    // Toolbar buttons
+    container.querySelector('#netmap-export')?.addEventListener('click', this.handlers.export);
+    container.querySelector('#netmap-fit')?.addEventListener('click', this.handlers.fit);
 
     // Code input
-    this.textarea.addEventListener('input', () => this.parseAndRender());
+    this.textarea.addEventListener('input', this.handlers.input);
 
     // Canvas interactions
-    this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-    this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-    this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
-    this.canvas.addEventListener('mouseleave', () => this.handleMouseUp());
-    this.canvas.addEventListener('click', (e) => this.handleClick(e));
-    this.canvas.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
+    this.canvas.addEventListener('mousedown', this.handlers.mousedown);
+    this.canvas.addEventListener('mousemove', this.handlers.mousemove);
+    this.canvas.addEventListener('mouseup', this.handlers.mouseup);
+    this.canvas.addEventListener('mouseleave', this.handlers.mouseleave);
+    this.canvas.addEventListener('click', this.handlers.click);
+    this.canvas.addEventListener('wheel', this.handlers.wheel, { passive: false });
+    
+    // Touch interactions
+    this.canvas.addEventListener('touchstart', this.handlers.touchstart, { passive: false });
+    this.canvas.addEventListener('touchmove', this.handlers.touchmove, { passive: false });
+    this.canvas.addEventListener('touchend', this.handlers.touchend);
+
+    // Keyboard
+    window.addEventListener('keydown', this.handlers.keydown);
+
+    // Reduced motion
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+      this.reducedMotion = e.matches;
+    });
+
+    // Responsive Canvas
+    this.resizeObserver = new ResizeObserver(() => this.resize());
+    this.resizeObserver.observe(container.parentElement || container);
+    this.resize();
 
     // Initialize
     this.textarea.value = SAMPLE_LLDP;
     this.parseAndRender();
     this.startAnimation();
+  }
+
+  private resize(): void {
+    const parent = this.canvas.parentElement;
+    if (!parent) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = parent.getBoundingClientRect();
+
+    this.canvas.style.width = `${rect.width}px`;
+    this.canvas.style.height = `${rect.height}px`;
+
+    this.canvas.width = rect.width * dpr;
+    this.canvas.height = rect.height * dpr;
+
+    this.ctx.scale(dpr, dpr);
+    this.render();
+  }
+
+  private handleInput(): void {
+    this.parseAndRender();
   }
 
   private screenToWorld(sx: number, sy: number): { x: number; y: number } {
@@ -438,9 +515,118 @@ export class NetworkTopologyVisualizer {
     const my = e.clientY - rect.top;
     const factor = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.max(0.2, Math.min(4, this.zoomLevel * factor));
+    // Zoom towards mouse
     this.panX = mx - (mx - this.panX) * (newZoom / this.zoomLevel);
     this.panY = my - (my - this.panY) * (newZoom / this.zoomLevel);
     this.zoomLevel = newZoom;
+    if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+  }
+
+  private handleTouchStart(e: TouchEvent): void {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const rect = this.canvas.getBoundingClientRect();
+      this.lastTouchX = touch.clientX - rect.left;
+      this.lastTouchY = touch.clientY - rect.top;
+      
+      const { x, y } = this.screenToWorld(this.lastTouchX, this.lastTouchY);
+      const device = this.getDeviceAt(x, y);
+      
+      if (device) {
+        this.isDragging = true;
+        this.dragDevice = device;
+        this.dragOffsetX = x - device.x;
+        this.dragOffsetY = y - device.y;
+      } else {
+        this.isPanning = true;
+      }
+    } else if (e.touches.length === 2) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      this.pinchStartDist = dist;
+      this.pinchStartZoom = this.zoomLevel;
+    }
+  }
+
+  private handleTouchMove(e: TouchEvent): void {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const rect = this.canvas.getBoundingClientRect();
+      const sx = touch.clientX - rect.left;
+      const sy = touch.clientY - rect.top;
+      
+      if (this.isDragging && this.dragDevice) {
+        const { x, y } = this.screenToWorld(sx, sy);
+        this.dragDevice.x = x - this.dragOffsetX;
+        this.dragDevice.y = y - this.dragOffsetY;
+        this.dragDevice.vx = 0;
+        this.dragDevice.vy = 0;
+      } else if (this.isPanning) {
+        const dx = sx - this.lastTouchX;
+        const dy = sy - this.lastTouchY;
+        this.panX += dx;
+        this.panY += dy;
+        this.lastTouchX = sx;
+        this.lastTouchY = sy;
+      }
+    } else if (e.touches.length === 2) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const scale = dist / this.pinchStartDist;
+      
+      const newZoom = Math.max(0.2, Math.min(4, this.pinchStartZoom * scale));
+      this.zoomLevel = newZoom;
+      if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+    }
+  }
+
+  private handleTouchEnd(e: TouchEvent): void {
+    if (e.touches.length === 0) {
+      this.isDragging = false;
+      this.dragDevice = null;
+      this.isPanning = false;
+    }
+  }
+  
+  private handleKeyDown(e: KeyboardEvent): void {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+      e.preventDefault();
+      this.exportPNG();
+    }
+    if (e.key === 'f' && !e.ctrlKey && !e.metaKey && document.activeElement !== this.textarea) {
+      this.fitToView();
+    }
+  }
+
+  private fitToView(): void {
+    if (this.devices.length === 0) return;
+    
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    this.devices.forEach(d => {
+      minX = Math.min(minX, d.x - 50); // 50 = half width
+      minY = Math.min(minY, d.y - 25); // 25 = half height
+      maxX = Math.max(maxX, d.x + 50);
+      maxY = Math.max(maxY, d.y + 25);
+    });
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const canvasW = this.canvas.width / dpr;
+    const canvasH = this.canvas.height / dpr;
+    
+    const contentW = maxX - minX;
+    const contentH = maxY - minY;
+    
+    const scaleX = (canvasW - 100) / contentW;
+    const scaleY = (canvasH - 100) / contentH;
+    this.zoomLevel = Math.max(0.2, Math.min(1.5, Math.min(scaleX, scaleY)));
+
+    this.panX = (canvasW / 2) - ((minX + contentW / 2) * this.zoomLevel);
+    this.panY = (canvasH / 2) - ((minY + contentH / 2) * this.zoomLevel);
+    
     if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
   }
 
@@ -449,6 +635,7 @@ export class NetworkTopologyVisualizer {
     link.download = 'network-topology.png';
     link.href = this.canvas.toDataURL('image/png');
     link.click();
+    if (isSoundEnabled()) playNotification();
   }
 
   private loadTemplate(type: 'lldp' | 'cdp' | 'routing'): void {
@@ -459,6 +646,7 @@ export class NetworkTopologyVisualizer {
     }
     this.selectedDevice = null;
     this.parseAndRender();
+    if (isSoundEnabled()) playClick();
   }
 
   private parseAndRender(): void {
@@ -486,15 +674,21 @@ export class NetworkTopologyVisualizer {
     }
 
     // Initialize device positions in a circle
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = this.canvas.width / dpr;
+    const height = this.canvas.height / dpr;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
     this.devices.forEach((device, i) => {
       const angle = (i / this.devices.length) * Math.PI * 2;
       const radius = 120 + Math.random() * 60;
       device.x = centerX + Math.cos(angle) * radius;
       device.y = centerY + Math.sin(angle) * radius;
+      device.scale = 0; // Start invisible
     });
 
+    this.deviceMap = new Map(this.devices.map(d => [d.id, d]));
     this.updateDetails();
   }
 
@@ -512,8 +706,11 @@ export class NetworkTopologyVisualizer {
     const repulsion = 8000;
     const attraction = 0.006;
     const centerForce = 0.001;
-    const worldW = this.canvas.width / this.zoomLevel;
-    const worldH = this.canvas.height / this.zoomLevel;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = this.canvas.width / dpr;
+    const height = this.canvas.height / dpr;
+    const worldW = width / this.zoomLevel;
+    const worldH = height / this.zoomLevel;
     const worldOriginX = -this.panX / this.zoomLevel;
     const worldOriginY = -this.panY / this.zoomLevel;
     const centerX = worldOriginX + worldW / 2;
@@ -537,8 +734,8 @@ export class NetworkTopologyVisualizer {
 
     // Attraction for linked devices
     for (const link of this.links) {
-      const source = this.devices.find(d => d.id === link.source);
-      const target = this.devices.find(d => d.id === link.target);
+      const source = this.deviceMap.get(link.source);
+      const target = this.deviceMap.get(link.target);
       if (source && target) {
         const dx = target.x - source.x;
         const dy = target.y - source.y;
@@ -563,15 +760,36 @@ export class NetworkTopologyVisualizer {
         device.x += device.vx;
         device.y += device.vy;
       }
+      
+      // Entrance animation
+      if (device.scale === undefined) device.scale = 0;
+      if (this.reducedMotion) {
+        device.scale = 1;
+      } else if (device.scale < 1) {
+        device.scale += (1 - device.scale) * 0.1;
+        if (device.scale > 0.99) device.scale = 1;
+      }
     }
   }
 
   private render(): void {
     const ctx = this.ctx;
+    const reducedMotion = this.reducedMotion;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = this.canvas.width / dpr;
+    const height = this.canvas.height / dpr;
+
+    // Clear canvas
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.restore();
 
+    // World-space transform: DPR -> Pan -> Zoom
     ctx.save();
+    ctx.scale(dpr, dpr);
     ctx.translate(this.panX, this.panY);
     ctx.scale(this.zoomLevel, this.zoomLevel);
 
@@ -579,8 +797,8 @@ export class NetworkTopologyVisualizer {
     const gridStep = 40;
     const worldX0 = -this.panX / this.zoomLevel;
     const worldY0 = -this.panY / this.zoomLevel;
-    const worldX1 = worldX0 + this.canvas.width / this.zoomLevel;
-    const worldY1 = worldY0 + this.canvas.height / this.zoomLevel;
+    const worldX1 = worldX0 + width / this.zoomLevel;
+    const worldY1 = worldY0 + height / this.zoomLevel;
     ctx.strokeStyle = '#1e293b';
     ctx.lineWidth = 1 / this.zoomLevel;
     for (let x = Math.floor(worldX0 / gridStep) * gridStep; x < worldX1; x += gridStep) {
@@ -591,10 +809,12 @@ export class NetworkTopologyVisualizer {
     }
 
     // Links
+    if (!reducedMotion) this.lineDashOffset = (this.lineDashOffset - 0.2) % 100;
+    ctx.lineDashOffset = this.lineDashOffset;
     ctx.lineWidth = 2 / this.zoomLevel;
     for (const link of this.links) {
-      const source = this.devices.find(d => d.id === link.source);
-      const target = this.devices.find(d => d.id === link.target);
+      const source = this.deviceMap.get(link.source);
+      const target = this.deviceMap.get(link.target);
       if (source && target) {
         const color = LINK_COLORS[link.type] || LINK_COLORS.unknown;
         ctx.strokeStyle = color + '80';
@@ -603,7 +823,10 @@ export class NetworkTopologyVisualizer {
         ctx.moveTo(source.x, source.y);
         ctx.lineTo(target.x, target.y);
         ctx.stroke();
+        
+        ctx.save();
         ctx.setLineDash([]);
+        ctx.lineDashOffset = 0;
 
         // Midpoint label for ports
         const midX = (source.x + target.x) / 2;
@@ -612,8 +835,11 @@ export class NetworkTopologyVisualizer {
         ctx.font = '9px system-ui';
         ctx.textAlign = 'center';
         ctx.fillText(`${link.sourcePort}↔${link.targetPort}`, midX, midY - 5);
+        ctx.restore();
       }
     }
+    ctx.setLineDash([]);
+    ctx.lineDashOffset = 0;
 
     // Devices
     for (const device of this.devices) {
@@ -622,11 +848,19 @@ export class NetworkTopologyVisualizer {
       const isHovered = device === this.hoveredDevice;
       const nodeWidth = 100;
       const nodeHeight = 50;
+      const scale = device.scale || 0;
+      
+      if (scale < 0.01) continue;
+
+      ctx.save();
+      ctx.translate(device.x, device.y);
+      ctx.scale(scale, scale);
 
       // Glow
       if (isSelected || isHovered) {
+        const pulse = (isSelected && !reducedMotion) ? Math.sin(Date.now() / 200) * 5 + 5 : 0;
         ctx.shadowColor = colors.border;
-        ctx.shadowBlur = isSelected ? 25 : 15;
+        ctx.shadowBlur = (isSelected ? 25 : 15) + pulse;
       }
 
       // Background
@@ -634,7 +868,7 @@ export class NetworkTopologyVisualizer {
       ctx.strokeStyle = isSelected ? '#ffffff' : colors.border;
       ctx.lineWidth = isSelected ? 3 : 2;
       ctx.beginPath();
-      ctx.roundRect(device.x - nodeWidth / 2, device.y - nodeHeight / 2, nodeWidth, nodeHeight, 10);
+      ctx.roundRect(-nodeWidth / 2, -nodeHeight / 2, nodeWidth, nodeHeight, 10);
       ctx.fill();
       ctx.stroke();
       ctx.shadowBlur = 0;
@@ -642,60 +876,125 @@ export class NetworkTopologyVisualizer {
       // Icon
       ctx.font = '16px system-ui';
       ctx.textAlign = 'center';
-      ctx.fillText(colors.icon, device.x, device.y - 8);
+      ctx.fillText(colors.icon, 0, -8);
 
       // Name
       ctx.fillStyle = colors.text;
       ctx.font = 'bold 10px system-ui';
-      ctx.fillText(device.name.slice(0, 14), device.x, device.y + 12);
+      ctx.fillText(device.name.slice(0, 14), 0, 12);
 
       // IP if available
       if (device.ip) {
         ctx.fillStyle = colors.text + '99';
         ctx.font = '8px system-ui';
-        ctx.fillText(device.ip, device.x, device.y + 22);
+        ctx.fillText(device.ip, 0, 22);
       }
+      
+      ctx.restore();
     }
 
     ctx.restore();
 
-    // Legend (screen space)
+    // Tooltip (screen space)
+    if (this.hoveredDevice) {
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      
+      const screenX = this.hoveredDevice.x * this.zoomLevel + this.panX;
+      const screenY = this.hoveredDevice.y * this.zoomLevel + this.panY;
+      
+      const text = `${this.hoveredDevice.type.toUpperCase()}: ${this.hoveredDevice.name}`;
+      
+      ctx.font = '12px system-ui';
+      const metrics = ctx.measureText(text);
+      const padding = 8;
+      const boxW = metrics.width + padding * 2;
+      const boxH = 26;
+      
+      const boxX = screenX - boxW / 2;
+      const boxY = screenY - 45; // Above device
+      
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 4);
+      ctx.fill();
+      ctx.stroke();
+      
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#e2e8f0';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, screenX, boxY + 17);
+      
+      ctx.restore();
+    }
+
+    // Legend & minimap (screen space)
     this.drawLegend();
+    this.drawMinimap();
 
     // Empty state
     if (this.devices.length === 0) {
       ctx.fillStyle = '#64748b';
       ctx.font = '16px system-ui';
       ctx.textAlign = 'center';
-      ctx.fillText('No network topology to visualize', this.canvas.width / 2, this.canvas.height / 2);
+      ctx.fillText('No network topology to visualize', width / 2, height / 2);
       ctx.font = '12px system-ui';
-      ctx.fillText('Paste LLDP, CDP, or routing table output', this.canvas.width / 2, this.canvas.height / 2 + 20);
+      ctx.fillText('Paste LLDP, CDP, or routing table output', width / 2, height / 2 + 20);
     }
   }
 
   private drawLegend(): void {
     const ctx = this.ctx;
-    const items = [
-      { color: DEVICE_COLORS.router.border, label: 'Router', icon: '🌐' },
-      { color: DEVICE_COLORS.switch.border, label: 'Switch', icon: '🔀' },
-      { color: DEVICE_COLORS.firewall.border, label: 'Firewall', icon: '🛡️' },
-      { color: DEVICE_COLORS.server.border, label: 'Server', icon: '🖥️' },
-    ];
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const height = this.canvas.height / dpr;
+
+    // Build legend from actually-present device types + link types
+    const presentTypes = new Set(this.devices.map(d => d.type));
+    const deviceItems = [...presentTypes].map(type => {
+      const c = DEVICE_COLORS[type] || DEVICE_COLORS.unknown;
+      return { color: c.border, label: type.charAt(0).toUpperCase() + type.slice(1), icon: c.icon };
+    });
+
+    const presentLinks = new Set(this.links.map(l => l.type));
+    const linkItems = [...presentLinks].map(type => ({
+      color: LINK_COLORS[type] || LINK_COLORS.unknown,
+      label: type.charAt(0).toUpperCase() + type.slice(1),
+    }));
+
+    if (deviceItems.length === 0) return;
+
+    const cols = 2;
+    const deviceRows = Math.ceil(deviceItems.length / cols);
+    const linkRows = Math.ceil(linkItems.length / cols);
+    const legendH = 20 + deviceRows * 14 + (linkItems.length > 0 ? 14 + linkRows * 14 : 0) + 8;
+    const legendW = 200;
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
 
     ctx.fillStyle = '#0f172acc';
-    ctx.fillRect(10, this.canvas.height - 60, 200, 50);
+    ctx.beginPath();
+    ctx.roundRect(10, height - legendH - 8, legendW, legendH, 6);
+    ctx.fill();
     ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
-    ctx.strokeRect(10, this.canvas.height - 60, 200, 50);
+    ctx.stroke();
 
     ctx.font = '9px system-ui';
     ctx.fillStyle = '#64748b';
     ctx.textAlign = 'left';
-    ctx.fillText('DEVICE TYPES', 18, this.canvas.height - 45);
+    ctx.fillText('DEVICES', 18, height - legendH + 4);
 
-    items.forEach((item, i) => {
-      const x = 18 + (i % 2) * 95;
-      const y = this.canvas.height - 28 + Math.floor(i / 2) * 14;
+    deviceItems.forEach((item, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = 18 + col * 95;
+      const y = height - legendH + 22 + row * 14;
       ctx.font = '12px system-ui';
       ctx.fillText(item.icon, x, y);
       ctx.fillStyle = item.color;
@@ -703,6 +1002,102 @@ export class NetworkTopologyVisualizer {
       ctx.fillText(item.label, x + 18, y);
       ctx.fillStyle = '#64748b';
     });
+
+    if (linkItems.length > 0) {
+      const linkStartY = height - legendH + 22 + deviceRows * 14;
+      ctx.font = '9px system-ui';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText('LINKS', 18, linkStartY + 2);
+
+      linkItems.forEach((item, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = 18 + col * 95;
+        const y = linkStartY + 16 + row * 14;
+        ctx.fillStyle = item.color;
+        ctx.beginPath();
+        ctx.roundRect(x, y - 8, 10, 10, 2);
+        ctx.fill();
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px system-ui';
+        ctx.fillText(item.label, x + 14, y);
+      });
+    }
+
+    ctx.restore();
+  }
+
+  private drawMinimap(): void {
+    if (this.devices.length < 5) return;
+    const ctx = this.ctx;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const cssW = this.canvas.width / dpr;
+    const cssH = this.canvas.height / dpr;
+    const mapSize = 120;
+    const mapPad = 8;
+    const mapX = cssW - mapSize - 12;
+    const mapY = 12;
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const d of this.devices) {
+      minX = Math.min(minX, d.x);
+      maxX = Math.max(maxX, d.x);
+      minY = Math.min(minY, d.y);
+      maxY = Math.max(maxY, d.y);
+    }
+    const graphW = (maxX - minX) || 1;
+    const graphH = (maxY - minY) || 1;
+    const scale = Math.min((mapSize - mapPad * 2) / graphW, (mapSize - mapPad * 2) / graphH);
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    ctx.fillStyle = '#0f172ae0';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(mapX, mapY, mapSize, mapSize, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    // Mini links
+    for (const link of this.links) {
+      const source = this.deviceMap.get(link.source);
+      const target = this.deviceMap.get(link.target);
+      if (!source || !target) continue;
+      const x1 = mapX + mapPad + (source.x - minX) * scale;
+      const y1 = mapY + mapPad + (source.y - minY) * scale;
+      const x2 = mapX + mapPad + (target.x - minX) * scale;
+      const y2 = mapY + mapPad + (target.y - minY) * scale;
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    // Mini devices
+    for (const d of this.devices) {
+      const nx = mapX + mapPad + (d.x - minX) * scale;
+      const ny = mapY + mapPad + (d.y - minY) * scale;
+      const colors = DEVICE_COLORS[d.type] || DEVICE_COLORS.unknown;
+      ctx.fillStyle = d === this.selectedDevice ? '#ffffff' : colors.border;
+      ctx.beginPath();
+      ctx.arc(nx, ny, d === this.selectedDevice ? 3 : 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Viewport rectangle
+    const vpX = (-this.panX / this.zoomLevel - minX) * scale + mapX + mapPad;
+    const vpY = (-this.panY / this.zoomLevel - minY) * scale + mapY + mapPad;
+    const vpW = (cssW / this.zoomLevel) * scale;
+    const vpH = (cssH / this.zoomLevel) * scale;
+    ctx.strokeStyle = '#ffffff40';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(vpX, vpY, vpW, vpH);
+
+    ctx.restore();
   }
 
   private getDeviceAt(x: number, y: number): NetworkDevice | null {
@@ -769,6 +1164,7 @@ export class NetworkTopologyVisualizer {
     const { x, y } = this.screenToWorld(sx, sy);
     this.selectedDevice = this.getDeviceAt(x, y);
     this.updateDetails();
+    if (this.selectedDevice && isSoundEnabled()) playClick();
   }
 
   private updateDetails(): void {
@@ -813,6 +1209,32 @@ export class NetworkTopologyVisualizer {
 
   destroy(): void {
     if (this.animationId) cancelAnimationFrame(this.animationId);
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+
+    // Remove event listeners
+    const container = this.canvas.parentElement?.parentElement;
+    if (container) {
+      container.querySelector('#netmap-lldp')?.removeEventListener('click', this.handlers.lldp);
+      container.querySelector('#netmap-cdp')?.removeEventListener('click', this.handlers.cdp);
+      container.querySelector('#netmap-routing')?.removeEventListener('click', this.handlers.routing);
+      container.querySelector('#netmap-export')?.removeEventListener('click', this.handlers.export);
+      container.querySelector('#netmap-fit')?.removeEventListener('click', this.handlers.fit);
+    }
+    
+    this.textarea.removeEventListener('input', this.handlers.input);
+
+    this.canvas.removeEventListener('mousedown', this.handlers.mousedown);
+    this.canvas.removeEventListener('mousemove', this.handlers.mousemove);
+    this.canvas.removeEventListener('mouseup', this.handlers.mouseup);
+    this.canvas.removeEventListener('mouseleave', this.handlers.mouseleave);
+    this.canvas.removeEventListener('click', this.handlers.click);
+    this.canvas.removeEventListener('wheel', this.handlers.wheel);
+
+    this.canvas.removeEventListener('touchstart', this.handlers.touchstart);
+    this.canvas.removeEventListener('touchmove', this.handlers.touchmove);
+    this.canvas.removeEventListener('touchend', this.handlers.touchend);
+    
+    window.removeEventListener('keydown', this.handlers.keydown);
   }
 }
 

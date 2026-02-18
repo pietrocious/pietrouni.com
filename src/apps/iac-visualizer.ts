@@ -2,6 +2,8 @@
 // Vanilla TypeScript implementation using Canvas API
 // Force-directed graph with documentation/learning features
 
+import { playClick, playNotification, isSoundEnabled } from '../audio';
+
 // ============ Types ============
 interface IaCNode {
   id: string;
@@ -14,6 +16,7 @@ interface IaCNode {
   y: number;
   vx: number;
   vy: number;
+  scale?: number;
 }
 
 interface ParsedIaC {
@@ -303,15 +306,32 @@ function parseKubernetes(code: string): ParsedIaC {
     }
   }
 
-  // Add K8s connections
+  // Add K8s connections using name-prefix matching
   nodes.forEach(node => {
     if (node.resourceType === 'Service') {
-      const deployment = nodes.find(n => n.resourceType === 'Deployment');
-      if (deployment) node.connections.push(deployment.id);
+      const svcBase = node.name.replace(/-svc$|-service$/, '');
+      const matched = nodes.find(n =>
+        n.resourceType === 'Deployment' &&
+        (n.name === svcBase || n.name.startsWith(svcBase) || svcBase.startsWith(n.name))
+      );
+      if (matched) {
+        node.connections.push(matched.id);
+      } else {
+        const fallback = nodes.find(n => n.resourceType === 'Deployment' &&
+          n.properties.namespace === node.properties.namespace);
+        if (fallback) node.connections.push(fallback.id);
+      }
     }
     if (node.resourceType === 'Ingress') {
-      const service = nodes.find(n => n.resourceType === 'Service');
-      if (service) node.connections.push(service.id);
+      nodes.filter(n => n.resourceType === 'Service').forEach(svc => {
+        node.connections.push(svc.id);
+      });
+    }
+    if (node.resourceType === 'ConfigMap' || node.resourceType === 'Secret') {
+      nodes.filter(n => n.resourceType === 'Deployment' &&
+        n.properties.namespace === node.properties.namespace).forEach(dep => {
+        node.connections.push(dep.id);
+      });
     }
   });
 
@@ -349,6 +369,7 @@ export class IaCVisualizer {
   private detailsEl: HTMLElement;
 
   private nodes: IaCNode[] = [];
+  private nodeMap: Map<string, IaCNode> = new Map();
   private format: 'terraform' | 'kubernetes' | 'unknown' = 'unknown';
   private selectedNode: IaCNode | null = null;
   private hoveredNode: IaCNode | null = null;
@@ -357,6 +378,10 @@ export class IaCVisualizer {
   private dragOffsetX = 0;
   private dragOffsetY = 0;
   private animationId: number | null = null;
+  private resizeObserver: ResizeObserver | null = null;
+
+  // Bound event handlers
+  private handlers: { [key: string]: (e: any) => void } = {};
 
   // Zoom/pan state
   private zoomLevel = 1;
@@ -366,6 +391,14 @@ export class IaCVisualizer {
   private panStartX = 0;
   private panStartY = 0;
   private zoomEl: HTMLElement | null = null;
+  
+  // Touch state
+  private lastTouchX = 0;
+  private lastTouchY = 0;
+  private pinchStartDist = 0;
+  private pinchStartZoom = 1;
+  private lineDashOffset = 0;
+  private reducedMotion = false;
 
   constructor(container: HTMLElement) {
     this.canvas = container.querySelector('#iac-canvas') as HTMLCanvasElement;
@@ -378,29 +411,95 @@ export class IaCVisualizer {
 
     this.zoomEl = container.querySelector('#iac-zoom') as HTMLElement;
 
-    // Template buttons
-    container.querySelector('#iac-terraform')?.addEventListener('click', () => this.loadTemplate('terraform'));
-    container.querySelector('#iac-kubernetes')?.addEventListener('click', () => this.loadTemplate('kubernetes'));
-    container.querySelector('#iac-microservices')?.addEventListener('click', () => this.loadTemplate('microservices'));
+    // Bind handlers
+    this.handlers = {
+      click: this.handleClick.bind(this),
+      mousedown: this.handleMouseDown.bind(this),
+      mousemove: this.handleMouseMove.bind(this),
+      mouseup: this.handleMouseUp.bind(this),
+      mouseleave: this.handleMouseUp.bind(this),
+      wheel: this.handleWheel.bind(this),
+      touchstart: this.handleTouchStart.bind(this),
+      touchmove: this.handleTouchMove.bind(this),
+      touchend: this.handleTouchEnd.bind(this),
+      input: this.handleInput.bind(this),
+      terraform: () => this.loadTemplate('terraform'),
+      kubernetes: () => this.loadTemplate('kubernetes'),
+      microservices: () => this.loadTemplate('microservices'),
+      export: () => this.exportPNG(),
+      fit: () => this.fitToView(),
+      keydown: this.handleKeyDown.bind(this),
+    };
 
-    // Export PNG
-    container.querySelector('#iac-export')?.addEventListener('click', () => this.exportPNG());
+    // Template buttons
+    container.querySelector('#iac-terraform')?.addEventListener('click', this.handlers.terraform);
+    container.querySelector('#iac-kubernetes')?.addEventListener('click', this.handlers.kubernetes);
+    container.querySelector('#iac-microservices')?.addEventListener('click', this.handlers.microservices);
+
+    // Toolbar buttons
+    container.querySelector('#iac-export')?.addEventListener('click', this.handlers.export);
+    container.querySelector('#iac-fit')?.addEventListener('click', this.handlers.fit);
 
     // Code input
-    this.textarea.addEventListener('input', () => this.parseAndRender());
+    this.textarea.addEventListener('input', this.handlers.input);
 
     // Canvas interactions
-    this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
-    this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-    this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
-    this.canvas.addEventListener('mouseleave', () => this.handleMouseUp());
-    this.canvas.addEventListener('click', (e) => this.handleClick(e));
-    this.canvas.addEventListener('wheel', (e) => this.handleWheel(e), { passive: false });
+    this.canvas.addEventListener('mousedown', this.handlers.mousedown);
+    this.canvas.addEventListener('mousemove', this.handlers.mousemove);
+    this.canvas.addEventListener('mouseup', this.handlers.mouseup);
+    this.canvas.addEventListener('mouseleave', this.handlers.mouseleave);
+    this.canvas.addEventListener('click', this.handlers.click);
+    this.canvas.addEventListener('wheel', this.handlers.wheel, { passive: false });
+    
+    // Touch interactions
+    this.canvas.addEventListener('touchstart', this.handlers.touchstart, { passive: false });
+    this.canvas.addEventListener('touchmove', this.handlers.touchmove, { passive: false });
+    this.canvas.addEventListener('touchend', this.handlers.touchend);
+
+    // Keyboard
+    window.addEventListener('keydown', this.handlers.keydown);
+
+    // Reduced motion
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+      this.reducedMotion = e.matches;
+    });
+
+    // Responsive Canvas
+    this.resizeObserver = new ResizeObserver(() => this.resize());
+    this.resizeObserver.observe(container.parentElement || container);
+    this.resize();
 
     // Initialize
     this.textarea.value = SAMPLE_TERRAFORM;
     this.parseAndRender();
     this.startAnimation();
+  }
+
+  private resize(): void {
+    const parent = this.canvas.parentElement;
+    if (!parent) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = parent.getBoundingClientRect();
+    
+    // Set display size (css)
+    this.canvas.style.width = `${rect.width}px`;
+    this.canvas.style.height = `${rect.height}px`;
+
+    // Set actual size in memory (scaled to account for extra pixel density)
+    this.canvas.width = rect.width * dpr;
+    this.canvas.height = rect.height * dpr;
+
+    // Normalize coordinate system to use css pixels
+    this.ctx.scale(dpr, dpr);
+    
+    // Trigger re-render
+    this.render();
+  }
+
+  private handleInput(): void {
+    this.parseAndRender();
   }
 
   private loadTemplate(type: 'terraform' | 'kubernetes' | 'microservices'): void {
@@ -411,6 +510,7 @@ export class IaCVisualizer {
     }
     this.selectedNode = null;
     this.parseAndRender();
+    if (isSoundEnabled()) playClick();
   }
 
   private screenToWorld(sx: number, sy: number): { x: number; y: number } {
@@ -424,9 +524,121 @@ export class IaCVisualizer {
     const my = e.clientY - rect.top;
     const factor = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.max(0.2, Math.min(4, this.zoomLevel * factor));
+    // Zoom towards mouse
     this.panX = mx - (mx - this.panX) * (newZoom / this.zoomLevel);
     this.panY = my - (my - this.panY) * (newZoom / this.zoomLevel);
     this.zoomLevel = newZoom;
+    if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+  }
+
+  private handleTouchStart(e: TouchEvent): void {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const rect = this.canvas.getBoundingClientRect();
+      this.lastTouchX = touch.clientX - rect.left;
+      this.lastTouchY = touch.clientY - rect.top;
+      
+      const { x, y } = this.screenToWorld(this.lastTouchX, this.lastTouchY);
+      const node = this.getNodeAt(x, y);
+      
+      if (node) {
+        this.isDragging = true;
+        this.dragNode = node;
+        this.dragOffsetX = x - node.x;
+        this.dragOffsetY = y - node.y;
+      } else {
+        this.isPanning = true;
+      }
+    } else if (e.touches.length === 2) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      this.pinchStartDist = dist;
+      this.pinchStartZoom = this.zoomLevel;
+    }
+  }
+
+  private handleTouchMove(e: TouchEvent): void {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const rect = this.canvas.getBoundingClientRect();
+      const sx = touch.clientX - rect.left;
+      const sy = touch.clientY - rect.top;
+      
+      if (this.isDragging && this.dragNode) {
+        const { x, y } = this.screenToWorld(sx, sy);
+        this.dragNode.x = x - this.dragOffsetX;
+        this.dragNode.y = y - this.dragOffsetY;
+        this.dragNode.vx = 0;
+        this.dragNode.vy = 0;
+      } else if (this.isPanning) {
+        const dx = sx - this.lastTouchX;
+        const dy = sy - this.lastTouchY;
+        this.panX += dx;
+        this.panY += dy;
+        this.lastTouchX = sx;
+        this.lastTouchY = sy;
+      }
+    } else if (e.touches.length === 2) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const scale = dist / this.pinchStartDist;
+      
+      const newZoom = Math.max(0.2, Math.min(4, this.pinchStartZoom * scale));
+      this.zoomLevel = newZoom;
+      if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
+      
+      // Center pan on pinch center? Complicated for now, just zoom in place.
+    }
+  }
+
+  private handleTouchEnd(e: TouchEvent): void {
+    if (e.touches.length === 0) {
+      this.isDragging = false;
+      this.dragNode = null;
+      this.isPanning = false;
+    }
+  }
+  
+  private handleKeyDown(e: KeyboardEvent): void {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+      e.preventDefault();
+      this.exportPNG();
+    }
+    if (e.key === 'f' && !e.ctrlKey && !e.metaKey && document.activeElement !== this.textarea) {
+      this.fitToView();
+    }
+  }
+
+  private fitToView(): void {
+    if (this.nodes.length === 0) return;
+    
+    // Calculate bounding box
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    this.nodes.forEach(node => {
+      minX = Math.min(minX, node.x - 60); // 60 = half width
+      minY = Math.min(minY, node.y - 30); // 30 = half height
+      maxX = Math.max(maxX, node.x + 60);
+      maxY = Math.max(maxY, node.y + 30);
+    });
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const canvasW = this.canvas.width / dpr;
+    const canvasH = this.canvas.height / dpr;
+    
+    const contentW = maxX - minX;
+    const contentH = maxY - minY;
+    
+    const scaleX = (canvasW - 100) / contentW;
+    const scaleY = (canvasH - 100) / contentH;
+    this.zoomLevel = Math.max(0.2, Math.min(1.5, Math.min(scaleX, scaleY)));
+
+    this.panX = (canvasW / 2) - ((minX + contentW / 2) * this.zoomLevel);
+    this.panY = (canvasH / 2) - ((minY + contentH / 2) * this.zoomLevel);
+    
     if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
   }
 
@@ -435,6 +647,7 @@ export class IaCVisualizer {
     link.download = 'iac-graph.png';
     link.href = this.canvas.toDataURL('image/png');
     link.click();
+    if (isSoundEnabled()) playNotification();
   }
 
   private parseAndRender(): void {
@@ -455,16 +668,22 @@ export class IaCVisualizer {
     }
 
     // Initialize node positions in a circle
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = this.canvas.width / dpr;
+    const height = this.canvas.height / dpr;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
     parsed.nodes.forEach((node, i) => {
       const angle = (i / parsed.nodes.length) * Math.PI * 2;
       const radius = 100 + Math.random() * 80;
       node.x = centerX + Math.cos(angle) * radius;
       node.y = centerY + Math.sin(angle) * radius;
+      node.scale = 0; // Start invisible
     });
 
     this.nodes = parsed.nodes;
+    this.nodeMap = new Map(this.nodes.map(n => [n.id, n]));
     this.updateDetails();
   }
 
@@ -483,8 +702,13 @@ export class IaCVisualizer {
     const attraction = 0.008;
     const centerForce = 0.0008;
     // World-space center (canvas dims divided by zoom gives world extent)
-    const worldW = this.canvas.width / this.zoomLevel;
-    const worldH = this.canvas.height / this.zoomLevel;
+    // Note: canvas.width/height are physical pixels, we need logical CSS pixels here
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = this.canvas.width / dpr;
+    const height = this.canvas.height / dpr;
+    
+    const worldW = width / this.zoomLevel;
+    const worldH = height / this.zoomLevel;
     const worldOriginX = -this.panX / this.zoomLevel;
     const worldOriginY = -this.panY / this.zoomLevel;
     const centerX = worldOriginX + worldW / 2;
@@ -509,7 +733,7 @@ export class IaCVisualizer {
     // Attraction for connected nodes
     for (const node of this.nodes) {
       for (const connId of node.connections) {
-        const target = this.nodes.find(n => n.id === connId);
+        const target = this.nodeMap.get(connId);
         if (target) {
           const dx = target.x - node.x;
           const dy = target.y - node.y;
@@ -535,15 +759,36 @@ export class IaCVisualizer {
         node.x += node.vx;
         node.y += node.vy;
       }
+      
+      // Entrance animation
+      if (node.scale === undefined) node.scale = 0;
+      if (this.reducedMotion) {
+        node.scale = 1;
+      } else if (node.scale < 1) {
+        node.scale += (1 - node.scale) * 0.1;
+        if (node.scale > 0.99) node.scale = 1;
+      }
     }
   }
 
   private render(): void {
     const ctx = this.ctx;
+    const reducedMotion = this.reducedMotion;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = this.canvas.width / dpr;
+    const height = this.canvas.height / dpr;
+
+    // Clear canvas (reset transform to physical pixels)
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.restore();
 
+    // World-space transform: DPR -> Pan -> Zoom
     ctx.save();
+    ctx.scale(dpr, dpr);
     ctx.translate(this.panX, this.panY);
     ctx.scale(this.zoomLevel, this.zoomLevel);
 
@@ -551,8 +796,8 @@ export class IaCVisualizer {
     const gridStep = 40;
     const worldX0 = -this.panX / this.zoomLevel;
     const worldY0 = -this.panY / this.zoomLevel;
-    const worldX1 = worldX0 + this.canvas.width / this.zoomLevel;
-    const worldY1 = worldY0 + this.canvas.height / this.zoomLevel;
+    const worldX1 = worldX0 + width / this.zoomLevel;
+    const worldY1 = worldY0 + height / this.zoomLevel;
     ctx.strokeStyle = '#1e293b';
     ctx.lineWidth = 1 / this.zoomLevel;
     for (let x = Math.floor(worldX0 / gridStep) * gridStep; x < worldX1; x += gridStep) {
@@ -563,10 +808,12 @@ export class IaCVisualizer {
     }
 
     // Connections
+    if (!reducedMotion) this.lineDashOffset = (this.lineDashOffset - 0.2) % 100;
+    ctx.lineDashOffset = this.lineDashOffset;
     ctx.lineWidth = 2 / this.zoomLevel;
     for (const node of this.nodes) {
       for (const connId of node.connections) {
-        const target = this.nodes.find(n => n.id === connId);
+        const target = this.nodeMap.get(connId);
         if (target) {
           const colors = NODE_COLORS[node.type] || NODE_COLORS.aws;
           ctx.strokeStyle = colors.border + '60';
@@ -575,7 +822,11 @@ export class IaCVisualizer {
           ctx.moveTo(node.x, node.y);
           ctx.lineTo(target.x, target.y);
           ctx.stroke();
+          
+          // Reset dash for arrow
+          ctx.save();
           ctx.setLineDash([]);
+          ctx.lineDashOffset = 0;
 
           // Arrow
           const angle = Math.atan2(target.y - node.y, target.x - node.x);
@@ -588,9 +839,12 @@ export class IaCVisualizer {
           ctx.closePath();
           ctx.fillStyle = colors.border;
           ctx.fill();
+          ctx.restore();
         }
       }
     }
+    ctx.setLineDash([]);
+    ctx.lineDashOffset = 0;
 
     // Nodes
     for (const node of this.nodes) {
@@ -599,11 +853,19 @@ export class IaCVisualizer {
       const isHovered = node === this.hoveredNode;
       const nodeWidth = 120;
       const nodeHeight = 55;
+      const scale = node.scale || 0;
+      
+      if (scale < 0.01) continue;
+
+      ctx.save();
+      ctx.translate(node.x, node.y);
+      ctx.scale(scale, scale);
 
       // Glow
       if (isSelected || isHovered) {
+        const pulse = (isSelected && !reducedMotion) ? Math.sin(Date.now() / 200) * 5 + 5 : 0;
         ctx.shadowColor = colors.border;
-        ctx.shadowBlur = isSelected ? 25 : 15;
+        ctx.shadowBlur = (isSelected ? 20 : 15) + pulse;
       }
 
       // Background
@@ -611,7 +873,7 @@ export class IaCVisualizer {
       ctx.strokeStyle = isSelected ? '#ffffff' : colors.border;
       ctx.lineWidth = isSelected ? 3 : 2;
       ctx.beginPath();
-      ctx.roundRect(node.x - nodeWidth / 2, node.y - nodeHeight / 2, nodeWidth, nodeHeight, 10);
+      ctx.roundRect(-nodeWidth / 2, -nodeHeight / 2, nodeWidth, nodeHeight, 10);
       ctx.fill();
       ctx.stroke();
       ctx.shadowBlur = 0;
@@ -620,53 +882,111 @@ export class IaCVisualizer {
       ctx.fillStyle = colors.border;
       ctx.font = 'bold 9px system-ui';
       ctx.textAlign = 'center';
-      ctx.fillText(node.resourceType.toUpperCase().slice(0, 18), node.x, node.y - 10);
+      ctx.fillText(node.resourceType.toUpperCase().slice(0, 18), 0, -10);
 
       // Name
       ctx.fillStyle = colors.text;
       ctx.font = 'bold 11px system-ui';
-      ctx.fillText(node.name.slice(0, 16), node.x, node.y + 8);
+      ctx.fillText(node.name.slice(0, 16), 0, 8);
+      
+      ctx.restore();
     }
 
     ctx.restore();
 
-    // Legend (screen space)
+    // Tooltip (screen space)
+    if (this.hoveredNode) {
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      
+      const screenX = this.hoveredNode.x * this.zoomLevel + this.panX;
+      const screenY = this.hoveredNode.y * this.zoomLevel + this.panY;
+      
+      const doc = RESOURCE_DOCS[this.hoveredNode.resourceType] || RESOURCE_DOCS.Deployment;
+      const text = doc ? doc.description : `ID: ${this.hoveredNode.id}`;
+      
+      ctx.font = '12px system-ui';
+      const metrics = ctx.measureText(text);
+      const padding = 8;
+      const boxW = metrics.width + padding * 2;
+      const boxH = 26;
+      
+      const boxX = screenX - boxW / 2;
+      const boxY = screenY - 45; // Above node
+      
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 4);
+      ctx.fill();
+      ctx.stroke();
+      
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#e2e8f0';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, screenX, boxY + 17);
+      
+      ctx.restore();
+    }
+
+    // Legend & minimap (screen space)
     this.drawLegend();
+    this.drawMinimap();
 
     // Empty state
     if (this.nodes.length === 0) {
       ctx.fillStyle = '#64748b';
       ctx.font = '16px system-ui';
       ctx.textAlign = 'center';
-      ctx.fillText('No infrastructure to visualize', this.canvas.width / 2, this.canvas.height / 2);
+      ctx.fillText('No infrastructure to visualize', width / 2, height / 2);
       ctx.font = '12px system-ui';
-      ctx.fillText('Paste Terraform or Kubernetes YAML', this.canvas.width / 2, this.canvas.height / 2 + 20);
+      ctx.fillText('Paste Terraform or Kubernetes YAML', width / 2, height / 2 + 20);
     }
   }
 
   private drawLegend(): void {
     const ctx = this.ctx;
-    const items = [
-      { color: NODE_COLORS.compute.border, label: 'Compute' },
-      { color: NODE_COLORS.network.border, label: 'Network' },
-      { color: NODE_COLORS.storage.border, label: 'Storage' },
-      { color: NODE_COLORS.service.border, label: 'Service' },
-    ];
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const height = this.canvas.height / dpr;
+
+    // Build legend from actually-present node types
+    const presentTypes = new Set(this.nodes.map(n => n.type));
+    const items = [...presentTypes].map(type => ({
+      color: (NODE_COLORS[type] || NODE_COLORS.aws).border,
+      label: type.charAt(0).toUpperCase() + type.slice(1),
+    }));
+    if (items.length === 0) return;
+
+    const cols = 2;
+    const rows = Math.ceil(items.length / cols);
+    const legendH = 20 + rows * 14 + 8;
+    const legendW = 170;
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
 
     ctx.fillStyle = '#0f172acc';
-    ctx.fillRect(10, this.canvas.height - 55, 160, 45);
+    ctx.beginPath();
+    ctx.roundRect(10, height - legendH - 8, legendW, legendH, 6);
+    ctx.fill();
     ctx.strokeStyle = '#334155';
     ctx.lineWidth = 1;
-    ctx.strokeRect(10, this.canvas.height - 55, 160, 45);
+    ctx.stroke();
 
     ctx.font = '9px system-ui';
     ctx.fillStyle = '#64748b';
     ctx.textAlign = 'left';
-    ctx.fillText('LEGEND', 18, this.canvas.height - 40);
+    ctx.fillText('LEGEND', 18, height - legendH + 4);
 
     items.forEach((item, i) => {
-      const x = 18 + (i % 2) * 75;
-      const y = this.canvas.height - 25 + Math.floor(i / 2) * 14;
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = 18 + col * 80;
+      const y = height - legendH + 22 + row * 14;
       ctx.fillStyle = item.color;
       ctx.beginPath();
       ctx.roundRect(x, y - 8, 10, 10, 2);
@@ -675,6 +995,82 @@ export class IaCVisualizer {
       ctx.font = '10px system-ui';
       ctx.fillText(item.label, x + 14, y);
     });
+
+    ctx.restore();
+  }
+
+  private drawMinimap(): void {
+    if (this.nodes.length < 5) return;
+    const ctx = this.ctx;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const cssW = this.canvas.width / dpr;
+    const mapSize = 120;
+    const mapPad = 8;
+    const mapX = cssW - mapSize - 12;
+    const mapY = 12;
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const node of this.nodes) {
+      minX = Math.min(minX, node.x);
+      maxX = Math.max(maxX, node.x);
+      minY = Math.min(minY, node.y);
+      maxY = Math.max(maxY, node.y);
+    }
+    const graphW = (maxX - minX) || 1;
+    const graphH = (maxY - minY) || 1;
+    const scale = Math.min((mapSize - mapPad * 2) / graphW, (mapSize - mapPad * 2) / graphH);
+
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    ctx.fillStyle = '#0f172ae0';
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(mapX, mapY, mapSize, mapSize, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    // Mini connections
+    for (const node of this.nodes) {
+      for (const connId of node.connections) {
+        const target = this.nodeMap.get(connId);
+        if (!target) continue;
+        const x1 = mapX + mapPad + (node.x - minX) * scale;
+        const y1 = mapY + mapPad + (node.y - minY) * scale;
+        const x2 = mapX + mapPad + (target.x - minX) * scale;
+        const y2 = mapY + mapPad + (target.y - minY) * scale;
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+    }
+
+    // Mini nodes
+    for (const node of this.nodes) {
+      const nx = mapX + mapPad + (node.x - minX) * scale;
+      const ny = mapY + mapPad + (node.y - minY) * scale;
+      const colors = NODE_COLORS[node.type] || NODE_COLORS.aws;
+      ctx.fillStyle = node === this.selectedNode ? '#ffffff' : colors.border;
+      ctx.beginPath();
+      ctx.arc(nx, ny, node === this.selectedNode ? 3 : 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Viewport rectangle
+    const cssH = this.canvas.height / dpr;
+    const vpX = (-this.panX / this.zoomLevel - minX) * scale + mapX + mapPad;
+    const vpY = (-this.panY / this.zoomLevel - minY) * scale + mapY + mapPad;
+    const vpW = (cssW / this.zoomLevel) * scale;
+    const vpH = (cssH / this.zoomLevel) * scale;
+    ctx.strokeStyle = '#ffffff40';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(vpX, vpY, vpW, vpH);
+
+    ctx.restore();
   }
 
   private getNodeAt(x: number, y: number): IaCNode | null {
@@ -741,6 +1137,7 @@ export class IaCVisualizer {
     const { x, y } = this.screenToWorld(sx, sy);
     this.selectedNode = this.getNodeAt(x, y);
     this.updateDetails();
+    if (this.selectedNode && isSoundEnabled()) playClick();
   }
 
   private updateDetails(): void {
@@ -794,6 +1191,32 @@ export class IaCVisualizer {
 
   destroy(): void {
     if (this.animationId) cancelAnimationFrame(this.animationId);
+    if (this.resizeObserver) this.resizeObserver.disconnect();
+
+    // Remove event listeners
+    const container = this.canvas.parentElement?.parentElement;
+    if (container) {
+       container.querySelector('#iac-terraform')?.removeEventListener('click', this.handlers.terraform);
+       container.querySelector('#iac-kubernetes')?.removeEventListener('click', this.handlers.kubernetes);
+       container.querySelector('#iac-microservices')?.removeEventListener('click', this.handlers.microservices);
+       container.querySelector('#iac-export')?.removeEventListener('click', this.handlers.export);
+       container.querySelector('#iac-fit')?.removeEventListener('click', this.handlers.fit);
+    }
+    
+    this.textarea.removeEventListener('input', this.handlers.input);
+
+    this.canvas.removeEventListener('mousedown', this.handlers.mousedown);
+    this.canvas.removeEventListener('mousemove', this.handlers.mousemove);
+    this.canvas.removeEventListener('mouseup', this.handlers.mouseup);
+    this.canvas.removeEventListener('mouseleave', this.handlers.mouseleave);
+    this.canvas.removeEventListener('click', this.handlers.click);
+    this.canvas.removeEventListener('wheel', this.handlers.wheel);
+    
+    this.canvas.removeEventListener('touchstart', this.handlers.touchstart);
+    this.canvas.removeEventListener('touchmove', this.handlers.touchmove);
+    this.canvas.removeEventListener('touchend', this.handlers.touchend);
+    
+    window.removeEventListener('keydown', this.handlers.keydown);
   }
 }
 
