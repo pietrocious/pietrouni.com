@@ -119,6 +119,17 @@
     />
 
     <link rel="stylesheet" href="styles.css" />
+
+    <!-- Inline theme init — must run before first paint to avoid FOUC -->
+    <script>
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
   </head>
 
   <body

@@ -256,30 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
-        // Listen for real-time system theme changes
-        window
-          .matchMedia("(prefers-color-scheme: dark)")
-          .addEventListener("change", (e) => {
-            // Only auto-switch if user hasn't manually set a preference
-            if (!("theme" in localStorage)) {
-              if (e.matches) {
-                document.documentElement.classList.add("dark");
-              } else {
-                document.documentElement.classList.remove("dark");
-              }
-              applyWallpaper();
-              // Notify iframes of theme change
-              const frames = document.querySelectorAll("iframe");
-              const newTheme = e.matches ? "dark" : "light";
-              frames.forEach((frame) => {
-                frame.contentWindow.postMessage(
-                  { type: "theme-change", theme: newTheme },
-                  "*"
-                );
-              });
-            }
-          });
-
         initTheme();
 
         // spotlight (ctrl+k)
@@ -610,7 +586,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
 
                         <!-- Scrollable Content -->
-                        <div class="flex-1 overflow-y-auto px-6 pb-6 pt-0 space-y-4">
+                        <div class="flex-1 overflow-y-auto px-6 pb-6 pt-2 space-y-4">
                             <!-- Current Projects -->
                             <div>
                                 <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
@@ -828,7 +804,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
 
                         <!-- Grid View -->
-                        <div id="vault-grid" class="flex-1 overflow-y-auto px-3 md:px-6 pb-3 md:pb-6 pt-0 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 content-start">
+                        <div id="vault-grid" class="flex-1 overflow-y-auto px-3 md:px-6 pb-3 md:pb-6 pt-2 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 content-start">
                             <!-- Items Injected Here -->
                         </div>
 
@@ -914,7 +890,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
 
                         <!-- Scrollable Content -->
-                        <div class="flex-1 overflow-y-auto px-4 md:px-6 pb-4 md:pb-6 pt-0 space-y-1">
+                        <div class="flex-1 overflow-y-auto px-4 md:px-6 pb-4 md:pb-6 pt-2 space-y-1">
                             <!-- Filter Tabs -->
                             <div class="flex flex-wrap gap-2 mb-4" id="lab-filter-bar">
                                 <button data-filter="all" class="lab-filter-btn px-4 py-1.5 text-xs font-bold rounded-full border transition-all bg-her-red text-white border-her-red" onclick="labFilter('all')">All</button>
@@ -1870,6 +1846,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           if (id === "finder") window.initFinder();
           if (id === "launchpad") window.initLaunchpad();
+          if (id === "settings") updateThemeUI();
           if (id === "tetris") {
             setTimeout(() => {
               const container = document.getElementById('tetris-app');
