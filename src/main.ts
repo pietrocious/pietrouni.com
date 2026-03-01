@@ -534,7 +534,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Why Cloud Engineering?</h2>
                                 <p class="opacity-90">
-                                    After years of troubleshooting other people's infrastructure, I want to be the one designing and building it. Cloud engineering lets me leverage that infrastructure foundation while learning modern automation patterns like IaC, containers, orchestration, and CI/CD.
+                                    I've always been more interested in how things are built than in any particular tool or title. Cloud is just where a lot of the interesting building happens right now — systems that scale, infrastructure that's code, things you can actually ship. It's a natural extension of understanding how networks work at the bottom, and a good foundation for whatever comes next.
                                 </p>
                             </div>
 
