@@ -512,14 +512,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         <h1 class="text-4xl font-display font-extrabold text-her-red dark:text-her-red tracking-tight mb-4">Hi, I'm Pietro</h1>
                         
                         <div class="space-y-4">
-                            <!-- My Journey -->
+                            <!-- Background -->
                             <div>
-                                <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">My Journey</h2>
+                                <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Background</h2>
                                 <p class="opacity-90">
-                                    I'm an Infrastructure Engineer specializing in AWS architecture and infrastructure-as-code automation. My path into cloud started with enterprise infrastructure, I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers. That foundation taught me how distributed systems actually work under the hood.
-                                </p>
-                                <p class="opacity-90 mt-4">
-                                    These days, I focus on building reliable cloud infrastructure. My current work centers on architecting AWS environments using Terraform, implementing CI/CD automation, and designing secure, highly-available systems that leverage cloud-native services.
+                                    I'm an infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers — that foundation gave me a deep understanding of how distributed systems actually work. These days I focus on cloud infrastructure: AWS, Terraform, CI/CD, and building things that are reliable by design.
                                 </p>
                             </div>
 
@@ -527,22 +524,22 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
                                 <p class="opacity-90 mb-4">
-                                    I have several projects here, please check <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a> to see what I'm working on.</p>
+                                    I have several projects here — a mix of infrastructure work and things I built out of curiosity. Check out <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a> to see what I'm working on.</p>
                             </div>
 
-                            <!-- Why Cloud Engineering -->
+                            <!-- How I Think -->
                             <div>
-                                <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Why Cloud Engineering?</h2>
+                                <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">How I Think</h2>
                                 <p class="opacity-90">
                                     I've always been more interested in how things are built than in any particular tool or title. Cloud is just where a lot of the interesting building happens right now — systems that scale, infrastructure that's code, things you can actually ship. It's a natural extension of understanding how networks work at the bottom, and a good foundation for whatever comes next.
                                 </p>
                             </div>
 
-                            <!-- Beyond Work -->
+                            <!-- Beyond the Screen -->
                             <div>
-                                <h2 class="text-lg font-display font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">Beyond Work</h2>
+                                <h2 class="text-lg font-display font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">Beyond the Screen</h2>
                                 <p class="opacity-90">
-                                    Outside of infrastructure work, I listen to music across pretty much every genre, play games when I have time, and enjoy understanding how complex systems get built. I'm fascinated by how architecture decisions make something actually work at such a scale, and how much we're all standing on the shoulders of giants.
+                                    Outside of work, I listen to music across pretty much every genre, play games when I have time, and enjoy understanding how complex systems get built — I'm fascinated by how architecture decisions ripple all the way down, and how much we're all standing on the shoulders of giants.
                                 </p>
                             </div>
 
