@@ -12,3 +12,6 @@ dist/
 # IDEs
 .vscode/
 .idea/
+
+# Private experiments
+src/experiments
