@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pietro's Gym Routine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: "Tiempos Headline";
+    src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposHeadline-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Tiempos Text";
+    src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Tiempos Text";
+    src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Medium.otf") format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #fdfbf7;
+    --bg-2: #f4ebd9;
+    --surface: rgba(255, 255, 255, 0.7);
+    --surface-strong: rgba(255, 255, 255, 0.9);
+    --surface-soft: rgba(74, 124, 157, 0.08);
+    --border: rgba(78, 52, 46, 0.12);
+    --border-strong: rgba(74, 124, 157, 0.2);
+    --text: #3e2723;
+    --muted: rgba(62, 39, 35, 0.68);
+    --accent: #4a7c9d;
+    --accent-soft: rgba(74, 124, 157, 0.12);
+    --shadow: 0 18px 55px rgba(62, 39, 35, 0.08);
+    --push: #c8794f;
+    --pull: #4a7c9d;
+    --legs: #7c9660;
+    --upper: #8d5d86;
+    --lower: #b28643;
+  }
+
+  html[data-theme="dark"] {
+    --bg: #171310;
+    --bg-2: #231c17;
+    --surface: rgba(255, 255, 255, 0.045);
+    --surface-strong: rgba(255, 255, 255, 0.07);
+    --surface-soft: rgba(91, 154, 184, 0.08);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(91, 154, 184, 0.18);
+    --text: #efebe9;
+    --muted: rgba(239, 235, 233, 0.64);
+    --accent: #5b9ab8;
+    --accent-soft: rgba(91, 154, 184, 0.14);
+    --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    --push: #e2a16f;
+    --pull: #7ab7d6;
+    --legs: #abd18c;
+    --upper: #c48dbb;
+    --lower: #e0bb6e;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+  }
+
+  body {
+    font-family: "DM Sans", sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at top left, rgba(74, 124, 157, 0.16), transparent 30%),
+      radial-gradient(circle at top right, rgba(124, 150, 96, 0.12), transparent 28%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .app-frame {
+    max-width: 1380px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: linear-gradient(180deg, var(--surface-strong) 0%, var(--surface) 100%);
+    backdrop-filter: blur(22px);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .hero {
+    position: relative;
+    padding: 28px 28px 24px;
+    border-bottom: 1px solid var(--border);
+    background:
+      linear-gradient(135deg, rgba(74, 124, 157, 0.12), transparent 55%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent);
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -10% -50px auto;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(124, 150, 96, 0.12), transparent 68%);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.9fr);
+    gap: 22px;
+    align-items: start;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--accent-soft);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .hero h1 {
+    margin: 0;
+    font-family: "Tiempos Headline", "Times New Roman", serif;
+    font-size: clamp(2.5rem, 5vw, 4.6rem);
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+  }
+
+  .hero h1 .accent {
+    color: var(--accent);
+  }
+
+  .hero-copy {
+    max-width: 720px;
+    margin-top: 14px;
+    font-family: "Tiempos Text", Georgia, serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: var(--surface-soft);
+    min-height: 84px;
+  }
+
+  .stat-label {
+    display: block;
+    margin-bottom: 6px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stat-value {
+    font-size: 0.96rem;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .top-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    padding: 14px 28px 18px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+
+  .mini-card {
+    min-width: 132px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .mini-card .mini-kicker {
+    display: block;
+    margin-bottom: 4px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .mini-card strong {
+    display: block;
+    font-size: 0.96rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.85fr);
+    gap: 20px;
+    padding: 22px 28px 28px;
+  }
+
+  .section {
+    min-width: 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .section-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .section-header span {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .days-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .day-card {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--surface);
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .day-card:hover {
+    transform: translateY(-1px);
+    border-color: var(--border-strong);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.05);
+  }
+
+  .day-card.open {
+    border-color: var(--border-strong);
+  }
+
+  .day-card[data-kind="push"] { --day-color: var(--push); }
+  .day-card[data-kind="pull"] { --day-color: var(--pull); }
+  .day-card[data-kind="legs"] { --day-color: var(--legs); }
+  .day-card[data-kind="upper"] { --day-color: var(--upper); }
+  .day-card[data-kind="lower"] { --day-color: var(--lower); }
+
+  .day-header {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    padding: 18px 20px;
+    border: 0;
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--day-color) 12%, transparent), transparent 60%);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .day-index {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--day-color) 22%, var(--border));
+    background: color-mix(in srgb, var(--day-color) 14%, var(--surface));
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--day-color);
+  }
+
+  .day-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .day-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .focus-pill,
+  .effort-pill,
+  .metric-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-strong) 84%, transparent);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .effort-pill {
+    border-color: color-mix(in srgb, var(--day-color) 18%, var(--border));
+    color: var(--day-color);
+  }
+
+  .day-subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .day-toggle {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-strong);
+    color: var(--muted);
+    transition: transform 180ms ease, color 180ms ease;
+  }
+
+  .day-card.open .day-toggle {
+    transform: rotate(45deg);
+    color: var(--day-color);
+  }
+
+  .day-body {
+    display: none;
+    padding: 0 20px 20px;
+  }
+
+  .day-card.open .day-body {
+    display: block;
+  }
+
+  .exercise-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .exercise-card {
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--surface-strong);
+  }
+
+  .exercise-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 10px;
+  }
+
+  .exercise-name {
+    margin: 0;
+    font-size: 0.97rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .exercise-note {
+    margin: 6px 0 0;
+    font-family: "Tiempos Text", Georgia, serif;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .exercise-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .sidebar-stack {
+    display: grid;
+    gap: 14px;
+    position: sticky;
+    top: 18px;
+  }
+
+  .panel {
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .panel h3 {
+    margin: 0 0 10px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .panel p {
+    margin: 0;
+    font-family: "Tiempos Text", Georgia, serif;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .rule-list,
+  .rhythm-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rule-item,
+  .rhythm-item {
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface-strong);
+  }
+
+  .rule-item strong,
+  .rhythm-item strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.92rem;
+  }
+
+  .rule-item span,
+  .rhythm-item span {
+    display: block;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .rhythm-item {
+    display: flex;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .rhythm-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 999px;
+    margin-top: 6px;
+    flex-shrink: 0;
+    background: var(--accent);
+  }
+
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 28px 24px;
+    color: var(--muted);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1100px) {
+    .hero-grid,
+    .main-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar-stack {
+      position: static;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .app-shell {
+      padding: 0;
+    }
+
+    .app-frame {
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+      min-height: 100vh;
+    }
+
+    .hero,
+    .top-strip,
+    .main-grid,
+    .footer {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+
+    .hero {
+      padding-top: 22px;
+    }
+
+    .meta-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .top-strip {
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+    }
+
+    .exercise-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .day-header {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .day-toggle {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="app-frame">
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Lab Utility · Training Protocol</div>
+          <h1>5-Day <span class="accent">PPL</span> Routine</h1>
+          <p class="hero-copy">
+            A cleaner in-app version of the home gym plan: compact enough to scan before a session, detailed enough to keep progression, exercise intent, and recovery rules visible at a glance.
+          </p>
+        </div>
+
+        <div class="meta-grid">
+          <div class="stat-card">
+            <span class="stat-label">Goal</span>
+            <div class="stat-value">Hypertrophy with consistent beginner-friendly progression.</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Equipment</span>
+            <div class="stat-value">Cable machine, barbell, dumbbells, bench.</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Intensity</span>
+            <div class="stat-value">Heavy on days 1-3, controlled volume on days 4-5.</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Rest</span>
+            <div class="stat-value">2-3 min for compounds, 60-90 sec for isolation work.</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="top-strip" aria-label="Routine overview">
+      <div class="mini-card">
+        <span class="mini-kicker">Frequency</span>
+        <strong>5 sessions / week</strong>
+      </div>
+      <div class="mini-card">
+        <span class="mini-kicker">Split</span>
+        <strong>Push / Pull / Legs / Upper / Lower</strong>
+      </div>
+      <div class="mini-card">
+        <span class="mini-kicker">Skill Focus</span>
+        <strong>Form first, load second</strong>
+      </div>
+      <div class="mini-card">
+        <span class="mini-kicker">Progression</span>
+        <strong>Add 1 rep or a small load weekly</strong>
+      </div>
+      <div class="mini-card">
+        <span class="mini-kicker">Tracking</span>
+        <strong>Log every working set</strong>
+      </div>
+    </section>
+
+    <main class="main-grid">
+      <section class="section">
+        <div class="section-header">
+          <h2>Session Plan</h2>
+          <span>Tap a day to expand</span>
+        </div>
+
+        <div class="days-grid">
+          <article class="day-card open" data-kind="push">
+            <button class="day-header" type="button" aria-expanded="true" onclick="toggleDay(this)">
+              <div class="day-index">D1</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Push</div>
+                  <span class="effort-pill">Heavy</span>
+                  <span class="focus-pill">Chest · Shoulders · Triceps</span>
+                </div>
+                <div class="day-subtitle">Safe solo pressing, shoulder volume, and tricep work that keeps setup simple at home.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-grid">
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Cable Chest Press</h3>
+                    <span class="metric-pill">20kg</span>
+                  </div>
+                  <p class="exercise-note">Pulleys low, press forward. A safer solo main press than a flat barbell bench.</p>
+                  <div class="exercise-meta"><span class="metric-pill">4 × 8-10</span><span class="metric-pill">Main compound</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">DB Overhead Press</h3>
+                    <span class="metric-pill">4kg DB</span>
+                  </div>
+                  <p class="exercise-note">Seated or standing with a neutral spine and no lower-back compensation.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 8-10</span><span class="metric-pill">Shoulders</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Cable Chest Fly</h3>
+                    <span class="metric-pill">20kg</span>
+                  </div>
+                  <p class="exercise-note">Mid-height pulleys, soft elbows, and a slight lean to keep tension on the pecs.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12-15</span><span class="metric-pill">Stretch focus</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Tricep Pushdown</h3>
+                    <span class="metric-pill">20kg</span>
+                  </div>
+                  <p class="exercise-note">Use rope or straight bar, elbows pinned, full lockout without swinging.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12-15</span><span class="metric-pill">Isolation</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Lateral Raises</h3>
+                    <span class="metric-pill">2kg DB</span>
+                  </div>
+                  <p class="exercise-note">Slow tempo, slight pause at the top, stop before traps take over.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 15-20</span><span class="metric-pill">Control</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day-card" data-kind="pull">
+            <button class="day-header" type="button" aria-expanded="false" onclick="toggleDay(this)">
+              <div class="day-index">D2</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Pull</div>
+                  <span class="effort-pill">Heavy</span>
+                  <span class="focus-pill">Back · Biceps · Rear Delts</span>
+                </div>
+                <div class="day-subtitle">Build the back with rows first, then use pulldowns and accessory work to round out the session.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-grid">
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Barbell Row</h3>
+                    <span class="metric-pill">Bar + 5kg / side</span>
+                  </div>
+                  <p class="exercise-note">Hinge at the hips, brace hard, and pull toward the lower ribs or belly button.</p>
+                  <div class="exercise-meta"><span class="metric-pill">4 × 6-8</span><span class="metric-pill">Main compound</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Lat Pulldown</h3>
+                    <span class="metric-pill">~27kg</span>
+                  </div>
+                  <p class="exercise-note">Wide grip, slight lean back, and drive elbows down instead of yanking with the hands.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 8-10</span><span class="metric-pill">Vertical pull</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Cable Row</h3>
+                    <span class="metric-pill">20kg</span>
+                  </div>
+                  <p class="exercise-note">Low pulley, chest up, pause the handle in close without shrugging.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 10-12</span><span class="metric-pill">Mid-back</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">DB Curl</h3>
+                    <span class="metric-pill">5kg DB</span>
+                  </div>
+                  <p class="exercise-note">Full range, no torso swing, and squeeze the top rep for control.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 10-12</span><span class="metric-pill">Biceps</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Face Pulls / Rear Delt Fly</h3>
+                    <span class="metric-pill">20kg</span>
+                  </div>
+                  <p class="exercise-note">Rotate out at the top and think elbows high to bias rear delts and upper back.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 15</span><span class="metric-pill">Posture work</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day-card" data-kind="legs">
+            <button class="day-header" type="button" aria-expanded="false" onclick="toggleDay(this)">
+              <div class="day-index">D3</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Legs</div>
+                  <span class="effort-pill">Heavy</span>
+                  <span class="focus-pill">Quads · Hamstrings · Glutes · Calves</span>
+                </div>
+                <div class="day-subtitle">A foundational lower-body day built around squat and hinge patterns with stable accessory work.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-grid">
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Barbell Squat</h3>
+                    <span class="metric-pill">Bar + 5kg / side</span>
+                  </div>
+                  <p class="exercise-note">Use rack safeties if available. If confidence drops, swap for goblet squats and keep quality high.</p>
+                  <div class="exercise-meta"><span class="metric-pill">4 × 6-8</span><span class="metric-pill">Main compound</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Romanian Deadlift</h3>
+                    <span class="metric-pill">Bar + 5kg / side</span>
+                  </div>
+                  <p class="exercise-note">Push hips back, keep lats on, and stop where the hamstrings stay loaded without lumbar rounding.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 8-10</span><span class="metric-pill">Hip hinge</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">DB Lunges</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">Walking or stationary. Keep the torso upright and let the front leg do the work.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 10 each</span><span class="metric-pill">Unilateral</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Leg Press</h3>
+                    <span class="metric-pill">Optional</span>
+                  </div>
+                  <p class="exercise-note">Use only if your setup allows it. Skip it if the machine configuration is awkward.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12-15</span><span class="metric-pill">Accessory</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Calf Raises</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">Full range, hard squeeze, and a slow eccentric to make lighter loading still productive.</p>
+                  <div class="exercise-meta"><span class="metric-pill">4 × 15-20</span><span class="metric-pill">Finisher</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day-card" data-kind="upper">
+            <button class="day-header" type="button" aria-expanded="false" onclick="toggleDay(this)">
+              <div class="day-index">D4</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Upper</div>
+                  <span class="effort-pill">Volume</span>
+                  <span class="focus-pill">Chest · Back · Shoulders · Arms</span>
+                </div>
+                <div class="day-subtitle">A lighter session that reinforces movement quality, accumulates volume, and protects recovery.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-grid">
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Incline DB Press</h3>
+                    <span class="metric-pill">4kg DB</span>
+                  </div>
+                  <p class="exercise-note">Stay lighter than day 1 and focus on a clean stretch at the bottom position.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12-15</span><span class="metric-pill">Volume press</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Cable Pulldown</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">Same pattern as lat pulldown, just lighter and smoother than the heavy pull day.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12-15</span><span class="metric-pill">Back volume</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">DB Shoulder Press</h3>
+                    <span class="metric-pill">4kg DB</span>
+                  </div>
+                  <p class="exercise-note">Control the eccentric and keep every rep technically identical.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12-15</span><span class="metric-pill">Shoulders</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">DB Row</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">Single-arm row with a stable brace so the lat does the work rather than momentum.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12-15</span><span class="metric-pill">Single arm</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">DB Curl</h3>
+                    <span class="metric-pill">5kg DB</span>
+                  </div>
+                  <p class="exercise-note">Simple arm volume with no need to chase load here.</p>
+                  <div class="exercise-meta"><span class="metric-pill">2 × 15</span><span class="metric-pill">Biceps</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Overhead Tricep Extension</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">Use a dumbbell or cable, keep elbows close, and aim for a full stretch.</p>
+                  <div class="exercise-meta"><span class="metric-pill">2 × 15</span><span class="metric-pill">Triceps</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day-card" data-kind="lower">
+            <button class="day-header" type="button" aria-expanded="false" onclick="toggleDay(this)">
+              <div class="day-index">D5</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Lower</div>
+                  <span class="effort-pill">Volume</span>
+                  <span class="focus-pill">Quads · Hamstrings · Glutes · Core</span>
+                </div>
+                <div class="day-subtitle">Higher-rep lower-body work that reinforces patterns without fighting recovery from the heavy leg day.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-grid">
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Goblet Squat</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">A great patterning movement that keeps the torso upright and the loading manageable.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 15</span><span class="metric-pill">Technique</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">DB Romanian Deadlift</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">Lighter than day 3. Think stretch, tension, and consistent tempo rather than max load.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12-15</span><span class="metric-pill">Hamstrings</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Reverse Lunges</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">Step back, stay balanced, and keep the forward shin stable through each rep.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 12 each</span><span class="metric-pill">Unilateral</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Hip Thrust</h3>
+                    <span class="metric-pill">TBD</span>
+                  </div>
+                  <p class="exercise-note">Shoulders on bench, drive through the heels, and pause at full lockout.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 15</span><span class="metric-pill">Glutes</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Plank</h3>
+                    <span class="metric-pill">BW</span>
+                  </div>
+                  <p class="exercise-note">Brace hard, glutes on, and stop before the lower back starts taking over.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 30-45s</span><span class="metric-pill">Core</span></div>
+                </div>
+                <div class="exercise-card">
+                  <div class="exercise-top">
+                    <h3 class="exercise-name">Dead Bug</h3>
+                    <span class="metric-pill">BW</span>
+                  </div>
+                  <p class="exercise-note">Slow, controlled reps with the lower back pinned to the floor the whole time.</p>
+                  <div class="exercise-meta"><span class="metric-pill">3 × 30-45s</span><span class="metric-pill">Core control</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <aside class="section">
+        <div class="sidebar-stack">
+          <section class="panel">
+            <h3>Training Notes</h3>
+            <p>Heavy days should feel demanding but stable. Volume days should feel repeatable. If a later session is wrecking the next one, back off before the plan turns into random fatigue.</p>
+          </section>
+
+          <section class="panel">
+            <h3>Session Rules</h3>
+            <ul class="rule-list">
+              <li class="rule-item">
+                <strong>Progressive overload</strong>
+                <span>Add a rep or a small amount of load each week when form stays honest.</span>
+              </li>
+              <li class="rule-item">
+                <strong>1-2 RIR on working sets</strong>
+                <span>Finish with one clean rep still in reserve rather than forcing failure every time.</span>
+              </li>
+              <li class="rule-item">
+                <strong>Warm up every pattern</strong>
+                <span>Two lighter sets before working weight, especially for the first compound of the session.</span>
+              </li>
+              <li class="rule-item">
+                <strong>Volume days stay lighter</strong>
+                <span>Restraint is part of the split. Easy enough to recover from is the point.</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="panel">
+            <h3>Weekly Rhythm</h3>
+            <div class="rhythm-list">
+              <div class="rhythm-item"><span class="rhythm-dot" style="background: var(--push)"></span><div><strong>Day 1</strong><span>Open the week with your most stable pressing work.</span></div></div>
+              <div class="rhythm-item"><span class="rhythm-dot" style="background: var(--pull)"></span><div><strong>Day 2</strong><span>Prioritize rows and pulldowns with crisp back mechanics.</span></div></div>
+              <div class="rhythm-item"><span class="rhythm-dot" style="background: var(--legs)"></span><div><strong>Day 3</strong><span>Squat and hinge with enough rest to keep reps solid.</span></div></div>
+              <div class="rhythm-item"><span class="rhythm-dot" style="background: var(--upper)"></span><div><strong>Day 4</strong><span>Use volume to practice skill, not to chase fatigue.</span></div></div>
+              <div class="rhythm-item"><span class="rhythm-dot" style="background: var(--lower)"></span><div><strong>Day 5</strong><span>Finish with lighter lower-body and core work that leaves you fresh.</span></div></div>
+            </div>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <span>Pietro · Home Gym · Vallirana</span>
+      <span>Week 3 Protocol · April 2026</span>
+    </footer>
+  </div>
+</div>
+
+<script>
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+  }
+
+  function resolveParentTheme() {
+    try {
+      return window.parent && window.parent.document.documentElement.classList.contains("dark")
+        ? "dark"
+        : "light";
+    } catch (error) {
+      return "light";
+    }
+  }
+
+  function toggleDay(button) {
+    const card = button.closest(".day-card");
+    const isOpen = card.classList.toggle("open");
+    button.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  }
+
+  window.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "theme-change") {
+      applyTheme(event.data.theme);
+    }
+  });
+
+  applyTheme(resolveParentTheme());
+</script>
+</body>
+</html>

@@ -23,6 +23,7 @@ import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } fro
 import { initTicTacToe, destroyTicTacToe } from './games/tic-tac-toe';
 import { initSnake, destroySnake } from './games/snake';
 import { initDoom, destroyDoom } from './games/doom';
+import { initGymRoutine, destroyGymRoutine } from './apps/gym-routine';
 import { handleTerminalCommand } from './terminal/core';
 import { handlePietrOSCommand, resetTerminalSubModes } from './terminal/pietros';
 import { handleCyberpunkCommand } from './terminal/cyberpunk';
@@ -870,6 +871,24 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             onClose: () => {
               destroyDoom();
+            },
+          },
+
+          gymroutine: {
+            title: "Gym Routine",
+            content: `
+                    <div id="gym-routine-container" class="h-full w-full bg-[#0e0e0e]"></div>
+                `,
+            width: 1100,
+            height: 820,
+            onOpen: () => {
+              setTimeout(() => {
+                const container = document.getElementById("gym-routine-container");
+                if (container) initGymRoutine(container);
+              }, 50);
+            },
+            onClose: () => {
+              destroyGymRoutine();
             },
           },
 
@@ -1775,6 +1794,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tetris: { title: "Tetris", icon: tetrisIcon },
             threes: { title: "Threes!", icon: threesIcon },
             doom: { title: "DOOM", icon: doomIcon },
+            gymroutine: { title: "Gym Routine", icon: "assets/icons/text-x-generic.svg" },
             iacvisualizer: { title: "IaC Visualizer", icon: "assets/icons/org.gaphor.Gaphor.svg" },
             networktopology: { title: "Network Topology", icon: "assets/icons/network-wired.svg" },
             monitor: { title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
