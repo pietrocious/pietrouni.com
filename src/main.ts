@@ -1883,6 +1883,34 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         };
 
+        const deepLinkableApps = new Set(["gymroutine"]);
+
+        function getDeepLinkedApp(): string | null {
+          const queryParams = new URLSearchParams(window.location.search);
+          const queryApp = queryParams.get("app")?.toLowerCase();
+          if (queryApp) return queryApp;
+
+          const hash = window.location.hash.startsWith("#")
+            ? window.location.hash.slice(1)
+            : window.location.hash;
+          const hashParams = new URLSearchParams(hash);
+          const hashApp = hashParams.get("app")?.toLowerCase();
+
+          return hashApp || null;
+        }
+
+        function openDeepLinkedApp(): void {
+          const appId = getDeepLinkedApp();
+          if (!appId) return;
+          if (!deepLinkableApps.has(appId)) return;
+          if (!windows[appId]) return;
+
+          window.openWindow(appId);
+        }
+
+        window.addEventListener("hashchange", openDeepLinkedApp);
+        openDeepLinkedApp();
+
 
 
         // md viewer
