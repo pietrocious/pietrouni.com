@@ -1201,7 +1201,7 @@ html.dark .dock-container {
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   background: rgba(244, 235, 217, 0.45);
   border-bottom: 1px solid rgba(74, 124, 157, 0.1);
-  font-family: "Noto Sans", sans-serif;
+  font-family: "DM Sans", system-ui, sans-serif;
   transition:
     background 0.4s ease,
     backdrop-filter 0.4s ease;
@@ -1229,7 +1229,7 @@ html.dark #menubar {
 .clock-flip {
   display: inline-flex;
   overflow: hidden;
-  font-family: "Noto Sans", sans-serif;
+  font-family: "DM Sans", system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: normal;
   font-feature-settings: "tnum";

@@ -1163,7 +1163,7 @@ export class IaCVisualizer {
 
     const docHtml = doc
       ? `<div class="mt-2"><div class="text-xs opacity-70">${doc.description}</div>
-         <a href="${doc.url}" target="_blank" class="text-xs text-blue-400 hover:underline mt-1 inline-block">📖 Documentation</a></div>`
+         <a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-400 hover:underline mt-1 inline-block">📖 Documentation</a></div>`
       : '';
 
     const tipsHtml = tips.length > 0

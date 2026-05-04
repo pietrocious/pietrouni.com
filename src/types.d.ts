@@ -51,6 +51,17 @@ declare global {
     // Audio
     toggleSound: () => boolean;
     isSoundEnabled: () => boolean;
+
+    // Spotlight
+    toggleSpotlight: () => void;
+    handleSearch: (query: string) => void;
+    executeSearchResult: () => void;
+
+    // Vault rendering
+    renderVault: (id?: string) => void;
+
+    // Monitor
+    switchMonitorTab: (tab: string) => void;
   }
 }
 

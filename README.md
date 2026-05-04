@@ -59,13 +59,16 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
 
 ### fonts
 
-this project uses a combination of Google Fonts and one custom font:
+this project uses a mix of Google Fonts, S3-hosted licensed fonts, and one self-hosted bitmap font:
 
-- **Playfair Display** (Google Fonts) – display/headline font
-- **Lora** (Google Fonts) – serif body text
-- **Noto Sans** (Google Fonts) – system UI font
+- **Copernicus** (S3) – display/headline
+- **Tiempos Text / Tiempos Headline** (S3) – body and large display serif
+- **DM Sans** (Google Fonts) – UI / sans body
+- **Outfit** (Google Fonts) – alt headline weight
 - **JetBrains Mono** (Google Fonts) – code/monospace
-- **Fixedsys** (custom, not included) – terminal emulator font
+- **Fixedsys** (self-hosted, not in repo) – terminal emulator font
+
+Tailwind v4 is configured via the `@theme` block in `styles.css` (no `tailwind.config.js`).
 
 ### icons and wallpapers
 

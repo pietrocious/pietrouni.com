@@ -1,4 +1,5 @@
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 // Lab Icons
 import snakeIcon from './assets/icons/lab/snake.png';
@@ -12,18 +13,38 @@ import doomIcon from './assets/icons/lab/doom.png';
 // config - static data
 import { fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
 import { vaultData } from './vault';
-import { initTetris, destroyTetris } from './games/tetris';
-import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
-import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topology';
-import { initThrees, destroyThrees } from './games/threes';
 import { initDock, dockBounce, refreshDockItems } from './dock';
 import { animateWindowContent } from './animations';
 import { initVanta, destroyVanta, updateVantaTheme, isVantaActive } from './vanta';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
-import { initTicTacToe, destroyTicTacToe } from './games/tic-tac-toe';
-import { initSnake, destroySnake } from './games/snake';
-import { initDoom, destroyDoom } from './games/doom';
-import { initGymRoutine, destroyGymRoutine } from './apps/gym-routine';
+import { initSpotlight, trapFocusInSpotlight } from './spotlight';
+
+// Lazy-loaded games and apps — split into separate Vite chunks
+const loadTetris = () => import('./games/tetris');
+const loadIaC = () => import('./apps/iac-visualizer');
+const loadNetwork = () => import('./apps/network-topology');
+const loadThrees = () => import('./games/threes');
+const loadTicTacToe = () => import('./games/tic-tac-toe');
+const loadSnake = () => import('./games/snake');
+const loadDoom = () => import('./games/doom');
+const loadGym = () => import('./apps/gym-routine');
+
+const initTetris = (c: HTMLElement) => loadTetris().then(m => m.initTetris(c));
+const destroyTetris = () => loadTetris().then(m => m.destroyTetris());
+const initIaCVisualizer = (c: HTMLElement) => loadIaC().then(m => m.initIaCVisualizer(c));
+const destroyIaCVisualizer = () => loadIaC().then(m => m.destroyIaCVisualizer());
+const initNetworkTopology = (c: HTMLElement) => loadNetwork().then(m => m.initNetworkTopology(c));
+const destroyNetworkTopology = () => loadNetwork().then(m => m.destroyNetworkTopology());
+const initThrees = (c: HTMLElement) => loadThrees().then(m => m.initThrees(c));
+const destroyThrees = () => loadThrees().then(m => m.destroyThrees());
+const initTicTacToe = (c: HTMLElement) => loadTicTacToe().then(m => m.initTicTacToe(c));
+const destroyTicTacToe = () => loadTicTacToe().then(m => m.destroyTicTacToe());
+const initSnake = (c: HTMLElement) => loadSnake().then(m => m.initSnake(c));
+const destroySnake = () => loadSnake().then(m => m.destroySnake());
+const initDoom = (c: HTMLElement) => loadDoom().then(m => m.initDoom(c));
+const destroyDoom = () => loadDoom().then(m => m.destroyDoom());
+const initGymRoutine = (c: HTMLElement) => loadGym().then(m => m.initGymRoutine(c));
+const destroyGymRoutine = () => loadGym().then(m => m.destroyGymRoutine());
 import { handleTerminalCommand } from './terminal/core';
 import { handlePietrOSCommand, resetTerminalSubModes } from './terminal/pietros';
 import { handleCyberpunkCommand } from './terminal/cyberpunk';
@@ -250,68 +271,17 @@ document.addEventListener("DOMContentLoaded", () => {
             )
               ? "dark"
               : "light";
-            event.source.postMessage(
+            (event.source as Window).postMessage(
               { type: "theme-change", theme: currentTheme },
-              "*"
+              { targetOrigin: "*" }
             );
           }
         });
 
         initTheme();
 
-        // spotlight (ctrl+k)
-        window.toggleSpotlight = function () {
-          const spot = document.getElementById("spotlight");
-          const box = document.getElementById("spotlight-box");
-          const input = document.getElementById("spotlight-input");
-
-          if (spot.classList.contains("hidden")) {
-            spot.classList.remove("hidden");
-            spot.classList.add("flex");
-            setTimeout(() => {
-              box.classList.remove("scale-95", "opacity-0");
-              box.classList.add("scale-100", "opacity-100");
-              input.focus();
-            }, 10);
-            window.handleSearch("");
-          } else {
-            box.classList.remove("scale-100", "opacity-100");
-            box.classList.add("scale-95", "opacity-0");
-            setTimeout(() => {
-              spot.classList.add("hidden");
-              spot.classList.remove("flex");
-            }, 300);
-          }
-        };
-
-        // Focus trapping for spotlight
-        function trapFocusInSpotlight(e) {
-          const spot = document.getElementById("spotlight");
-          if (spot.classList.contains("hidden")) return;
-
-          const spotlightBox = document.getElementById("spotlight-box");
-          const focusableElements = spotlightBox.querySelectorAll(
-            'input, button, [tabindex]:not([tabindex="-1"]), .spotlight-result'
-          );
-          const firstFocusable = focusableElements[0];
-          const lastFocusable = focusableElements[focusableElements.length - 1];
-
-          if (e.key === "Tab") {
-            if (e.shiftKey) {
-              // Shift + Tab
-              if (document.activeElement === firstFocusable) {
-                e.preventDefault();
-                lastFocusable?.focus();
-              }
-            } else {
-              // Tab
-              if (document.activeElement === lastFocusable) {
-                e.preventDefault();
-                firstFocusable?.focus();
-              }
-            }
-          }
-        }
+        // spotlight (ctrl+k) — implemented in src/spotlight.ts
+        initSpotlight();
 
         document.addEventListener("keydown", (e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -333,115 +303,6 @@ document.addEventListener("DOMContentLoaded", () => {
           // Trap focus in spotlight when open
           trapFocusInSpotlight(e);
         });
-
-        window.handleSearch = function (query) {
-          const container = document.getElementById("spotlight-results");
-          container.innerHTML = "";
-          const term = query.toLowerCase().trim();
-
-          // Define all apps with same icons as dock
-          const spotlightApps = [
-            { id: "finder", title: "Finder", icon: "assets/icons/org.gnome.Nautilus.svg" },
-            { id: "about", title: "README.md", icon: "assets/icons/org.gnome.Logs.svg" },
-            { id: "projects", title: "Projects", icon: "assets/icons/org.gnome.tweaks.svg" },
-            { id: "vault", title: "Vault", icon: "assets/icons/org.gnome.FileRoller.svg" },
-            { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
-            { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
-            { id: "experiments", title: "Lab", icon: "assets/icons/characters.svg" },
-            { id: "sysinfo", title: "About", icon: "assets/icons/contacts.svg" },
-          ];
-
-          // If no search term, show app grid (like macOS 26 Siri/Spotlight)
-          if (!term) {
-            container.innerHTML = `
-              <div class="p-4">
-                <div class="text-[10px] uppercase font-bold opacity-40 tracking-wider mb-3">Applications</div>
-                <div class="grid grid-cols-5 gap-3">
-                  ${spotlightApps.map(app => `
-                    <div 
-                      class="spotlight-app flex flex-col items-center gap-1 p-2 rounded-lg cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all hover:scale-105"
-                      onclick="restoreWindow('${app.id}'); toggleSpotlight();"
-                      role="button"
-                      tabindex="0"
-                      onkeydown="if(event.key==='Enter'){restoreWindow('${app.id}'); toggleSpotlight();}"
-                    >
-                      <img src="${app.icon}" alt="${app.title}" class="w-10 h-10 drop-shadow-sm" />
-                      <span class="text-[10px] text-center truncate w-full opacity-70">${app.title}</span>
-                    </div>
-                  `).join("")}
-                </div>
-              </div>
-            `;
-            return;
-          }
-
-          const results = [];
-
-          // Search apps
-          spotlightApps.forEach(app => {
-            if (app.title.toLowerCase().includes(term) || app.id.includes(term)) {
-              results.push({
-                title: app.title,
-                desc: "Application",
-                action: `restoreWindow('${app.id}'); toggleSpotlight();`,
-                icon: `<img src="${app.icon}" alt="${app.title}" class="w-8 h-8" />`,
-              });
-            }
-          });
-
-          // Search Vault
-          vaultData.forEach((item) => {
-            if (
-              item.title.toLowerCase().includes(term) ||
-              item.desc.toLowerCase().includes(term)
-            ) {
-              results.push({
-                title: item.title,
-                desc: `Vault • ${item.desc}`,
-                action: item.url
-                  ? `window.open('${item.url}', '_blank'); toggleSpotlight();`
-                  : `restoreWindow('vault'); toggleSpotlight();`,
-                icon: `<div class="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>`,
-              });
-            }
-          });
-
-          if (results.length === 0) {
-            container.innerHTML = `<div class="p-4 text-center opacity-50 text-sm">No results found.</div>`;
-            return;
-          }
-
-          results.forEach((res, idx) => {
-            const div = document.createElement("div");
-            div.className = `spotlight-result p-3 flex items-center gap-3 border-b border-her-red/5 last:border-0 ${
-              idx === 0 ? "selected" : ""
-            }`;
-            div.setAttribute("tabindex", "0");
-            div.setAttribute("role", "option");
-            div.setAttribute("aria-selected", idx === 0 ? "true" : "false");
-            if (res.action) {
-              div.setAttribute("onclick", res.action);
-              div.setAttribute(
-                "onkeydown",
-                `if(event.key==='Enter'){${res.action}}`
-              );
-            }
-
-            div.innerHTML = `
-                    ${res.icon}
-                    <div>
-                        <div class="font-bold text-sm text-her-text dark:text-her-textLight">${res.title}</div>
-                        <div class="text-xs opacity-60">${res.desc}</div>
-                    </div>
-                 `;
-            container.appendChild(div);
-          });
-        };
-
-        window.executeSearchResult = function () {
-          const first = document.querySelector(".spotlight-result");
-          if (first) first.click();
-        };
 
         // windows
         const windows = {
@@ -525,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
                                 <p class="opacity-90 mb-4">
-                                    I have several projects here — a mix of infrastructure work and things I built out of curiosity. Check out <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a> to see what I'm working on.</p>
+                                    I have several projects here — a mix of infrastructure work and things I built out of curiosity. Check out <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" rel="noopener noreferrer" class="content-link">GitHub</a> to see what I'm working on.</p>
                             </div>
 
                             <!-- How I Think -->
@@ -554,10 +415,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <a href="mailto:pietrouni@gmail.com" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="Email">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                     </a>
-                                    <a href="https://github.com/pietrocious" target="_blank" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="GitHub">
+                                    <a href="https://github.com/pietrocious" target="_blank" rel="noopener noreferrer" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="GitHub">
                                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                                     </a>
-                                    <a href="https://linkedin.com/in/pietrouni" target="_blank" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="LinkedIn">
+                                    <a href="https://linkedin.com/in/pietrouni" target="_blank" rel="noopener noreferrer" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="LinkedIn">
                                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                                     </a>
                                 </div>
@@ -594,7 +455,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
                                     <!-- Terraform AWS Modules -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank', 'noopener,noreferrer')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
@@ -613,7 +474,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </div>
 
                                     <!-- pietrouni.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank', 'noopener,noreferrer')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Portfolio</span>
@@ -730,7 +591,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                                     <!-- suprsymmetry.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://suprsymmetry.com/', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://suprsymmetry.com/', '_blank', 'noopener,noreferrer')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">suprsymmetry.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
@@ -749,7 +610,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </div>
 
                                     <!-- cerebralwwaves.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://cerebralwwaves.com/', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://cerebralwwaves.com/', '_blank', 'noopener,noreferrer')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">cerebralwwaves.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
@@ -1733,7 +1594,7 @@ document.addEventListener("DOMContentLoaded", () => {
           winEl.style.height = heightStyle;
           winEl.style.left = `${leftPos}px`;
           winEl.style.top = `${topPos}px`;
-          winEl.style.zIndex = incrementZIndex();
+          winEl.style.zIndex = incrementZIndex().toString();
 
           // macOS Header + Content
           winEl.innerHTML = `
@@ -1929,7 +1790,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(filePath);
             if (!response.ok) throw new Error("File not found");
             const markdown = await response.text();
-            htmlContent = marked.parse(markdown);
+            htmlContent = DOMPurify.sanitize(marked.parse(markdown) as string);
           } catch (error) {
             // Check if it's a CORS/local file issue
             const isLocalFile = window.location.protocol === "file:";
@@ -1992,7 +1853,7 @@ document.addEventListener("DOMContentLoaded", () => {
           winEl.style.height = `${finalH}px`;
           winEl.style.left = `${leftPos}px`;
           winEl.style.top = `${topPos}px`;
-          winEl.style.zIndex = ++zIndexCounter;
+          winEl.style.zIndex = incrementZIndex().toString();
 
           winEl.innerHTML = `
                     <div class="window-header" onmousedown="window.startDrag(event, '${viewerId}')" ondblclick="window.toggleMaximize('${viewerId}')">
@@ -2142,7 +2003,7 @@ document.addEventListener("DOMContentLoaded", () => {
               "p-3 md:p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-red/50 hover:-translate-y-0.5 transition-all group vault-card-animate" +
               (isClickable ? " cursor-pointer" : "");
             card.style.animationDelay = `${i * 50}ms`;
-            if (item.url) card.setAttribute("onclick", `window.open('${item.url}', '_blank')`);
+            if (item.url) card.setAttribute("onclick", `window.open('${item.url}', '_blank', 'noopener,noreferrer')`);
             else if (hasItems) card.setAttribute("onclick", `window.vaultShowDetail('${item.id}')`);
 
             // Badge icon
@@ -2606,7 +2467,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (monitorInterval) clearInterval(monitorInterval);
 
           // Canvas Setup
-          const canvas = document.getElementById("monitor-canvas");
+          const canvas = document.getElementById("monitor-canvas") as HTMLCanvasElement;
           const ctx = canvas.getContext("2d");
           let dataPoints = new Array(50).fill(20);
           let errorPoints = new Array(50).fill(5); // Error rate series
