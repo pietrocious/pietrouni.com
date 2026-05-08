@@ -1,5 +1,3 @@
-import { marked } from 'marked';
-import DOMPurify from 'dompurify';
 
 // Lab Icons
 import snakeIcon from './assets/icons/lab/snake.png';
@@ -15,9 +13,14 @@ import { fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_C
 import { vaultData } from './vault';
 import { initDock, dockBounce, refreshDockItems } from './dock';
 import { animateWindowContent } from './animations';
-import { initVanta, destroyVanta, updateVantaTheme, isVantaActive } from './vanta';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
 import { initSpotlight, trapFocusInSpotlight } from './spotlight';
+import { registerServiceWorker } from './sw-register';
+import { initClock } from './clock';
+import { initMonitor, startMonitor } from './monitor';
+import { initLaunchpadModule } from './launchpad';
+import { initMarkdownViewer } from './markdown-viewer';
+import { initTheme, updateThemeUI } from './theme';
 
 // Lazy-loaded games and apps — split into separate Vite chunks
 const loadTetris = () => import('./games/tetris');
@@ -54,11 +57,10 @@ import { handleFalloutCommand } from './terminal/fallout';
 
 // state - shared app state with setters for mutations
 import {
-  activeWindows, incrementZIndex, wallpapers, allWallpaperClasses,
+  activeWindows, incrementZIndex,
   currentPath, setCurrentPath, terminalHistory, pushTerminalHistory,
   terminalHistoryIndex, setTerminalHistoryIndex, guessGame, ciscoMode, terraformMode,
   shuffledQuotes, quoteIndex, setQuoteIndex, reshuffleQuotes, TERMINAL_STATE,
-  activeWallpaperIndex, setActiveWallpaperIndex, monitorInterval, setMonitorInterval,
   tabCompletionIndex, setTabCompletionIndex, lastTabInput, setLastTabInput,
   registerTerminalCleanup, runTerminalCleanups, hasActiveCleanups
 } from './state';
@@ -98,6 +100,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // initialize dock fish-eye magnification
         initDock();
 
+        // initialize monitor app handlers
+        initMonitor();
+
+        // initialize launchpad app handlers
+        initLaunchpadModule();
+
+        // expose markdown viewer (sanitized via DOMPurify)
+        initMarkdownViewer();
+
         // expose sound toggle for settings
         window.toggleSound = toggleSound;
         window.isSoundEnabled = isSoundEnabled;
@@ -108,125 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
           dockContainer.addEventListener('click', () => playClick());
         }
 
-        function applyWallpaperClasses(wp: (typeof wallpapers)[0], isDark: boolean, desktop: HTMLElement) {
-          desktop.style.background = "";
-          allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
-          if (wp.type === "class") {
-            desktop.classList.add(isDark ? wp.dark : wp.light);
-            destroyVanta();
-          } else if (wp.type === "gradient") {
-            desktop.style.background = isDark ? wp.dark : wp.light;
-            destroyVanta();
-          } else if (wp.type === "vanta" && wp.vantaEffect) {
-            desktop.style.background = "";
-            initVanta(wp.vantaEffect, isDark, desktop);
-          }
-        }
+        // Theme + wallpaper — implemented in src/theme.ts (initTheme() called below)
 
-        function applyWallpaper(animate = false) {
-          const isDark = document.documentElement.classList.contains("dark");
-          const wp = wallpapers[activeWallpaperIndex];
-          const desktop = document.getElementById("desktop");
-          if (!desktop) return;
-
-          // If switching away from vanta, no cross-fade needed (canvas unmounts)
-          const skipFade = wp.type === "vanta" || isVantaActive();
-
-          if (animate && !skipFade) {
-            // Cross-fade: freeze current look in ::before, swap underneath, then fade ::before out
-            desktop.classList.add("wallpaper-transitioning");
-            requestAnimationFrame(() => {
-              applyWallpaperClasses(wp, isDark, desktop);
-              requestAnimationFrame(() => {
-                desktop.classList.remove("wallpaper-transitioning");
-              });
-            });
-          } else {
-            applyWallpaperClasses(wp, isDark, desktop);
-          }
-
-        }
-
-        // theme + wallpaper
-        function setTheme(dark: boolean) {
-          const desktop = document.getElementById("desktop");
-          if (dark) {
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-          }
-          desktop.classList.remove("her-bg", "her-bg-dark");
-          // If a vanta effect is active, update its colors live rather than full reinit
-          if (isVantaActive()) {
-            updateVantaTheme(dark);
-          }
-          applyWallpaper();
-
-          // notify iframes
-          const newTheme = dark ? "dark" : "light";
-          document.querySelectorAll("iframe").forEach((frame) => {
-            frame.contentWindow.postMessage(
-              { type: "theme-change", theme: newTheme },
-              "*"
-            );
-          });
-        }
-
-        function initTheme() {
-          // Resolve initial theme: explicit localStorage > system preference
-          const prefersDark =
-            localStorage.theme === "dark" ||
-            (!("theme" in localStorage) &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-          setTheme(prefersDark);
-          updateThemeUI();
-
-          // Live-sync with OS preference when user hasn't manually overridden
-          window
-            .matchMedia("(prefers-color-scheme: dark)")
-            .addEventListener("change", (e) => {
-              if (!("theme" in localStorage)) {
-                setTheme(e.matches);
-                updateThemeUI();
-              }
-            });
-        }
-
-        function updateThemeUI() {
-          const mode = localStorage.theme || "system";
-          const isDark = document.documentElement.classList.contains("dark");
-          // Update settings label
-          const label = document.getElementById("settings-theme-label");
-          if (label) {
-            const labels: Record<string, string> = { light: "Light Mode", dark: "Dark Mode", system: "System (" + (isDark ? "Dark" : "Light") + ")" };
-            label.textContent = labels[mode] || labels.system;
-          }
-          // Update segmented control active state
-          document.querySelectorAll(".theme-seg-btn").forEach((btn) => {
-            const el = btn as HTMLElement;
-            const isActive = el.dataset.mode === mode;
-            if (isActive) {
-              el.classList.add("bg-her-red", "text-white");
-              el.classList.remove("hover:bg-black/10", "dark:hover:bg-white/10");
-            } else {
-              el.classList.remove("bg-her-red", "text-white");
-              el.classList.add("hover:bg-black/10", "dark:hover:bg-white/10");
-            }
-          });
-        }
-
-        window.setThemeMode = function (mode: string) {
-          if (mode === "system") {
-            localStorage.removeItem("theme");
-            setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-          } else {
-            localStorage.theme = mode;
-            setTheme(mode === "dark");
-          }
-          updateThemeUI();
-        };
-
-        // Menu bar button — simple light/dark flip (pins the choice)
         // Lab filter for experiments window
         (window as any).labFilter = function (filter: string) {
           const items = document.querySelectorAll<HTMLElement>('#lab-grid [data-category]');
@@ -244,24 +138,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const show = filter === 'all' || item.dataset.category === filter;
             item.style.display = show ? '' : 'none';
           });
-        };
-
-        window.toggleTheme = function () {
-          const goingDark = !document.documentElement.classList.contains("dark");
-          window.setThemeMode(goingDark ? "dark" : "light");
-        };
-
-        window.cycleWallpaper = function () {
-          setActiveWallpaperIndex((activeWallpaperIndex + 1) % wallpapers.length);
-          applyWallpaper(true);
-        };
-
-        // set wallpaper by index (for settings grid)
-        window.setWallpaper = function (index: number) {
-          if (index >= 0 && index < wallpapers.length) {
-            setActiveWallpaperIndex(index);
-            applyWallpaper(true);
-          }
         };
 
         window.addEventListener("message", (event) => {
@@ -1775,120 +1651,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         // md viewer
-        window.openMarkdownViewer = async function (filePath, title) {
-          const viewerId = "md-viewer-" + title.replace(/[^a-z0-9]/gi, "");
-
-          // If already open, bring to front
-          if (activeWindows[viewerId]) {
-            restoreWindow(viewerId);
-            return;
-          }
-
-          // Fetch and parse markdown
-          let htmlContent = "";
-          try {
-            const response = await fetch(filePath);
-            if (!response.ok) throw new Error("File not found");
-            const markdown = await response.text();
-            htmlContent = DOMPurify.sanitize(marked.parse(markdown) as string);
-          } catch (error) {
-            // Check if it's a CORS/local file issue
-            const isLocalFile = window.location.protocol === "file:";
-            if (isLocalFile) {
-              htmlContent = `
-                            <div class="text-center p-8">
-                                <div class="text-4xl mb-4">📁</div>
-                                <h3 class="text-lg font-bold mb-2 text-her-dark dark:text-her-textLight">Local Server Required</h3>
-                                <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or deploy to S3.</p>
-                                <code class="text-xs bg-black/10 dark:bg-white/10 px-3 py-2 rounded block">npx serve .</code>
-                            </div>
-                        `;
-            } else {
-              htmlContent = `<div class="text-red-500 p-4">Error loading file: ${error.message}</div>`;
-            }
-          }
-
-          // Create window config dynamically
-          const viewerConfig = {
-            title: title,
-            content: `
-                        <div class="h-full overflow-y-auto p-6 md:p-8">
-                            <article class="markdown-body prose prose-sm dark:prose-invert max-w-none">
-                                ${htmlContent}
-                            </article>
-                        </div>
-                    `,
-            width: 700,
-            height: 600,
-          };
-
-          // Use similar logic to openWindow
-          const container = document.getElementById("windows-container");
-          const containerW = container.clientWidth;
-          const containerH = container.clientHeight;
-          const isMobile = window.innerWidth < 768;
-          const dockBuffer = isMobile ? 68 : 120;
-          const maxAvailableHeight = containerH - dockBuffer;
-
-          let finalW = isMobile ? containerW : viewerConfig.width;
-          let finalH = isMobile
-            ? maxAvailableHeight
-            : Math.min(viewerConfig.height, maxAvailableHeight);
-          let leftPos = isMobile
-            ? 0
-            : Math.max(0, (containerW - finalW) / 2) +
-              Math.floor(Math.random() * 30);
-          let topPos = isMobile
-            ? 0
-            : Math.max(10, (maxAvailableHeight - finalH) / 2) +
-              Math.floor(Math.random() * 30);
-
-          const winEl = document.createElement("div");
-          winEl.className =
-            "window absolute flex flex-col active-window window-opening";
-          winEl.id = `win-${viewerId}`;
-          winEl.setAttribute("role", "dialog");
-          winEl.setAttribute("aria-labelledby", `win-title-${viewerId}`);
-          winEl.style.width = `${finalW}px`;
-          winEl.style.height = `${finalH}px`;
-          winEl.style.left = `${leftPos}px`;
-          winEl.style.top = `${topPos}px`;
-          winEl.style.zIndex = incrementZIndex().toString();
-
-          winEl.innerHTML = `
-                    <div class="window-header" onmousedown="window.startDrag(event, '${viewerId}')" ondblclick="window.toggleMaximize('${viewerId}')">
-                        <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-                            <button class="btn-neon min" onclick="window.minimizeWindow('${viewerId}')" aria-label="Minimize window"></button>
-                            <button class="btn-neon max" onclick="window.toggleMaximize('${viewerId}')" aria-label="Maximize window"></button>
-                            <button class="btn-neon close" onclick="window.closeWindow('${viewerId}')" aria-label="Close window"></button>
-                        </div>
-                        <span class="window-title" id="win-title-${viewerId}">${viewerConfig.title}</span>
-                    </div>
-                    <div class="flex-1 relative overflow-hidden">
-                        ${viewerConfig.content}
-                    </div>
-                `;
-
-          winEl.addEventListener("mousedown", () => bringToFront(viewerId));
-          winEl.addEventListener("touchstart", () => bringToFront(viewerId), {
-            passive: true,
-          });
-          winEl.onmousemove = (e) => updateWindowCursor(e, winEl);
-          winEl.onmousedown = (e) => {
-            bringToFront(viewerId);
-            handleResizeStart(e, winEl, viewerId);
-          };
-          addTouchListeners(winEl, viewerId);
-
-          container.appendChild(winEl);
-          activeWindows[viewerId] = {
-            element: winEl,
-            config: viewerConfig,
-            maximized: false,
-            prevRect: null,
-          };
-          setTimeout(() => winEl.classList.remove("window-opening"), 350);
-        };
+        // Markdown viewer — implemented in src/markdown-viewer.ts
 
 
 
@@ -1902,54 +1665,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-        // clock with flip-digit animation
-        let prevClockText = '';
-        function updateClock() {
-          const now = new Date();
-          const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-          const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-          const day = days[now.getDay()];
-          const month = months[now.getMonth()];
-          const date = now.getDate();
-          const time = now.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: false,
-          });
-          const text = `${day} ${month} ${date} ${time}`;
-          const clockEl = document.getElementById("clock");
-          if (!clockEl) return;
-
-          // First render or text length changed — just set it
-          if (!prevClockText || prevClockText.length !== text.length) {
-            clockEl.innerHTML = '';
-            for (const ch of text) {
-              const span = document.createElement('span');
-              span.className = 'clock-char';
-              span.textContent = ch;
-              span.dataset.char = ch;
-              clockEl.appendChild(span);
-            }
-            prevClockText = text;
-            return;
-          }
-
-          // Animate only changed characters
-          const spans = clockEl.querySelectorAll('.clock-char');
-          for (let i = 0; i < text.length; i++) {
-            if (prevClockText[i] !== text[i] && spans[i]) {
-              const span = spans[i] as HTMLElement;
-              span.classList.add('clock-char-flip');
-              span.textContent = text[i];
-              span.dataset.char = text[i];
-              // Remove animation class after it completes
-              setTimeout(() => span.classList.remove('clock-char-flip'), 400);
-            }
-          }
-          prevClockText = text;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        // clock — implemented in src/clock.ts
+        initClock();
 
         // terminal
         function resolvePath(path) {
@@ -2230,56 +1947,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
 
-        window.openMarkdownViewer = function(title: string, file: string) {
-             const viewerId = `md-${title.replace(/[^a-z0-9]/gi, '')}`;
-             if (activeWindows[viewerId]) {
-                restoreWindow(viewerId, undefined);
-                return;
-             }
-             
-             // Mock markdown content since we don't have a real file reader yet
-             const mdContent = `# ${title}\n\nThis is a markdown preview for **${title}**.\n\n- Feature 1\n- Feature 2\n\n*Simulated markdown content.*`;
-             // In a real app we would parse `mdContent` with marked()
-             // but here we will just wrap it in a pre for now, or basic HTML
-             
-             const winContent = `
-                <div class="h-full bg-[#0d1117] text-[#c9d1d9] p-6 overflow-y-auto font-ui markdown-body">
-                    <h1 class="text-2xl font-bold mb-4 border-b border-[#30363d] pb-2">${title}</h1>
-                    <p class="mb-4">This is a markdown preview for <strong class="text-white">${title}</strong>.</p>
-                    <ul class="list-disc pl-5 mb-4 space-y-1">
-                        <li>Feature 1</li>
-                        <li>Feature 2</li>
-                    </ul>
-                    <p class="italic opacity-70">Simulated markdown content.</p>
-                </div>
-             `;
-             
-             const winId = viewerId;
-             const winEl = document.createElement("div");
-             winEl.className = "window absolute flex flex-col active-window window-opening";
-             winEl.id = `win-${winId}`;
-             winEl.style.width = "600px";
-             winEl.style.height = "500px";
-             winEl.style.left = "120px";
-             winEl.style.top = "120px";
-             winEl.style.zIndex = incrementZIndex().toString();
-             winEl.innerHTML = `
-                <div class="window-header" onmousedown="window.startDrag(event, '${winId}')" ondblclick="window.toggleMaximize('${winId}')">
-                    <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-                         <button class="btn-neon close" onclick="window.closeWindow('${winId}')"></button>
-                         <button class="btn-neon min" onclick="window.minimizeWindow('${winId}')"></button>
-                         <button class="btn-neon max" onclick="window.toggleMaximize('${winId}')"></button>
-                    </div>
-                    <span class="window-title">${title}</span>
-                </div>
-                <div class="flex-1 relative overflow-hidden">${winContent}</div>
-            `;
-            winEl.onmousedown = () => bringToFront(winId);
-            const container = document.getElementById("windows-container");
-            if (container) container.appendChild(winEl);
-            activeWindows[winId] = { element: winEl, config: { title: title, content: winContent, width: 600, height: 500 }, maximized: false };
-            setTimeout(() => winEl.classList.remove("window-opening"), 350);
-        };
+        // (markdown viewer is in src/markdown-viewer.ts; an old duplicate stub was removed)
 
         window.finderRender = function () {
           const pathEl = document.getElementById("finder-path");
@@ -2377,201 +2045,11 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         };
 
-        // =====================================
-        // LAUNCHPAD APP FUNCTIONS
-        // =====================================
-        const launchpadApps = [
-          { id: "about", title: "README.md", icon: "📄", color: "bg-blue-500" },
-          { id: "projects", title: "Projects", icon: "📁", color: "bg-purple-500" },
-          { id: "vault", title: "Vault", icon: "🔒", color: "bg-amber-500" },
-          { id: "terminal", title: "Terminal", icon: "💻", color: "bg-gray-700" },
-          { id: "finder", title: "Finder", icon: "📂", color: "bg-blue-400" },
-          { id: "monitor", title: "Monitoring", icon: "📊", color: "bg-teal-500" },
-          { id: "settings", title: "Settings", icon: "⚙️", color: "bg-gray-500" },
-          { id: "sysinfo", title: "About", icon: "ℹ️", color: "bg-rose-500" },
-          { id: "experiments", title: "Lab", icon: "🧪", color: "bg-lime-500" },
-        ];
-
-        window.initLaunchpad = function () {
-          window.filterLaunchpad("");
-        };
-
-        window.filterLaunchpad = function (query: string) {
-          const grid = document.getElementById("launchpad-grid");
-          if (!grid) return;
-          
-          const term = query.toLowerCase();
-          const filtered = launchpadApps.filter(app => 
-            app.title.toLowerCase().includes(term) || app.id.includes(term)
-          );
-          
-          grid.innerHTML = "";
-          
-          filtered.forEach((app, idx) => {
-            const item = document.createElement("div");
-            item.className = "launchpad-item flex flex-col items-center gap-2 cursor-pointer group";
-            item.style.animationDelay = `${idx * 30}ms`;
-            item.innerHTML = `
-              <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl ${app.color} flex items-center justify-center text-2xl md:text-3xl shadow-lg group-hover:scale-110 transition-transform">
-                ${app.icon}
-              </div>
-              <span class="text-white text-xs text-center truncate w-full opacity-80 group-hover:opacity-100">${app.title}</span>
-            `;
-            
-            item.onclick = () => {
-              window.closeWindow("launchpad");
-              setTimeout(() => window.restoreWindow(app.id), 100);
-            };
-            
-            grid.appendChild(item);
-          });
-        };
-        window.switchMonitorTab = function (tab) {
-          document.getElementById("mon-view-infra").style.display = "none";
-          document.getElementById("mon-view-cloudfront").style.display = "none";
-          document.getElementById("mon-view-billing").style.display = "none";
-
-          // Layout logic: Infra is default (block/space-y), Cloudfront block, Billing flex (center)
-          if (tab === "infra")
-            document.getElementById("mon-view-infra").style.display = "block";
-          else if (tab === "cf")
-            document.getElementById("mon-view-cloudfront").style.display =
-              "block";
-          else if (tab === "bill")
-            document.getElementById("mon-view-billing").style.display = "flex";
-
-          // Tab styling
-          ["infra", "cf", "bill"].forEach((t) => {
-            const el = document.getElementById(`tab-${t}`);
-            if (t === tab) {
-              el.classList.add(
-                "border-her-red",
-                "text-her-red",
-                "bg-white/50",
-                "dark:bg-black/20"
-              );
-              el.classList.remove("border-transparent", "opacity-60");
-            } else {
-              el.classList.remove(
-                "border-her-red",
-                "text-her-red",
-                "bg-white/50",
-                "dark:bg-black/20"
-              );
-              el.classList.add("border-transparent", "opacity-60");
-            }
-          });
-        };
-
-        function startMonitor() {
-          if (monitorInterval) clearInterval(monitorInterval);
-
-          // Canvas Setup
-          const canvas = document.getElementById("monitor-canvas") as HTMLCanvasElement;
-          const ctx = canvas.getContext("2d");
-          let dataPoints = new Array(50).fill(20);
-          let errorPoints = new Array(50).fill(5); // Error rate series
-
-          // KPI Simulation
-          const kpiReq = document.getElementById("kpi-req");
-          const kpiData = document.getElementById("kpi-data");
-          const logContainer = document.getElementById("sys-log");
-
-          const logs = [
-            "[INFO] Auto-scaling group: +1 instance",
-            "[INFO] Route53 health check: Healthy",
-            "[WARN] High latency detected in ap-south-1",
-            "[INFO] S3 Lifecycle rule executed",
-            "[INFO] CloudFront cache refresh",
-          ];
-
-          setMonitorInterval(setInterval(() => {
-            // Update Graph Data
-            dataPoints.shift();
-            errorPoints.shift();
-            const base = 40 + Math.random() * 30;
-            dataPoints.push(base);
-            errorPoints.push(Math.max(0, 5 + (Math.random() * 10 - 5))); // Sim error
-
-            // Render Graph
-            // Check visibility to save resources
-            if (canvas && canvas.offsetParent !== null) {
-              // Resize if needed
-              if (canvas.width !== canvas.clientWidth) {
-                canvas.width = canvas.clientWidth;
-                canvas.height = canvas.clientHeight;
-              }
-              const w = canvas.width;
-              const h = canvas.height;
-
-              ctx.clearRect(0, 0, w, h);
-
-              // Draw Main Traffic
-              ctx.beginPath();
-              ctx.moveTo(0, h);
-              dataPoints.forEach((p, i) => {
-                const x = (i / (dataPoints.length - 1)) * w;
-                const y = h - (p / 100) * h;
-                ctx.lineTo(x, y);
-              });
-              ctx.lineTo(w, h);
-              ctx.fillStyle = "rgba(74, 124, 157, 0.2)"; // Blue tint #4A7C9D
-              ctx.fill();
-
-              // Stroke Main
-              ctx.beginPath();
-              dataPoints.forEach((p, i) => {
-                const x = (i / (dataPoints.length - 1)) * w;
-                const y = h - (p / 100) * h;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-              });
-              ctx.strokeStyle = "#4A7C9D"; // Blue
-              ctx.lineWidth = 2;
-              ctx.stroke();
-
-              // Draw Error Rate (Dashed)
-              ctx.beginPath();
-              ctx.setLineDash([5, 5]);
-              errorPoints.forEach((p, i) => {
-                const x = (i / (errorPoints.length - 1)) * w;
-                const y = h - (p / 100) * h; // Scale differently realistically, but for viz ok
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-              });
-              ctx.strokeStyle = "#4A7C9D";
-              ctx.lineWidth = 1;
-              ctx.stroke();
-              ctx.setLineDash([]);
-            }
-
-            // Update KPIs
-            if (kpiReq && Math.random() > 0.7)
-              kpiReq.innerText = (2.4 + Math.random() * 0.2).toFixed(1) + "k";
-            if (logContainer && Math.random() > 0.9) {
-              const log = logs[Math.floor(Math.random() * logs.length)];
-              const div = document.createElement("div");
-              div.innerText = log;
-              logContainer.prepend(div);
-              if (logContainer.children.length > 5)
-                logContainer.lastChild.remove();
-            }
-          }, 1000));
-        }
+        // Launchpad — implemented in src/launchpad.ts
+        // Monitor (system dashboard) — implemented in src/monitor.ts
 
         // Initial site Launch - start with clean desktop
         // (Windows can be opened from the dock)
       });
 
-// register service worker for pwa
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('[SW] Registration successful, scope:', registration.scope);
-      })
-      .catch((error) => {
-        console.error('[SW] Registration failed:', error);
-      });
-  });
-}
+registerServiceWorker();
