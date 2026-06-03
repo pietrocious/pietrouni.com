@@ -11,7 +11,6 @@ export const fileSystem: { root: FileSystemNode } = {
         vault: {},
         projects: {
           "pietrouni.com": "FILE",
-          "terraform-modules": "FILE",
           "network-automation": "FILE",
         },
         photos: {

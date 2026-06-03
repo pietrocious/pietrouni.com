@@ -517,7 +517,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Background</h2>
                                 <p class="opacity-90">
-                                    I'm an infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers — that foundation gave me a deep understanding of how distributed systems actually work. These days I focus on cloud infrastructure: AWS, Terraform, CI/CD, and building things that are reliable by design.
+                                    I'm an infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers — that foundation gave me a deep understanding of how distributed systems actually work. These days I focus on cloud infrastructure, CI/CD, and building things that are reliable by design.
                                 </p>
                             </div>
 
@@ -593,25 +593,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
-                                    <!-- Terraform AWS Modules -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Complete AWS cloud architecture featuring Multi-AZ networking, auto-scaling, CloudFront CDN, and automated deployment. Built to demonstrate enterprise IaC patterns..</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TERRAFORM</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CI/CD</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-60">
-                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>GitHub</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <!-- pietrouni.com -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank')">
                                         <div class="flex justify-between items-start mb-2">
@@ -680,25 +661,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- AWS Multi-Region DR Setup -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 200ms">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">AWS Multi-Region DR Setup</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Disaster recovery architecture demonstrating cross-region replication, failover automation, and backup strategies. Will showcase Route53 health checks, S3 cross-region replication, and RDS read replicas.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TERRAFORM</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AUTOMATION</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-50">
-                                                <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     <!-- Kubernetes Homelab Cluster -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 250ms">
                                         <div class="flex justify-between items-start mb-2">
@@ -974,11 +936,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gnome.SystemMonitor.svg" class="inline w-5 h-5 mr-1" alt="" /> Monitoring</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">WIP</span>
                                     </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Live AWS infrastructure metrics dashboard. Currently under construction.</p>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Live infrastructure metrics dashboard. Currently under construction.</p>
                                     <div class="mt-auto">
                                         <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CLOUDWATCH</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">METRICS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">MONITORING</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1140,7 +1102,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         
                         <!-- Description -->
                         <p class="text-sm opacity-70 max-w-sm mb-6 text-her-text dark:text-her-textLight">
-                            This dashboard will show live AWS infrastructure metrics once connected to CloudWatch.
+                            This dashboard will show live infrastructure metrics once connected to a metrics backend.
                         </p>
                         
                         <!-- Coming Soon Badge -->
@@ -1155,11 +1117,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             <ul class="space-y-2 text-xs opacity-60">
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
-                                    CloudFront traffic metrics
+                                    CDN traffic metrics
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
-                                    S3 storage analytics
+                                    Object storage analytics
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
@@ -1167,7 +1129,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
-                                    Edge location performance
+                                    Edge node performance
                                 </li>
                             </ul>
                         </div>
@@ -1938,7 +1900,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div class="text-center p-8">
                                 <div class="text-4xl mb-4">📁</div>
                                 <h3 class="text-lg font-bold mb-2 text-her-dark dark:text-her-textLight">Local Server Required</h3>
-                                <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or deploy to S3.</p>
+                                <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or deploy to a static host.</p>
                                 <code class="text-xs bg-black/10 dark:bg-white/10 px-3 py-2 rounded block">npx serve .</code>
                             </div>
                         `;
@@ -2567,14 +2529,14 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         window.switchMonitorTab = function (tab) {
           document.getElementById("mon-view-infra").style.display = "none";
-          document.getElementById("mon-view-cloudfront").style.display = "none";
+          document.getElementById("mon-view-cdn").style.display = "none";
           document.getElementById("mon-view-billing").style.display = "none";
 
-          // Layout logic: Infra is default (block/space-y), Cloudfront block, Billing flex (center)
+          // Layout logic: Infra is default (block/space-y), CDN block, Billing flex (center)
           if (tab === "infra")
             document.getElementById("mon-view-infra").style.display = "block";
           else if (tab === "cf")
-            document.getElementById("mon-view-cloudfront").style.display =
+            document.getElementById("mon-view-cdn").style.display =
               "block";
           else if (tab === "bill")
             document.getElementById("mon-view-billing").style.display = "flex";
@@ -2618,10 +2580,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const logs = [
             "[INFO] Auto-scaling group: +1 instance",
-            "[INFO] Route53 health check: Healthy",
-            "[WARN] High latency detected in ap-south-1",
-            "[INFO] S3 Lifecycle rule executed",
-            "[INFO] CloudFront cache refresh",
+            "[INFO] DNS health check: Healthy",
+            "[WARN] High latency detected in the eu-west region",
+            "[INFO] Object storage lifecycle rule executed",
+            "[INFO] CDN cache refresh",
           ];
 
           setMonitorInterval(setInterval(() => {
