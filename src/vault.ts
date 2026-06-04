@@ -18,6 +18,9 @@ export const vaultData: VaultItem[] = [
     desc: "My resume in PDF format",
     url: "https://pietrouni.com/vault/PietroUni_Resume_2026.pdf",
   },
+  // TEMPORARILY DISABLED — Tech Stack hidden pending an honesty pass.
+  // Trim the items below to only what's genuinely hands-on, then uncomment to re-enable.
+  /*
   {
     id: "techstack",
     title: "Tech Stack",
@@ -44,6 +47,7 @@ export const vaultData: VaultItem[] = [
       { name: "OS: Linux (Ubuntu, CentOS), Windows Server" },
     ],
   },
+  */
   {
     id: "food",
     title: "Food",

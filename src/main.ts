@@ -517,7 +517,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Background</h2>
                                 <p class="opacity-90">
-                                    I'm an infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers — that foundation gave me a deep understanding of how distributed systems actually work. These days I focus on cloud infrastructure, CI/CD, and building things that are reliable by design.
+                                    I'm a network and infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers — that foundation gave me a deep understanding of how distributed systems actually work. More recently I've been growing into cloud infrastructure: a new interest that builds naturally on those networking fundamentals, and on making things that are reliable by design.
                                 </p>
                             </div>
 
@@ -593,6 +593,25 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
+                                    <!-- Terraform AWS Modules -->
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
+                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
+                                        </div>
+                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Complete AWS cloud architecture featuring Multi-AZ networking, auto-scaling, CloudFront CDN, and automated deployment. Built to demonstrate enterprise IaC patterns..</p>
+                                        <div class="mt-auto">
+                                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TERRAFORM</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CI/CD</span>
+                                            </div>
+                                            <div class="flex gap-3 text-xs opacity-60">
+                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>GitHub</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- pietrouni.com -->
                                     <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank')">
                                         <div class="flex justify-between items-start mb-2">
@@ -661,25 +680,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- Kubernetes Homelab Cluster -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 250ms">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Kubernetes Homelab Cluster</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Self-hosted K8s cluster for learning container orchestration. Planning to deploy monitoring stack (Prometheus/Grafana), practice Helm charts, and document the full setup process.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">KUBERNETES</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">HELM</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">RASPBERRY PI</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-50">
-                                                <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
                                 </div>
                             </div>
 
