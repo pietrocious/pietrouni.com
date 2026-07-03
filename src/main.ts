@@ -2255,7 +2255,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (fileName.toLowerCase() === 'readme.md') {
                     window.openWindow('about'); 
                 } else {
-                    window.openMarkdownViewer(fileName, `/home/guest/${fileName}`); 
+                    window.openMarkdownViewer(`/home/guest/${fileName}`, fileName);
                 }
             } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext || '')) {
                  const viewerId = `img-${fileName.replace(/[^a-z0-9]/gi, '')}`;
@@ -2329,57 +2329,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 activeWindows[winId] = { element: winEl, config: { title: fileName, content: content, width: 500, height: 400 }, maximized: false };
                 setTimeout(() => winEl.classList.remove("window-opening"), 350);
             }
-        };
-
-        window.openMarkdownViewer = function(title: string, file: string) {
-             const viewerId = `md-${title.replace(/[^a-z0-9]/gi, '')}`;
-             if (activeWindows[viewerId]) {
-                restoreWindow(viewerId, undefined);
-                return;
-             }
-             
-             // Mock markdown content since we don't have a real file reader yet
-             const mdContent = `# ${title}\n\nThis is a markdown preview for **${title}**.\n\n- Feature 1\n- Feature 2\n\n*Simulated markdown content.*`;
-             // In a real app we would parse `mdContent` with marked()
-             // but here we will just wrap it in a pre for now, or basic HTML
-             
-             const winContent = `
-                <div class="h-full bg-[#0d1117] text-[#c9d1d9] p-6 overflow-y-auto font-ui markdown-body">
-                    <h1 class="text-2xl font-bold mb-4 border-b border-[#30363d] pb-2">${title}</h1>
-                    <p class="mb-4">This is a markdown preview for <strong class="text-white">${title}</strong>.</p>
-                    <ul class="list-disc pl-5 mb-4 space-y-1">
-                        <li>Feature 1</li>
-                        <li>Feature 2</li>
-                    </ul>
-                    <p class="italic opacity-70">Simulated markdown content.</p>
-                </div>
-             `;
-             
-             const winId = viewerId;
-             const winEl = document.createElement("div");
-             winEl.className = "window absolute flex flex-col active-window window-opening";
-             winEl.id = `win-${winId}`;
-             winEl.style.width = "600px";
-             winEl.style.height = "500px";
-             winEl.style.left = "120px";
-             winEl.style.top = "120px";
-             winEl.style.zIndex = incrementZIndex().toString();
-             winEl.innerHTML = `
-                <div class="window-header" onmousedown="window.startDrag(event, '${winId}')" ondblclick="window.toggleMaximize('${winId}')">
-                    <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-                         <button class="btn-neon close" onclick="window.closeWindow('${winId}')"></button>
-                         <button class="btn-neon min" onclick="window.minimizeWindow('${winId}')"></button>
-                         <button class="btn-neon max" onclick="window.toggleMaximize('${winId}')"></button>
-                    </div>
-                    <span class="window-title">${title}</span>
-                </div>
-                <div class="flex-1 relative overflow-hidden">${winContent}</div>
-            `;
-            winEl.onmousedown = () => bringToFront(winId);
-            const container = document.getElementById("windows-container");
-            if (container) container.appendChild(winEl);
-            activeWindows[winId] = { element: winEl, config: { title: title, content: winContent, width: 600, height: 500 }, maximized: false };
-            setTimeout(() => winEl.classList.remove("window-opening"), 350);
         };
 
         window.finderRender = function () {
