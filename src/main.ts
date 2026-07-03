@@ -12,18 +12,13 @@ import doomIcon from './assets/icons/lab/doom.png';
 // config - static data
 import { fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
 import { vaultData } from './vault';
-import { initTetris, destroyTetris } from './games/tetris';
-import { initIaCVisualizer, destroyIaCVisualizer } from './apps/iac-visualizer';
-import { initNetworkTopology, destroyNetworkTopology } from './apps/network-topology';
-import { initThrees, destroyThrees } from './games/threes';
+// Games and heavier apps (tetris, threes, doom, snake, tic-tac-toe, gym-routine,
+// iac-visualizer, network-topology) are dynamically imported at open-time below —
+// see each window config's onOpen/onClose — so they don't bloat the initial bundle.
 import { initDock, dockBounce, refreshDockItems } from './dock';
 import { animateWindowContent } from './animations';
 import { initVanta, destroyVanta, updateVantaTheme, isVantaActive } from './vanta';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
-import { initTicTacToe, destroyTicTacToe } from './games/tic-tac-toe';
-import { initSnake, destroySnake } from './games/snake';
-import { initDoom, destroyDoom } from './games/doom';
-import { initGymRoutine, destroyGymRoutine } from './apps/gym-routine';
 import { handleTerminalCommand } from './terminal/core';
 import { handlePietrOSCommand, resetTerminalSubModes } from './terminal/pietros';
 import { handleCyberpunkCommand } from './terminal/cyberpunk';
@@ -56,6 +51,17 @@ window.addEventListener('error', (event) => {
 window.addEventListener('unhandledrejection', (event) => {
   console.error('[Promise Error]', event.reason);
 });
+
+// Cached module refs for dynamically-imported games/apps — populated on first open,
+// reused on subsequent opens so onClose can call the matching destroy function.
+let tttModule: typeof import('./games/tic-tac-toe') | null = null;
+let snakeModule: typeof import('./games/snake') | null = null;
+let doomModule: typeof import('./games/doom') | null = null;
+let gymRoutineModule: typeof import('./apps/gym-routine') | null = null;
+let tetrisModule: typeof import('./games/tetris') | null = null;
+let iacVisualizerModule: typeof import('./apps/iac-visualizer') | null = null;
+let networkTopologyModule: typeof import('./apps/network-topology') | null = null;
+let threesModule: typeof import('./games/threes') | null = null;
 
 document.addEventListener("DOMContentLoaded", () => {
         // config object (kept for potential future use)
@@ -788,13 +794,15 @@ document.addEventListener("DOMContentLoaded", () => {
             height: 680,
             onOpen: () => {
               // slight delay to ensure DOM is ready
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById("ttt-container");
-                if (container) initTicTacToe(container);
+                if (!container) return;
+                tttModule = await import('./games/tic-tac-toe');
+                if (container.isConnected) tttModule.initTicTacToe(container);
               }, 50);
             },
             onClose: () => {
-              destroyTicTacToe();
+              tttModule?.destroyTicTacToe();
             },
           },
 
@@ -808,13 +816,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 560,
             height: 680,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById("snake-container");
-                if (container) initSnake(container);
+                if (!container) return;
+                snakeModule = await import('./games/snake');
+                if (container.isConnected) snakeModule.initSnake(container);
               }, 50);
             },
             onClose: () => {
-              destroySnake();
+              snakeModule?.destroySnake();
             },
           },
 
@@ -826,13 +836,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 960,
             height: 720,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById("doom-container");
-                if (container) initDoom(container);
+                if (!container) return;
+                doomModule = await import('./games/doom');
+                if (container.isConnected) doomModule.initDoom(container);
               }, 100);
             },
             onClose: () => {
-              destroyDoom();
+              doomModule?.destroyDoom();
             },
           },
 
@@ -844,13 +856,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 1100,
             height: 820,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById("gym-routine-container");
-                if (container) initGymRoutine(container);
+                if (!container) return;
+                gymRoutineModule = await import('./apps/gym-routine');
+                if (container.isConnected) gymRoutineModule.initGymRoutine(container);
               }, 50);
             },
             onClose: () => {
-              destroyGymRoutine();
+              gymRoutineModule?.destroyGymRoutine();
             },
           },
 
@@ -1348,13 +1362,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 520,
             height: 640,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById('tetris-app');
-                if (container) initTetris(container);
+                if (!container) return;
+                tetrisModule = await import('./games/tetris');
+                if (container.isConnected) tetrisModule.initTetris(container);
               }, 100);
             },
             onClose: () => {
-              destroyTetris();
+              tetrisModule?.destroyTetris();
             },
           },
           iacvisualizer: {
@@ -1404,13 +1420,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 1200,
             height: 740,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById('iac-app');
-                if (container) initIaCVisualizer(container);
+                if (!container) return;
+                iacVisualizerModule = await import('./apps/iac-visualizer');
+                if (container.isConnected) iacVisualizerModule.initIaCVisualizer(container);
               }, 100);
             },
             onClose: () => {
-              destroyIaCVisualizer();
+              iacVisualizerModule?.destroyIaCVisualizer();
             },
           },
           networktopology: {
@@ -1460,13 +1478,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 1200,
             height: 740,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById('netmap-app');
-                if (container) initNetworkTopology(container);
+                if (!container) return;
+                networkTopologyModule = await import('./apps/network-topology');
+                if (container.isConnected) networkTopologyModule.initNetworkTopology(container);
               }, 100);
             },
             onClose: () => {
-              destroyNetworkTopology();
+              networkTopologyModule?.destroyNetworkTopology();
             },
           },
           threes: {
@@ -1512,13 +1532,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 580,
             height: 720,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById('threes-app');
-                if (container) initThrees(container);
+                if (!container) return;
+                threesModule = await import('./games/threes');
+                if (container.isConnected) threesModule.initThrees(container);
               }, 100);
             },
             onClose: () => {
-              destroyThrees();
+              threesModule?.destroyThrees();
             },
           },
           finder: {
@@ -1826,18 +1848,8 @@ document.addEventListener("DOMContentLoaded", () => {
           if (id === "finder") window.initFinder();
           if (id === "launchpad") window.initLaunchpad();
           if (id === "settings") updateThemeUI();
-          if (id === "tetris") {
-            setTimeout(() => {
-              const container = document.getElementById('tetris-app');
-              if (container) initTetris(container);
-            }, 100);
-          }
-          if (id === "threes") {
-            setTimeout(() => {
-              const container = document.getElementById('threes-app');
-              if (container) initThrees(container);
-            }, 100);
-          }
+          // Note: tetris/threes init already happens via their window config's onOpen below —
+          // this used to duplicate that call, double-initializing the game on every open.
 
           // Generic onOpen callback from window config
           if (winConfig.onOpen) {

@@ -1,18 +1,23 @@
 
 // vanta.ts — manages Vanta.js animated wallpaper effects
 // Effects: Birds (0), Halo (1), Waves (2)
-
-import * as THREE from 'three';
-import BIRDS from 'vanta/dist/vanta.birds.min';
-import HALO from 'vanta/dist/vanta.halo.min';
-import WAVES from 'vanta/dist/vanta.waves.min';
+// three.js + the vanta effect modules are ~700KB combined, so they're loaded on demand
+// (via dynamic import) rather than bundled into the main chunk for visitors who never pick one.
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type VantaEffect = { destroy: () => void; setOptions: (opts: Record<string, unknown>) => void };
 let activeEffect: VantaEffect | null = null;
 let activeEffectName: string | null = null;
 
-const EFFECTS = { BIRDS, HALO, WAVES } as Record<string, (opts: Record<string, unknown>) => VantaEffect>;
+// Bumped on every initVanta/destroyVanta call so a slow-loading effect can detect
+// it's been superseded (e.g. rapid wallpaper cycling) and discard itself instead of leaking.
+let requestId = 0;
+
+const EFFECT_LOADERS: Record<string, () => Promise<(opts: Record<string, unknown>) => VantaEffect>> = {
+  BIRDS: () => import('vanta/dist/vanta.birds.min').then((m) => m.default),
+  HALO: () => import('vanta/dist/vanta.halo.min').then((m) => m.default),
+  WAVES: () => import('vanta/dist/vanta.waves.min').then((m) => m.default),
+};
 
 // Per-effect configs — correct option names from vanta source, tuned for each theme
 const CONFIGS: Record<string, { light: Record<string, unknown>; dark: Record<string, unknown> }> = {
@@ -88,12 +93,18 @@ const CONFIGS: Record<string, { light: Record<string, unknown>; dark: Record<str
   },
 };
 
-export function initVanta(effectName: string, isDark: boolean, desktop: HTMLElement): void {
+export async function initVanta(effectName: string, isDark: boolean, desktop: HTMLElement): Promise<void> {
   destroyVanta();
 
   const key = effectName.toUpperCase();
-  const fn = EFFECTS[key];
-  if (!fn) return;
+  const loadEffect = EFFECT_LOADERS[key];
+  if (!loadEffect) return;
+
+  const thisRequest = ++requestId;
+  const [THREE, fn] = await Promise.all([import('three'), loadEffect()]);
+
+  // Superseded by a newer wallpaper switch (or destroyed) while modules were loading — bail out.
+  if (thisRequest !== requestId) return;
 
   // Dedicated wrapper: explicit px dimensions so Vanta reads correct offsetWidth/Height at init.
   // Using inset:0 alone can yield 0 at read time before layout is committed.
@@ -137,6 +148,7 @@ export function updateVantaTheme(isDark: boolean): void {
 }
 
 export function destroyVanta(): void {
+  requestId++;
   if (activeEffect) {
     activeEffect.destroy();
     activeEffect = null;
