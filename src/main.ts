@@ -1143,10 +1143,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <span id="iac-count" class="text-xs opacity-50">0 resources</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span id="iac-zoom" class="text-xs opacity-30 font-mono">100%</span>
+                                    <span id="iac-zoom" class="text-xs opacity-30 font-mono cursor-pointer hover:opacity-60 transition-opacity" title="Reset zoom to 100% (0)">100%</span>
                                     <button id="iac-fit" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Fit to View (F)">Fit</button>
                                     <button id="iac-export" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Export PNG (Ctrl+E)">⬇ PNG</button>
-                                    <span class="text-xs opacity-30">F=fit · Ctrl+E=export</span>
+                                    <span class="text-xs opacity-30">F=fit · 0=100% · Esc=deselect</span>
                                 </div>
                             </div>
                             <div class="flex-1 relative">
@@ -1201,10 +1201,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <span id="netmap-count" class="text-xs opacity-50">0 devices, 0 links</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span id="netmap-zoom" class="text-xs opacity-30 font-mono">100%</span>
+                                    <span id="netmap-zoom" class="text-xs opacity-30 font-mono cursor-pointer hover:opacity-60 transition-opacity" title="Reset zoom to 100% (0)">100%</span>
                                     <button id="netmap-fit" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Fit to View (F)">Fit</button>
                                     <button id="netmap-export" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Export PNG (Ctrl+E)">⬇ PNG</button>
-                                    <span class="text-xs opacity-30">F=fit · Ctrl+E=export</span>
+                                    <span class="text-xs opacity-30">F=fit · 0=100% · Esc=deselect</span>
                                 </div>
                             </div>
                             <div class="flex-1 relative">
