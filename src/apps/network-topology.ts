@@ -514,6 +514,7 @@ export class NetworkTopologyVisualizer {
 
     // Initialize
     this.textarea.value = SAMPLE_LLDP;
+    this.setTemplateActive('lldp');
     this.parseAndRender();
     this.startAnimation();
   }
@@ -711,6 +712,7 @@ export class NetworkTopologyVisualizer {
       case 'cdp': this.textarea.value = SAMPLE_CDP; break;
       case 'routing': this.textarea.value = SAMPLE_ROUTING; break;
     }
+    this.setTemplateActive(type);
     this.selectedDevice = null;
     this.hoveredDevice = null;
     // Force a fresh layout for the new template (no position carry-over)
@@ -718,6 +720,15 @@ export class NetworkTopologyVisualizer {
     this.deviceMap.clear();
     this.parseAndRender();
     if (isSoundEnabled()) playClick();
+  }
+
+  private setTemplateActive(type: 'lldp' | 'cdp' | 'routing'): void {
+    const root = this.textarea.closest('#netmap-app');
+    for (const option of ['lldp', 'cdp', 'routing'] as const) {
+      const button = root?.querySelector<HTMLElement>(`#netmap-${option}`);
+      button?.setAttribute('data-active', String(option === type));
+      button?.setAttribute('aria-pressed', String(option === type));
+    }
   }
 
   private parseAndRender(): void {
@@ -869,7 +880,7 @@ export class NetworkTopologyVisualizer {
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.fillStyle = '#0f172a';
+    ctx.fillStyle = '#0b1016';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.restore();
 
@@ -885,7 +896,7 @@ export class NetworkTopologyVisualizer {
     const worldY0 = -this.panY / this.zoomLevel;
     const worldX1 = worldX0 + width / this.zoomLevel;
     const worldY1 = worldY0 + height / this.zoomLevel;
-    ctx.strokeStyle = '#1e293b';
+    ctx.strokeStyle = '#202a33';
     ctx.lineWidth = 1 / this.zoomLevel;
     for (let x = Math.floor(worldX0 / gridStep) * gridStep; x < worldX1; x += gridStep) {
       ctx.beginPath(); ctx.moveTo(x, worldY0); ctx.lineTo(x, worldY1); ctx.stroke();
@@ -1330,7 +1341,7 @@ export class NetworkTopologyVisualizer {
   private updateDetails(): void {
     const device = this.selectedDevice;
     if (!device) {
-      this.detailsEl.innerHTML = '<div class="text-xs opacity-50">Click a device to view details</div>';
+      this.detailsEl.innerHTML = '<div class="lab-eyebrow mb-2">Inspector</div><div class="lab-muted text-xs">Select a device to inspect its interfaces and connections.</div>';
       return;
     }
 

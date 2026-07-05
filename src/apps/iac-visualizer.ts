@@ -25,6 +25,11 @@ interface ParsedIaC {
   errors: string[];
 }
 
+const NODE_WIDTH = 148;
+const NODE_HEIGHT = 64;
+const COLUMN_GAP = 72;
+const ROW_GAP = 30;
+
 // ============ Node Colors ============
 const NODE_COLORS: Record<string, { bg: string; border: string; text: string }> = {
   compute: { bg: '#1e3a5f', border: '#3b82f6', text: '#93c5fd' },
@@ -68,6 +73,32 @@ function escapeHtml(value: unknown): string {
   return String(value).replace(/[&<>"']/g, c => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!
   ));
+}
+
+function highlightIaC(code: string): string {
+  const tokens = /("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|#[^\n]*|\b(?:terraform|required_providers|provider|resource|data|module|variable|output|locals|apiVersion|kind|metadata|spec|selector|template|containers|ports|env)\b|\b\d+(?:\.\d+)?\b|[A-Za-z_][\w-]*(?=\s*[:=])|[{}\[\]=])/g;
+
+  return code.split('\n').map(line => {
+    let html = '';
+    let cursor = 0;
+    for (const match of line.matchAll(tokens)) {
+      const token = match[0];
+      const index = match.index ?? 0;
+      html += escapeHtml(line.slice(cursor, index));
+      let className = 'iac-token-punctuation';
+      if (token.startsWith('#')) className = 'iac-token-comment';
+      else if (token.startsWith('"') || token.startsWith("'")) className = 'iac-token-string';
+      else if (/^\d/.test(token)) className = 'iac-token-number';
+      else if (/^[A-Za-z_]/.test(token)) {
+        className = /^(terraform|required_providers|provider|resource|data|module|variable|output|locals|apiVersion|kind|metadata|spec|selector|template|containers|ports|env)$/.test(token)
+          ? 'iac-token-keyword'
+          : 'iac-token-key';
+      }
+      html += `<span class="${className}">${escapeHtml(token)}</span>`;
+      cursor = index + token.length;
+    }
+    return html + escapeHtml(line.slice(cursor));
+  }).join('\n');
 }
 
 const LEARNING_TIPS: Record<string, string[]> = {
@@ -382,6 +413,9 @@ export class IaCVisualizer {
   private countEl: HTMLElement;
   private errorEl: HTMLElement;
   private detailsEl: HTMLElement;
+  private highlightEl: HTMLElement;
+  private lineNumbersEl: HTMLElement;
+  private filenameEl: HTMLElement;
 
   private nodes: IaCNode[] = [];
   private nodeMap: Map<string, IaCNode> = new Map();
@@ -424,6 +458,8 @@ export class IaCVisualizer {
   // True once the pointer moved while dragging/panning, so the click that
   // follows mouseup doesn't change the selection.
   private didMove = false;
+  private layoutTargets = new Map<string, { x: number; y: number }>();
+  private manuallyPlaced = new Set<string>();
 
   constructor(container: HTMLElement) {
     this.canvas = container.querySelector('#iac-canvas') as HTMLCanvasElement;
@@ -433,6 +469,9 @@ export class IaCVisualizer {
     this.countEl = container.querySelector('#iac-count')!;
     this.errorEl = container.querySelector('#iac-errors')!;
     this.detailsEl = container.querySelector('#iac-details')!;
+    this.highlightEl = container.querySelector('#iac-highlight code')!;
+    this.lineNumbersEl = container.querySelector('#iac-line-numbers')!;
+    this.filenameEl = container.querySelector('#iac-filename')!;
 
     this.zoomEl = container.querySelector('#iac-zoom') as HTMLElement;
 
@@ -448,6 +487,8 @@ export class IaCVisualizer {
       touchmove: this.handleTouchMove.bind(this),
       touchend: this.handleTouchEnd.bind(this),
       input: this.handleInput.bind(this),
+      editorscroll: this.syncEditorScroll.bind(this),
+      editorkeydown: this.handleEditorKeyDown.bind(this),
       terraform: () => this.loadTemplate('terraform'),
       kubernetes: () => this.loadTemplate('kubernetes'),
       microservices: () => this.loadTemplate('microservices'),
@@ -469,6 +510,8 @@ export class IaCVisualizer {
 
     // Code input
     this.textarea.addEventListener('input', this.handlers.input);
+    this.textarea.addEventListener('scroll', this.handlers.editorscroll);
+    this.textarea.addEventListener('keydown', this.handlers.editorkeydown);
 
     // Canvas interactions
     this.canvas.addEventListener('mousedown', this.handlers.mousedown);
@@ -499,6 +542,8 @@ export class IaCVisualizer {
 
     // Initialize
     this.textarea.value = SAMPLE_TERRAFORM;
+    this.setTemplateActive('terraform');
+    this.updateEditorPresentation();
     this.parseAndRender();
     this.startAnimation();
   }
@@ -520,12 +565,41 @@ export class IaCVisualizer {
     this.canvas.width = rect.width * dpr;
     this.canvas.height = rect.height * dpr;
 
+    if (this.nodes.length > 0) this.computeLayeredLayout(false);
+
     // Trigger re-render
     this.render();
   }
 
   private handleInput(): void {
+    this.updateEditorPresentation();
     this.parseAndRender();
+  }
+
+  private updateEditorPresentation(): void {
+    const code = this.textarea.value;
+    this.highlightEl.innerHTML = highlightIaC(code) + (code.endsWith('\n') ? '\n ' : '');
+    const lineCount = Math.max(1, code.split('\n').length);
+    this.lineNumbersEl.textContent = Array.from({ length: lineCount }, (_, index) => index + 1).join('\n');
+    this.syncEditorScroll();
+  }
+
+  private syncEditorScroll(): void {
+    const pre = this.highlightEl.parentElement as HTMLElement | null;
+    if (pre) {
+      pre.scrollTop = this.textarea.scrollTop;
+      pre.scrollLeft = this.textarea.scrollLeft;
+    }
+    this.lineNumbersEl.scrollTop = this.textarea.scrollTop;
+  }
+
+  private handleEditorKeyDown(event: KeyboardEvent): void {
+    if (event.key !== 'Tab') return;
+    event.preventDefault();
+    const start = this.textarea.selectionStart;
+    const end = this.textarea.selectionEnd;
+    this.textarea.setRangeText('  ', start, end, 'end');
+    this.handleInput();
   }
 
   private loadTemplate(type: 'terraform' | 'kubernetes' | 'microservices'): void {
@@ -534,13 +608,29 @@ export class IaCVisualizer {
       case 'kubernetes': this.textarea.value = SAMPLE_KUBERNETES; break;
       case 'microservices': this.textarea.value = SAMPLE_MICROSERVICES; break;
     }
+    this.setTemplateActive(type);
+    this.updateEditorPresentation();
     this.selectedNode = null;
     this.hoveredNode = null;
     // Force a fresh layout for the new template (no position carry-over)
     this.nodes = [];
     this.nodeMap.clear();
+    this.manuallyPlaced.clear();
     this.parseAndRender();
     if (isSoundEnabled()) playClick();
+  }
+
+  private setTemplateActive(type: 'terraform' | 'kubernetes' | 'microservices'): void {
+    const root = this.textarea.closest('#iac-app');
+    for (const option of ['terraform', 'kubernetes', 'microservices'] as const) {
+      const button = root?.querySelector<HTMLElement>(`#iac-${option}`);
+      button?.setAttribute('data-active', String(option === type));
+      button?.setAttribute('aria-pressed', String(option === type));
+    }
+    const isKubernetes = type === 'kubernetes' || type === 'microservices';
+    this.filenameEl.textContent = isKubernetes ? (type === 'microservices' ? 'microservices.yaml' : 'deployment.yaml') : 'main.tf';
+    root?.querySelector('#iac-file-terraform-icon')?.classList.toggle('hidden', isKubernetes);
+    root?.querySelector('#iac-file-kubernetes-icon')?.classList.toggle('hidden', !isKubernetes);
   }
 
   private screenToWorld(sx: number, sy: number): { x: number; y: number } {
@@ -632,6 +722,7 @@ export class IaCVisualizer {
 
   private handleTouchEnd(e: TouchEvent): void {
     if (e.touches.length === 0) {
+      if (this.dragNode) this.manuallyPlaced.add(this.dragNode.id);
       this.isDragging = false;
       this.dragNode = null;
       this.isPanning = false;
@@ -678,10 +769,10 @@ export class IaCVisualizer {
     // Calculate bounding box
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     this.nodes.forEach(node => {
-      minX = Math.min(minX, node.x - 60); // 60 = half width
-      minY = Math.min(minY, node.y - 30); // 30 = half height
-      maxX = Math.max(maxX, node.x + 60);
-      maxY = Math.max(maxY, node.y + 30);
+      minX = Math.min(minX, node.x - NODE_WIDTH / 2);
+      minY = Math.min(minY, node.y - NODE_HEIGHT / 2);
+      maxX = Math.max(maxX, node.x + NODE_WIDTH / 2);
+      maxY = Math.max(maxY, node.y + NODE_HEIGHT / 2);
     });
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -726,16 +817,10 @@ export class IaCVisualizer {
       this.errorEl.classList.add('hidden');
     }
 
-    // Keep positions of nodes that survive the re-parse so live edits
-    // don't scatter the layout; only new nodes enter on the circle.
+    // Keep positions of nodes that survive live edits. New graphs start in a
+    // dependency-aware left-to-right layout instead of a collision-prone ring.
     const previous = this.nodeMap;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const width = this.canvas.width / dpr;
-    const height = this.canvas.height / dpr;
-    const centerX = width / 2;
-    const centerY = height / 2;
-
-    parsed.nodes.forEach((node, i) => {
+    parsed.nodes.forEach(node => {
       const prev = previous.get(node.id);
       if (prev) {
         node.x = prev.x;
@@ -744,21 +829,70 @@ export class IaCVisualizer {
         node.vy = prev.vy;
         node.scale = prev.scale ?? 1;
       } else {
-        const angle = (i / parsed.nodes.length) * Math.PI * 2;
-        const radius = 100 + Math.random() * 80;
-        node.x = centerX + Math.cos(angle) * radius;
-        node.y = centerY + Math.sin(angle) * radius;
+        node.x = Number.NaN;
+        node.y = Number.NaN;
         node.scale = 0; // Start invisible
       }
     });
 
     this.nodes = parsed.nodes;
     this.nodeMap = new Map(this.nodes.map(n => [n.id, n]));
+    this.computeLayeredLayout(previous.size === 0);
 
     // Re-point selection/hover at the fresh node objects
     this.selectedNode = this.selectedNode ? this.nodeMap.get(this.selectedNode.id) ?? null : null;
     this.hoveredNode = this.hoveredNode ? this.nodeMap.get(this.hoveredNode.id) ?? null : null;
     this.updateDetails();
+  }
+
+  private computeLayeredLayout(placeAll: boolean): void {
+    const depthCache = new Map<string, number>();
+    const visiting = new Set<string>();
+    const depthOf = (id: string): number => {
+      const cached = depthCache.get(id);
+      if (cached !== undefined) return cached;
+      if (visiting.has(id)) return 0;
+      visiting.add(id);
+      const node = this.nodeMap.get(id);
+      const dependencies = node?.connections.filter(target => this.nodeMap.has(target)) ?? [];
+      const depth = dependencies.length ? Math.max(...dependencies.map(target => depthOf(target) + 1)) : 0;
+      visiting.delete(id);
+      depthCache.set(id, depth);
+      return depth;
+    };
+
+    const layers = new Map<number, IaCNode[]>();
+    for (const node of this.nodes) {
+      const depth = depthOf(node.id);
+      const layer = layers.get(depth) ?? [];
+      layer.push(node);
+      layers.set(depth, layer);
+    }
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const canvasW = this.canvas.width / dpr;
+    const canvasH = this.canvas.height / dpr;
+    const columnStep = NODE_WIDTH + COLUMN_GAP;
+    const maxDepth = Math.max(0, ...layers.keys());
+    const graphW = maxDepth * columnStep;
+    const startX = Math.max(NODE_WIDTH / 2 + 54, canvasW / 2 - graphW / 2);
+
+    this.layoutTargets.clear();
+    for (const [depth, layer] of layers) {
+      layer.sort((a, b) => a.resourceType.localeCompare(b.resourceType) || a.name.localeCompare(b.name));
+      const rowStep = NODE_HEIGHT + ROW_GAP;
+      const startY = Math.max(NODE_HEIGHT / 2 + 42, canvasH / 2 - ((layer.length - 1) * rowStep) / 2);
+      layer.forEach((node, row) => {
+        const target = { x: startX + depth * columnStep, y: startY + row * rowStep };
+        this.layoutTargets.set(node.id, target);
+        if (placeAll || !Number.isFinite(node.x) || !Number.isFinite(node.y)) {
+          node.x = target.x;
+          node.y = target.y;
+          node.vx = 0;
+          node.vy = 0;
+        }
+      });
+    }
   }
 
   private startAnimation(): void {
@@ -771,58 +905,39 @@ export class IaCVisualizer {
   }
 
   private applyForces(): void {
-    const damping = 0.92;
-    const repulsion = 6000;
-    const attraction = 0.008;
-    const centerForce = 0.0008;
-    // World-space center (canvas dims divided by zoom gives world extent)
-    // Note: canvas.width/height are physical pixels, we need logical CSS pixels here
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const width = this.canvas.width / dpr;
-    const height = this.canvas.height / dpr;
-    
-    const worldW = width / this.zoomLevel;
-    const worldH = height / this.zoomLevel;
-    const worldOriginX = -this.panX / this.zoomLevel;
-    const worldOriginY = -this.panY / this.zoomLevel;
-    const centerX = worldOriginX + worldW / 2;
-    const centerY = worldOriginY + worldH / 2;
+    const damping = 0.78;
 
-    // Repulsion between nodes
+    // A strict rectangular collision pass guarantees cards never overlap.
     for (let i = 0; i < this.nodes.length; i++) {
       for (let j = i + 1; j < this.nodes.length; j++) {
-        const dx = this.nodes[j].x - this.nodes[i].x;
-        const dy = this.nodes[j].y - this.nodes[i].y;
-        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-        const force = repulsion / (dist * dist);
-        const fx = (dx / dist) * force;
-        const fy = (dy / dist) * force;
-        this.nodes[i].vx -= fx;
-        this.nodes[i].vy -= fy;
-        this.nodes[j].vx += fx;
-        this.nodes[j].vy += fy;
-      }
-    }
-
-    // Attraction for connected nodes
-    for (const node of this.nodes) {
-      for (const connId of node.connections) {
-        const target = this.nodeMap.get(connId);
-        if (target) {
-          const dx = target.x - node.x;
-          const dy = target.y - node.y;
-          node.vx += dx * attraction;
-          node.vy += dy * attraction;
-          target.vx -= dx * attraction;
-          target.vy -= dy * attraction;
+        const a = this.nodes[i];
+        const b = this.nodes[j];
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const overlapX = NODE_WIDTH + 18 - Math.abs(dx);
+        const overlapY = NODE_HEIGHT + 16 - Math.abs(dy);
+        if (overlapX > 0 && overlapY > 0) {
+          if (overlapX < overlapY) {
+            const push = overlapX * 0.09 * (dx < 0 ? -1 : 1);
+            if (a !== this.dragNode) a.vx -= push;
+            if (b !== this.dragNode) b.vx += push;
+          } else {
+            const push = overlapY * 0.12 * (dy < 0 ? -1 : 1);
+            if (a !== this.dragNode) a.vy -= push;
+            if (b !== this.dragNode) b.vy += push;
+          }
         }
       }
     }
 
-    // Center gravity
+    // Gently settle automatic nodes back into dependency columns. Manually
+    // dragged cards remain where the user placed them.
     for (const node of this.nodes) {
-      node.vx += (centerX - node.x) * centerForce;
-      node.vy += (centerY - node.y) * centerForce;
+      const target = this.layoutTargets.get(node.id);
+      if (target && !this.manuallyPlaced.has(node.id) && node !== this.dragNode) {
+        node.vx += (target.x - node.x) * 0.035;
+        node.vy += (target.y - node.y) * 0.035;
+      }
     }
 
     // Apply velocity and damping
@@ -856,7 +971,7 @@ export class IaCVisualizer {
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.fillStyle = '#0f172a';
+    ctx.fillStyle = '#0b1016';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.restore();
 
@@ -872,7 +987,7 @@ export class IaCVisualizer {
     const worldY0 = -this.panY / this.zoomLevel;
     const worldX1 = worldX0 + width / this.zoomLevel;
     const worldY1 = worldY0 + height / this.zoomLevel;
-    ctx.strokeStyle = '#1e293b';
+    ctx.strokeStyle = '#202a33';
     ctx.lineWidth = 1 / this.zoomLevel;
     for (let x = Math.floor(worldX0 / gridStep) * gridStep; x < worldX1; x += gridStep) {
       ctx.beginPath(); ctx.moveTo(x, worldY0); ctx.lineTo(x, worldY1); ctx.stroke();
@@ -892,40 +1007,50 @@ export class IaCVisualizer {
       }
     }
 
-    // Connections
-    if (!reducedMotion) this.lineDashOffset = (this.lineDashOffset - 0.2) % 100;
-    ctx.lineDashOffset = this.lineDashOffset;
-    ctx.lineWidth = 2 / this.zoomLevel;
+    // Connections are routed from card edge to card edge with smooth,
+    // horizontal designer-style paths and explicit connection ports.
     for (const node of this.nodes) {
       for (const connId of node.connections) {
         const target = this.nodeMap.get(connId);
         if (target) {
           const colors = NODE_COLORS[node.type] || NODE_COLORS.aws;
           ctx.globalAlpha = !focus || node === focus || target === focus ? 1 : 0.12;
-          ctx.strokeStyle = colors.border + '60';
-          ctx.setLineDash([6, 4]);
-          ctx.beginPath();
-          ctx.moveTo(node.x, node.y);
-          ctx.lineTo(target.x, target.y);
-          ctx.stroke();
-          
-          // Reset dash for arrow
-          ctx.save();
-          ctx.setLineDash([]);
-          ctx.lineDashOffset = 0;
+          const direction = target.x >= node.x ? 1 : -1;
+          const startX = node.x + direction * NODE_WIDTH / 2;
+          const endX = target.x - direction * NODE_WIDTH / 2;
+          const bend = Math.max(34, Math.abs(endX - startX) * 0.48);
 
-          // Arrow
-          const angle = Math.atan2(target.y - node.y, target.x - node.x);
-          const arrowX = target.x - Math.cos(angle) * 55;
-          const arrowY = target.y - Math.sin(angle) * 55;
+          ctx.setLineDash([]);
+          ctx.lineWidth = 5 / this.zoomLevel;
+          ctx.strokeStyle = '#06090d';
           ctx.beginPath();
-          ctx.moveTo(arrowX, arrowY);
-          ctx.lineTo(arrowX - 10 * Math.cos(angle - 0.4), arrowY - 10 * Math.sin(angle - 0.4));
-          ctx.lineTo(arrowX - 10 * Math.cos(angle + 0.4), arrowY - 10 * Math.sin(angle + 0.4));
+          ctx.moveTo(startX, node.y);
+          ctx.bezierCurveTo(startX + direction * bend, node.y, endX - direction * bend, target.y, endX, target.y);
+          ctx.stroke();
+
+          ctx.lineWidth = (node === focus || target === focus ? 2.5 : 1.5) / this.zoomLevel;
+          ctx.strokeStyle = colors.border + (node === focus || target === focus ? 'e6' : '8c');
+          ctx.beginPath();
+          ctx.moveTo(startX, node.y);
+          ctx.bezierCurveTo(startX + direction * bend, node.y, endX - direction * bend, target.y, endX, target.y);
+          ctx.stroke();
+
+          // Ports and directional chevron.
+          ctx.fillStyle = '#0b1016';
+          ctx.strokeStyle = colors.border;
+          ctx.lineWidth = 2 / this.zoomLevel;
+          for (const [px, py] of [[startX, node.y], [endX, target.y]] as const) {
+            ctx.beginPath();
+            ctx.arc(px, py, 4 / this.zoomLevel, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          }
+          ctx.beginPath();
+          ctx.moveTo(endX, target.y);
+          ctx.lineTo(endX - direction * 8, target.y - 5);
+          ctx.lineTo(endX - direction * 8, target.y + 5);
           ctx.closePath();
-          ctx.fillStyle = colors.border;
           ctx.fill();
-          ctx.restore();
         }
       }
     }
@@ -938,8 +1063,6 @@ export class IaCVisualizer {
       const colors = NODE_COLORS[node.type] || NODE_COLORS.aws;
       const isSelected = node === this.selectedNode;
       const isHovered = node === this.hoveredNode;
-      const nodeWidth = 120;
-      const nodeHeight = 55;
       const scale = node.scale || 0;
 
       if (scale < 0.01) continue;
@@ -957,25 +1080,45 @@ export class IaCVisualizer {
       }
 
       // Background
-      ctx.fillStyle = colors.bg;
+      ctx.fillStyle = '#111923';
       ctx.strokeStyle = isSelected ? '#ffffff' : colors.border;
       ctx.lineWidth = isSelected ? 3 : 2;
       ctx.beginPath();
-      ctx.roundRect(-nodeWidth / 2, -nodeHeight / 2, nodeWidth, nodeHeight, 10);
+      ctx.roundRect(-NODE_WIDTH / 2, -NODE_HEIGHT / 2, NODE_WIDTH, NODE_HEIGHT, 9);
       ctx.fill();
       ctx.stroke();
       ctx.shadowBlur = 0;
 
-      // Type label
+      // A slim type rail and compact icon make the card easier to scan.
       ctx.fillStyle = colors.border;
-      ctx.font = 'bold 9px system-ui';
+      ctx.beginPath();
+      ctx.roundRect(-NODE_WIDTH / 2, -NODE_HEIGHT / 2, 5, NODE_HEIGHT, [9, 0, 0, 9]);
+      ctx.fill();
+      ctx.globalAlpha *= 0.16;
+      ctx.beginPath();
+      ctx.arc(-NODE_WIDTH / 2 + 25, 0, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = !focusIds || focusIds.has(node.id) ? 1 : 0.25;
+      ctx.fillStyle = colors.text;
+      ctx.font = '700 9px ui-monospace, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(node.resourceType.toUpperCase().slice(0, 18), 0, -10);
+      const initials = node.resourceType.replace(/^aws_/, '').split('_').map(part => part[0]).join('').slice(0, 2).toUpperCase();
+      ctx.fillText(initials || 'R', -NODE_WIDTH / 2 + 25, 3);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#7f8c99';
+      ctx.font = '700 8px ui-monospace, monospace';
+      ctx.fillText(node.resourceType.toUpperCase().slice(0, 18), -NODE_WIDTH / 2 + 47, -8);
 
       // Name
-      ctx.fillStyle = colors.text;
-      ctx.font = 'bold 11px system-ui';
-      ctx.fillText(node.name.slice(0, 16), 0, 8);
+      ctx.fillStyle = '#f2f6fa';
+      ctx.font = '600 12px system-ui';
+      ctx.fillText(node.name.slice(0, 16), -NODE_WIDTH / 2 + 47, 11);
+
+      ctx.fillStyle = colors.border;
+      ctx.beginPath();
+      ctx.arc(NODE_WIDTH / 2 - 12, -NODE_HEIGHT / 2 + 12, 3, 0, Math.PI * 2);
+      ctx.fill();
       
       ctx.restore();
     }
@@ -1182,7 +1325,7 @@ export class IaCVisualizer {
   private getNodeAt(x: number, y: number): IaCNode | null {
     for (let i = this.nodes.length - 1; i >= 0; i--) {
       const node = this.nodes[i];
-      if (Math.abs(x - node.x) < 60 && Math.abs(y - node.y) < 28) return node;
+      if (Math.abs(x - node.x) < NODE_WIDTH / 2 && Math.abs(y - node.y) < NODE_HEIGHT / 2) return node;
     }
     return null;
   }
@@ -1264,6 +1407,7 @@ export class IaCVisualizer {
   }
 
   private handleMouseUp(): void {
+    if (this.dragNode && this.didMove) this.manuallyPlaced.add(this.dragNode.id);
     this.isDragging = false;
     this.dragNode = null;
     this.isPanning = false;
@@ -1286,7 +1430,7 @@ export class IaCVisualizer {
   private updateDetails(): void {
     const node = this.selectedNode;
     if (!node) {
-      this.detailsEl.innerHTML = '<div class="text-xs opacity-50">Click a node to view details</div>';
+      this.detailsEl.innerHTML = '<div class="lab-eyebrow mb-2">Inspector</div><div class="lab-muted text-xs">Select a resource to inspect its properties and dependencies.</div>';
       return;
     }
 
@@ -1351,6 +1495,8 @@ export class IaCVisualizer {
     this.zoomEl?.removeEventListener('click', this.handlers.zoomreset);
     
     this.textarea.removeEventListener('input', this.handlers.input);
+    this.textarea.removeEventListener('scroll', this.handlers.editorscroll);
+    this.textarea.removeEventListener('keydown', this.handlers.editorkeydown);
 
     this.canvas.removeEventListener('mousedown', this.handlers.mousedown);
     this.canvas.removeEventListener('mousemove', this.handlers.mousemove);

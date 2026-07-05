@@ -431,55 +431,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                             </div>
 
-                            <!-- Personal Projects -->
-                            <div>
-                                <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                    Personal Projects
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                    <!-- suprsymmetry.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://suprsymmetry.com/', '_blank', 'noopener,noreferrer')">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">suprsymmetry.com</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">AI art studio for generative art and concept art. Features Gemini-powered image generation with a sleek nocturne-themed interface.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">GEMINI</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AI</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-60">
-                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>Live Site</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- cerebralwwaves.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://cerebralwwaves.com/', '_blank', 'noopener,noreferrer')">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">cerebralwwaves.com</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Creative experimental space with an obsidian cinema aesthetic. Features AI-powered content generation with a dark, cinematic interface.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">REACT</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">GEMINI</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AI</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-60">
-                                                <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>Live Site</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
                             <!-- Footer Message -->
                             <div class="mt-8 text-center text-sm opacity-50 text-her-dark dark:text-her-textLight">
                                 <p class="font-semibold">More projects and categories will be added soon</p>
@@ -1118,42 +1069,52 @@ document.addEventListener("DOMContentLoaded", () => {
           iacvisualizer: {
             title: "IaC Visualizer",
             content: `
-                    <div id="iac-app" class="h-full flex bg-[#0f172a] text-white select-none font-ui">
+                    <div id="iac-app" class="lab-shell h-full flex select-none font-ui overflow-hidden">
                         <!-- Left Panel: Code Editor -->
-                        <div class="w-[420px] flex-shrink-0 flex flex-col border-r border-white/10">
-                            <div class="p-3 border-b border-white/10 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold uppercase opacity-50">Code</span>
-                                    <span id="iac-format" class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">Terraform HCL</span>
+                        <div class="lab-rail flex-shrink-0 flex flex-col">
+                            <div class="lab-rail-header px-4 pt-4 pb-3 border-b">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div><div class="lab-eyebrow mb-1.5">IaC Lab / 01</div><div class="text-sm font-semibold tracking-tight">Source configuration</div></div>
+                                    <span id="iac-format" class="lab-badge text-[10px] font-mono px-2 py-1 rounded-full">Terraform HCL</span>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button id="iac-terraform" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">Terraform</button>
-                                    <button id="iac-kubernetes" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">Kubernetes</button>
-                                    <button id="iac-microservices" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">Microservices</button>
+                                <div class="flex flex-wrap gap-1.5" role="group" aria-label="Example configurations">
+                                    <button id="iac-terraform" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2 3.5l8 4.6v9.2l-8-4.6V3.5zm9 4.6l8-4.6v9.2l-8 4.6V8.1zm0 10.4l5.5-3.2v5.2L11 23.7v-5.2z"/></svg>Terraform</button>
+                                    <button id="iac-kubernetes" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 1.8l8.8 5.1v10.2L12 22.2l-8.8-5.1V6.9L12 1.8zm0 4.1a6.1 6.1 0 100 12.2 6.1 6.1 0 000-12.2zm0 1.8l1 .3-.2 2 1.7 1 .9-1.8.8.7-1.2 1.6.7 1.8 2-.4.2 1-2 .3-.5 1.8 1.6 1.2-.7.8-1.5-1.4-1.7.8.1 2-1 .2-.4-2-1.9-.3-1 1.7-.9-.5.9-1.8-1.3-1.4-1.8 1-.4-.9 1.8-1.1-.1-1.9-2-.6.3-1 2 .4 1.2-1.5-1.3-1.6.8-.7 1.5 1.4 1.8-.7-.2-2z"/></svg>Kubernetes</button>
+                                    <button id="iac-microservices" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M4 4h6v6H4zM14 4h6v6h-6zM9 14h6v6H9zM7 10v2h5v2m5-4v2h-5"/></svg>Microservices</button>
                                 </div>
                             </div>
-                            <textarea id="iac-code" class="flex-1 bg-[#1e293b] text-green-400 font-mono text-xs p-4 resize-none outline-none" spellcheck="false" placeholder="Paste your Terraform or Kubernetes code here..."></textarea>
+                            <div class="lab-editor-tabs flex items-end border-b">
+                                <div class="lab-file-tab active flex items-center gap-2 px-4 py-2.5 text-xs font-medium"><svg id="iac-file-terraform-icon" class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2 3.5l8 4.6v9.2l-8-4.6V3.5zm9 4.6l8-4.6v9.2l-8 4.6V8.1zm0 10.4l5.5-3.2v5.2L11 23.7v-5.2z"/></svg><svg id="iac-file-kubernetes-icon" class="hidden w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 1.8l8.8 5.1v10.2L12 22.2l-8.8-5.1V6.9L12 1.8zm0 4.1a6.1 6.1 0 100 12.2 6.1 6.1 0 000-12.2zm0 1.8l1 .3-.2 2 1.7 1 .9-1.8.8.7-1.2 1.6.7 1.8 2-.4.2 1-2 .3-.5 1.8 1.6 1.2-.7.8-1.5-1.4-1.7.8.1 2-1 .2-.4-2-1.9-.3-1 1.7-.9-.5.9-1.8-1.3-1.4-1.8 1-.4-.9 1.8-1.1-.1-1.9-2-.6.3-1 2 .4 1.2-1.5-1.3-1.6.8-.7 1.5 1.4 1.8-.7-.2-2z"/></svg><span id="iac-filename">main.tf</span></div>
+                                <div class="lab-editor-status ml-auto px-3 py-2.5 text-[9px] font-mono">AUTO-PARSE</div>
+                            </div>
+                            <div class="lab-code-shell flex-1 min-h-0 flex">
+                                <pre id="iac-line-numbers" class="lab-line-numbers" aria-hidden="true">1</pre>
+                                <div class="lab-code-viewport flex-1 min-w-0 relative">
+                                    <pre id="iac-highlight" class="lab-code-highlight" aria-hidden="true"><code></code></pre>
+                                    <textarea id="iac-code" aria-label="Infrastructure source code" class="lab-code-input" spellcheck="false" wrap="off" placeholder="Paste your Terraform or Kubernetes code here..."></textarea>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Right Panel: Graph + Details -->
-                        <div class="flex-1 flex flex-col">
-                            <div class="p-3 border-b border-white/10 flex items-center justify-between">
+                        <div class="lab-workspace min-w-0 flex-1 flex flex-col">
+                            <div class="lab-toolbar min-h-14 px-4 py-3 border-b flex flex-wrap items-center justify-between gap-3">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold uppercase opacity-50">Infrastructure Graph</span>
-                                    <span id="iac-count" class="text-xs opacity-50">0 resources</span>
+                                    <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-her-red opacity-40"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-her-red"></span></span>
+                                    <div><div class="lab-eyebrow">Live model</div><div id="iac-count" class="lab-muted text-[11px] mt-1">0 resources</div></div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span id="iac-zoom" class="text-xs opacity-30 font-mono cursor-pointer hover:opacity-60 transition-opacity" title="Reset zoom to 100% (0)">100%</span>
-                                    <button id="iac-fit" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Fit to View (F)">Fit</button>
-                                    <button id="iac-export" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Export PNG (Ctrl+E)">⬇ PNG</button>
-                                    <span class="text-xs opacity-30">F=fit · 0=100% · Esc=deselect</span>
+                                    <button id="iac-zoom" class="lab-action text-[10px] font-mono px-2 py-1.5 rounded-md" title="Reset zoom to 100% (0)">100%</button>
+                                    <button id="iac-fit" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Fit to View (F)">FIT VIEW</button>
+                                    <button id="iac-export" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Export PNG (Ctrl+E)">EXPORT PNG</button>
+                                    <span class="lab-shortcuts lab-muted text-[10px] font-mono ml-1">F · 0 · ESC</span>
                                 </div>
                             </div>
-                            <div class="flex-1 relative">
+                            <div class="lab-stage flex-1 relative min-h-0">
                                 <canvas id="iac-canvas" class="absolute inset-0 w-full h-full"></canvas>
                             </div>
-                            <div id="iac-details" class="h-40 border-t border-white/10 p-3 overflow-y-auto text-sm">
-                                <div class="text-xs opacity-50">Click a node to view details</div>
+                            <div id="iac-details" class="lab-inspector h-36 px-4 py-3 overflow-y-auto text-sm">
+                                <div class="lab-eyebrow mb-2">Inspector</div><div class="lab-muted text-xs">Select a resource to inspect its properties and dependencies.</div>
                             </div>
                             <div id="iac-errors" class="hidden bg-red-500/20 text-red-400 text-xs p-2 border-t border-red-500/30"></div>
                         </div>
@@ -1176,42 +1137,43 @@ document.addEventListener("DOMContentLoaded", () => {
           networktopology: {
             title: "Network Topology Mapper",
             content: `
-                    <div id="netmap-app" class="h-full flex bg-[#0f172a] text-white select-none font-ui">
+                    <div id="netmap-app" class="lab-shell h-full flex select-none font-ui overflow-hidden">
                         <!-- Left Panel: Data Input -->
-                        <div class="w-[420px] flex-shrink-0 flex flex-col border-r border-white/10">
-                            <div class="p-3 border-b border-white/10 flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold uppercase opacity-50">Input</span>
-                                    <span id="netmap-format" class="text-xs bg-teal-500/20 text-teal-400 px-2 py-0.5 rounded">LLDP Neighbors</span>
+                        <div class="lab-rail flex-shrink-0 flex flex-col">
+                            <div class="lab-rail-header px-4 pt-4 pb-3 border-b">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div><div class="lab-eyebrow mb-1.5">Network Lab / 02</div><div class="text-sm font-semibold tracking-tight">Discovery data</div></div>
+                                    <span id="netmap-format" class="lab-badge text-[10px] font-mono px-2 py-1 rounded-full">LLDP Neighbors</span>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button id="netmap-lldp" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">LLDP</button>
-                                    <button id="netmap-cdp" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">CDP</button>
-                                    <button id="netmap-routing" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors">Routing</button>
+                                <div class="flex flex-wrap gap-1.5" role="group" aria-label="Example discovery formats">
+                                    <button id="netmap-lldp" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors">LLDP</button>
+                                    <button id="netmap-cdp" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors">CDP</button>
+                                    <button id="netmap-routing" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors">Routing</button>
                                 </div>
                             </div>
-                            <textarea id="netmap-code" class="flex-1 bg-[#1e293b] text-teal-400 font-mono text-xs p-4 resize-none outline-none" spellcheck="false" placeholder="Paste LLDP/CDP neighbors or routing table output..."></textarea>
+                            <div class="lab-filebar px-4 py-2 border-b flex justify-between text-[10px] font-mono"><span>DISCOVERY.LOG</span><span>AUTO-PARSE</span></div>
+                            <textarea id="netmap-code" aria-label="Network discovery data" class="lab-editor flex-1 font-mono text-xs p-4 resize-none outline-none transition-shadow" spellcheck="false" placeholder="Paste LLDP/CDP neighbors or routing table output..."></textarea>
                         </div>
                         
                         <!-- Right Panel: Topology Graph + Details -->
-                        <div class="flex-1 flex flex-col">
-                            <div class="p-3 border-b border-white/10 flex items-center justify-between">
+                        <div class="lab-workspace min-w-0 flex-1 flex flex-col">
+                            <div class="lab-toolbar min-h-14 px-4 py-3 border-b flex flex-wrap items-center justify-between gap-3">
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold uppercase opacity-50">Network Topology</span>
-                                    <span id="netmap-count" class="text-xs opacity-50">0 devices, 0 links</span>
+                                    <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-her-red opacity-40"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-her-red"></span></span>
+                                    <div><div class="lab-eyebrow">Live topology</div><div id="netmap-count" class="lab-muted text-[11px] mt-1">0 devices, 0 links</div></div>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span id="netmap-zoom" class="text-xs opacity-30 font-mono cursor-pointer hover:opacity-60 transition-opacity" title="Reset zoom to 100% (0)">100%</span>
-                                    <button id="netmap-fit" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Fit to View (F)">Fit</button>
-                                    <button id="netmap-export" class="text-xs px-2 py-1 bg-white/10 hover:bg-white/20 rounded transition-colors" title="Export PNG (Ctrl+E)">⬇ PNG</button>
-                                    <span class="text-xs opacity-30">F=fit · 0=100% · Esc=deselect</span>
+                                    <button id="netmap-zoom" class="lab-action text-[10px] font-mono px-2 py-1.5 rounded-md" title="Reset zoom to 100% (0)">100%</button>
+                                    <button id="netmap-fit" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Fit to View (F)">FIT VIEW</button>
+                                    <button id="netmap-export" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Export PNG (Ctrl+E)">EXPORT PNG</button>
+                                    <span class="lab-shortcuts lab-muted text-[10px] font-mono ml-1">F · 0 · ESC</span>
                                 </div>
                             </div>
-                            <div class="flex-1 relative">
+                            <div class="lab-stage flex-1 relative min-h-0">
                                 <canvas id="netmap-canvas" class="absolute inset-0 w-full h-full"></canvas>
                             </div>
-                            <div id="netmap-details" class="h-40 border-t border-white/10 p-3 overflow-y-auto text-sm">
-                                <div class="text-xs opacity-50">Click a device to view details</div>
+                            <div id="netmap-details" class="lab-inspector h-36 px-4 py-3 overflow-y-auto text-sm">
+                                <div class="lab-eyebrow mb-2">Inspector</div><div class="lab-muted text-xs">Select a device to inspect its interfaces and connections.</div>
                             </div>
                             <div id="netmap-errors" class="hidden bg-red-500/20 text-red-400 text-xs p-2 border-t border-red-500/30"></div>
                         </div>
