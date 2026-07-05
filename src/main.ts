@@ -1071,7 +1071,7 @@ document.addEventListener("DOMContentLoaded", () => {
             content: `
                     <div id="iac-app" class="lab-shell h-full flex select-none font-ui overflow-hidden">
                         <!-- Left Panel: Code Editor -->
-                        <div class="lab-rail flex-shrink-0 flex flex-col">
+                        <div id="iac-sidebar" class="lab-rail flex-shrink-0 flex flex-col">
                             <div class="lab-rail-header px-4 pt-4 pb-3 border-b">
                                 <div class="flex items-center justify-between mb-3">
                                     <div><div class="lab-eyebrow mb-1.5">IaC Lab / 01</div><div class="text-sm font-semibold tracking-tight">Source configuration</div></div>
@@ -1095,11 +1095,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                             </div>
                         </div>
+                        <div class="lab-rail-resizer" role="separator" aria-label="Resize source editor" aria-orientation="vertical" tabindex="0"></div>
                         
                         <!-- Right Panel: Graph + Details -->
                         <div class="lab-workspace min-w-0 flex-1 flex flex-col">
                             <div class="lab-toolbar min-h-14 px-4 py-3 border-b flex flex-wrap items-center justify-between gap-3">
                                 <div class="flex items-center gap-2">
+                                    <button class="lab-action lab-sidebar-toggle p-1.5 rounded-md" aria-controls="iac-sidebar" aria-expanded="true" title="Hide source editor"><svg class="w-3.5 h-3.5" viewBox="0 0 20 20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 4h14v12H3zM7 4v12m4-8l-2 2 2 2"/></svg></button>
                                     <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-her-red opacity-40"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-her-red"></span></span>
                                     <div><div class="lab-eyebrow">Live model</div><div id="iac-count" class="lab-muted text-[11px] mt-1">0 resources</div></div>
                                 </div>
@@ -1107,13 +1109,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <button id="iac-zoom" class="lab-action text-[10px] font-mono px-2 py-1.5 rounded-md" title="Reset zoom to 100% (0)">100%</button>
                                     <button id="iac-fit" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Fit to View (F)">FIT VIEW</button>
                                     <button id="iac-export" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Export PNG (Ctrl+E)">EXPORT PNG</button>
+                                    <button class="lab-action lab-inspector-toggle text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" aria-controls="iac-details" aria-expanded="true" title="Hide inspector">INSPECTOR</button>
                                     <span class="lab-shortcuts lab-muted text-[10px] font-mono ml-1">F · 0 · ESC</span>
                                 </div>
                             </div>
                             <div class="lab-stage flex-1 relative min-h-0">
                                 <canvas id="iac-canvas" class="absolute inset-0 w-full h-full"></canvas>
                             </div>
-                            <div id="iac-details" class="lab-inspector h-36 px-4 py-3 overflow-y-auto text-sm">
+                            <div class="lab-inspector-resizer" role="separator" aria-label="Resize resource inspector" aria-orientation="horizontal" tabindex="0"></div>
+                            <div id="iac-details" class="lab-inspector px-4 py-3 overflow-y-auto text-sm">
                                 <div class="lab-eyebrow mb-2">Inspector</div><div class="lab-muted text-xs">Select a resource to inspect its properties and dependencies.</div>
                             </div>
                             <div id="iac-errors" class="hidden bg-red-500/20 text-red-400 text-xs p-2 border-t border-red-500/30"></div>
@@ -1139,7 +1143,7 @@ document.addEventListener("DOMContentLoaded", () => {
             content: `
                     <div id="netmap-app" class="lab-shell h-full flex select-none font-ui overflow-hidden">
                         <!-- Left Panel: Data Input -->
-                        <div class="lab-rail flex-shrink-0 flex flex-col">
+                        <div id="netmap-sidebar" class="lab-rail flex-shrink-0 flex flex-col">
                             <div class="lab-rail-header px-4 pt-4 pb-3 border-b">
                                 <div class="flex items-center justify-between mb-3">
                                     <div><div class="lab-eyebrow mb-1.5">Network Lab / 02</div><div class="text-sm font-semibold tracking-tight">Discovery data</div></div>
@@ -1163,11 +1167,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
                             </div>
                         </div>
+                        <div class="lab-rail-resizer" role="separator" aria-label="Resize discovery editor" aria-orientation="vertical" tabindex="0"></div>
                         
                         <!-- Right Panel: Topology Graph + Details -->
                         <div class="lab-workspace min-w-0 flex-1 flex flex-col">
                             <div class="lab-toolbar min-h-14 px-4 py-3 border-b flex flex-wrap items-center justify-between gap-3">
                                 <div class="flex items-center gap-2">
+                                    <button class="lab-action lab-sidebar-toggle p-1.5 rounded-md" aria-controls="netmap-sidebar" aria-expanded="true" title="Hide discovery editor"><svg class="w-3.5 h-3.5" viewBox="0 0 20 20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 4h14v12H3zM7 4v12m4-8l-2 2 2 2"/></svg></button>
                                     <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-her-red opacity-40"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-her-red"></span></span>
                                     <div><div class="lab-eyebrow">Live topology</div><div id="netmap-count" class="lab-muted text-[11px] mt-1">0 devices, 0 links</div></div>
                                 </div>
@@ -1175,13 +1181,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <button id="netmap-zoom" class="lab-action text-[10px] font-mono px-2 py-1.5 rounded-md" title="Reset zoom to 100% (0)">100%</button>
                                     <button id="netmap-fit" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Fit to View (F)">FIT VIEW</button>
                                     <button id="netmap-export" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Export PNG (Ctrl+E)">EXPORT PNG</button>
+                                    <button class="lab-action lab-inspector-toggle text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" aria-controls="netmap-details" aria-expanded="true" title="Hide inspector">INSPECTOR</button>
                                     <span class="lab-shortcuts lab-muted text-[10px] font-mono ml-1">F · 0 · ESC</span>
                                 </div>
                             </div>
                             <div class="lab-stage flex-1 relative min-h-0">
                                 <canvas id="netmap-canvas" class="absolute inset-0 w-full h-full"></canvas>
                             </div>
-                            <div id="netmap-details" class="lab-inspector h-36 px-4 py-3 overflow-y-auto text-sm">
+                            <div class="lab-inspector-resizer" role="separator" aria-label="Resize device inspector" aria-orientation="horizontal" tabindex="0"></div>
+                            <div id="netmap-details" class="lab-inspector px-4 py-3 overflow-y-auto text-sm">
                                 <div class="lab-eyebrow mb-2">Inspector</div><div class="lab-muted text-xs">Select a device to inspect its interfaces and connections.</div>
                             </div>
                             <div id="netmap-errors" class="hidden bg-red-500/20 text-red-400 text-xs p-2 border-t border-red-500/30"></div>

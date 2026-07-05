@@ -1943,6 +1943,8 @@ html.dark .markdown-body pre {
   --lab-muted: #826f68;
   --lab-code-bg: #f9f6f0;
   --lab-code-text: #4e342e;
+  --lab-rail-width: 410px;
+  --lab-inspector-height: 144px;
   background: var(--lab-surface);
   color: var(--lab-text);
   font-family: "DM Sans", sans-serif;
@@ -1966,9 +1968,9 @@ html.dark #netmap-app {
 }
 
 .lab-shell { background-image: radial-gradient(circle at 70% 15%, rgba(var(--lab-accent-rgb), .06), transparent 34%); }
-.lab-rail { width: 360px; background: var(--lab-panel); border-right: 1px solid var(--lab-border); }
+.lab-rail { width: var(--lab-rail-width); background: var(--lab-panel); border-right: 1px solid var(--lab-border); transition: width .22s ease, opacity .18s ease; }
 #iac-app .lab-rail,
-#netmap-app .lab-rail { width: 410px; }
+#netmap-app .lab-rail { width: var(--lab-rail-width); }
 .lab-rail-header,
 .lab-filebar,
 .lab-toolbar { border-color: var(--lab-border); }
@@ -2012,15 +2014,35 @@ html.dark .iac-token-keyword { color: #b69be2; }
 html.dark .iac-token-number { color: #e49a6b; }
 html.dark .iac-token-key { color: #68b6d3; }
 .lab-stage { background-color: #0b1016; background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px); background-size: 24px 24px; }
-.lab-inspector { background: var(--lab-surface); border-top: 1px solid var(--lab-border); color: var(--lab-text); }
+.lab-inspector { height: var(--lab-inspector-height); flex: 0 0 var(--lab-inspector-height); background: var(--lab-surface); border-top: 1px solid var(--lab-border); color: var(--lab-text); transition: height .2s ease, flex-basis .2s ease, opacity .16s ease, padding .2s ease; }
 .lab-inspector a,
 .lab-inspector .text-blue-400 { color: var(--lab-accent); }
+.lab-rail-resizer { position: relative; z-index: 4; width: 5px; flex: 0 0 5px; margin-left: -3px; cursor: col-resize; touch-action: none; }
+.lab-rail-resizer::after { content: ""; position: absolute; inset: 0 2px; background: transparent; transition: background .15s ease; }
+.lab-rail-resizer:hover::after,
+.lab-rail-resizer:focus-visible::after,
+.lab-is-resizing .lab-rail-resizer::after { background: rgba(var(--lab-accent-rgb), .65); }
+.lab-inspector-resizer { position: relative; z-index: 4; height: 5px; flex: 0 0 5px; margin-top: -3px; cursor: row-resize; touch-action: none; }
+.lab-inspector-resizer::after { content: ""; position: absolute; inset: 2px 0; background: transparent; transition: background .15s ease; }
+.lab-inspector-resizer:hover::after,
+.lab-inspector-resizer:focus-visible::after,
+.lab-is-resizing .lab-inspector-resizer::after { background: rgba(var(--lab-accent-rgb), .65); }
+.lab-sidebar-collapsed .lab-rail { width: 0 !important; opacity: 0; overflow: hidden; border: 0; }
+.lab-sidebar-collapsed .lab-rail-resizer,
+.lab-inspector-collapsed .lab-inspector-resizer { display: none; }
+.lab-inspector-collapsed .lab-inspector { height: 0; flex-basis: 0; min-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; overflow: hidden; border: 0; }
+.lab-sidebar-toggle[aria-expanded="false"],
+.lab-inspector-toggle[aria-expanded="false"] { color: var(--lab-accent); background: rgba(var(--lab-accent-rgb), .1); border-color: rgba(var(--lab-accent-rgb), .42); }
+.lab-is-resizing,
+.lab-is-resizing * { cursor: inherit; user-select: none !important; }
 
 @media (max-width: 760px) {
   .lab-shell { flex-direction: column; overflow: auto; }
   .lab-rail { width: 100%; min-height: 280px; max-height: 42%; border-right: 0; border-bottom: 1px solid var(--lab-border); }
   #iac-app .lab-rail { width: 100%; }
   #netmap-app .lab-rail { width: 100%; }
+  .lab-rail-resizer { display: none; }
+  .lab-sidebar-collapsed .lab-rail { width: 100% !important; min-height: 0; max-height: 0; }
   .lab-workspace { min-height: 420px; }
   .lab-shortcuts { display: none; }
 }

@@ -3,6 +3,7 @@
 // Force-directed graph with documentation/learning features
 
 import { playClick, playNotification, isSoundEnabled } from '../audio';
+import { LabLayoutController } from './lab-layout';
 
 // ============ Types ============
 interface IaCNode {
@@ -416,6 +417,7 @@ export class IaCVisualizer {
   private highlightEl: HTMLElement;
   private lineNumbersEl: HTMLElement;
   private filenameEl: HTMLElement;
+  private layoutController: LabLayoutController;
 
   private nodes: IaCNode[] = [];
   private nodeMap: Map<string, IaCNode> = new Map();
@@ -472,6 +474,7 @@ export class IaCVisualizer {
     this.highlightEl = container.querySelector('#iac-highlight code')!;
     this.lineNumbersEl = container.querySelector('#iac-line-numbers')!;
     this.filenameEl = container.querySelector('#iac-filename')!;
+    this.layoutController = new LabLayoutController(container);
 
     this.zoomEl = container.querySelector('#iac-zoom') as HTMLElement;
 
@@ -1477,6 +1480,7 @@ export class IaCVisualizer {
   }
 
   destroy(): void {
+    this.layoutController.destroy();
     if (this.animationId) cancelAnimationFrame(this.animationId);
     if (this.resizeObserver) this.resizeObserver.disconnect();
     if (this.motionQuery && this.motionHandler) {

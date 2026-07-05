@@ -3,6 +3,7 @@
 // Force-directed graph visualization for network devices
 
 import { playClick, playNotification, isSoundEnabled } from '../audio';
+import { LabLayoutController } from './lab-layout';
 
 // ============ Types ============
 interface NetworkDevice {
@@ -421,6 +422,7 @@ export class NetworkTopologyVisualizer {
   private highlightEl: HTMLElement;
   private lineNumbersEl: HTMLElement;
   private filenameEl: HTMLElement;
+  private layoutController: LabLayoutController;
 
   private devices: NetworkDevice[] = [];
   private deviceMap: Map<string, NetworkDevice> = new Map();
@@ -476,6 +478,7 @@ export class NetworkTopologyVisualizer {
     this.highlightEl = container.querySelector('#netmap-highlight code')!;
     this.lineNumbersEl = container.querySelector('#netmap-line-numbers')!;
     this.filenameEl = container.querySelector('#netmap-filename')!;
+    this.layoutController = new LabLayoutController(container);
 
     this.zoomEl = container.querySelector('#netmap-zoom') as HTMLElement;
 
@@ -1441,6 +1444,7 @@ export class NetworkTopologyVisualizer {
   }
 
   destroy(): void {
+    this.layoutController.destroy();
     if (this.animationId) cancelAnimationFrame(this.animationId);
     if (this.resizeObserver) this.resizeObserver.disconnect();
     if (this.motionQuery && this.motionHandler) {
