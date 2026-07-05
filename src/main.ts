@@ -1146,13 +1146,22 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <span id="netmap-format" class="lab-badge text-[10px] font-mono px-2 py-1 rounded-full">LLDP Neighbors</span>
                                 </div>
                                 <div class="flex flex-wrap gap-1.5" role="group" aria-label="Example discovery formats">
-                                    <button id="netmap-lldp" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors">LLDP</button>
-                                    <button id="netmap-cdp" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors">CDP</button>
-                                    <button id="netmap-routing" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors">Routing</button>
+                                    <button id="netmap-lldp" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M4 6h16v8H4zM8 18h8M12 14v4M7 10h.01M10 10h.01M14 10h3"/></svg>LLDP</button>
+                                    <button id="netmap-cdp" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" d="M8 12h8M12 8v8M6.5 9.5l2 1M17.5 9.5l-2 1"/></svg>CDP</button>
+                                    <button id="netmap-routing" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 18V7m0 0l-2 2m2-2l2 2M5 13h9m0 0l-2-2m2 2l-2 2M14 6h5v12h-5"/></svg>Routing</button>
                                 </div>
                             </div>
-                            <div class="lab-filebar px-4 py-2 border-b flex justify-between text-[10px] font-mono"><span>DISCOVERY.LOG</span><span>AUTO-PARSE</span></div>
-                            <textarea id="netmap-code" aria-label="Network discovery data" class="lab-editor flex-1 font-mono text-xs p-4 resize-none outline-none transition-shadow" spellcheck="false" placeholder="Paste LLDP/CDP neighbors or routing table output..."></textarea>
+                            <div class="lab-editor-tabs flex items-end border-b">
+                                <div class="lab-file-tab active flex items-center gap-2 px-4 py-2.5 text-xs font-medium"><svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M4 6h16v8H4zM8 18h8M12 14v4M7 10h.01M10 10h.01M14 10h3"/></svg><span id="netmap-filename">lldp-neighbors.log</span></div>
+                                <div class="lab-editor-status ml-auto px-3 py-2.5 text-[9px] font-mono">AUTO-PARSE</div>
+                            </div>
+                            <div class="lab-code-shell flex-1 min-h-0 flex">
+                                <pre id="netmap-line-numbers" class="lab-line-numbers" aria-hidden="true">1</pre>
+                                <div class="lab-code-viewport flex-1 min-w-0 relative">
+                                    <pre id="netmap-highlight" class="lab-code-highlight" aria-hidden="true"><code></code></pre>
+                                    <textarea id="netmap-code" aria-label="Network discovery data" class="lab-code-input" spellcheck="false" wrap="off" placeholder="Paste LLDP/CDP neighbors or routing table output..."></textarea>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Right Panel: Topology Graph + Details -->

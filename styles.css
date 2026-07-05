@@ -1967,7 +1967,8 @@ html.dark #netmap-app {
 
 .lab-shell { background-image: radial-gradient(circle at 70% 15%, rgba(var(--lab-accent-rgb), .06), transparent 34%); }
 .lab-rail { width: 360px; background: var(--lab-panel); border-right: 1px solid var(--lab-border); }
-#iac-app .lab-rail { width: 410px; }
+#iac-app .lab-rail,
+#netmap-app .lab-rail { width: 410px; }
 .lab-rail-header,
 .lab-filebar,
 .lab-toolbar { border-color: var(--lab-border); }
@@ -2019,6 +2020,7 @@ html.dark .iac-token-key { color: #68b6d3; }
   .lab-shell { flex-direction: column; overflow: auto; }
   .lab-rail { width: 100%; min-height: 280px; max-height: 42%; border-right: 0; border-bottom: 1px solid var(--lab-border); }
   #iac-app .lab-rail { width: 100%; }
+  #netmap-app .lab-rail { width: 100%; }
   .lab-workspace { min-height: 420px; }
   .lab-shortcuts { display: none; }
 }

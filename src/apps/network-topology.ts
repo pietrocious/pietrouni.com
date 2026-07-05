@@ -70,6 +70,28 @@ function escapeHtml(value: unknown): string {
   ));
 }
 
+function highlightNetworkData(data: string): string {
+  const tokens = /(#.*|\b(?:Device ID|Local Intf|Hold-time|Capability|Port ID|Platform|Interface|Holdtime|Codes|Gateway|Network|Destination|Metric|Next Hop)\b|\b(?:\d{1,3}\.){3}\d{1,3}(?:\/\d{1,2})?\b|\b(?:[0-9a-fA-F]{2}[:-]){5}[0-9a-fA-F]{2}\b|\b(?:Gi|GigabitEthernet|Fa|FastEthernet|Te|TenGigabitEthernet|Eth|Ethernet|Vlan|Po|Port-channel)[\w/.:-]*\b|\b\d+\b|[-:]+)/g;
+  return data.split('\n').map(line => {
+    let html = '';
+    let cursor = 0;
+    for (const match of line.matchAll(tokens)) {
+      const token = match[0];
+      const index = match.index ?? 0;
+      html += escapeHtml(line.slice(cursor, index));
+      let className = 'iac-token-punctuation';
+      if (token.startsWith('#')) className = 'iac-token-comment';
+      else if (/^(?:\d{1,3}\.){3}/.test(token) || /^(?:[0-9a-fA-F]{2}[:-]){5}/.test(token)) className = 'iac-token-string';
+      else if (/^(?:Gi|GigabitEthernet|Fa|FastEthernet|Te|TenGigabitEthernet|Eth|Ethernet|Vlan|Po|Port-channel)/.test(token)) className = 'iac-token-key';
+      else if (/^\d+$/.test(token)) className = 'iac-token-number';
+      else if (/^[A-Za-z]/.test(token)) className = 'iac-token-keyword';
+      html += `<span class="${className}">${escapeHtml(token)}</span>`;
+      cursor = index + token.length;
+    }
+    return html + escapeHtml(line.slice(cursor));
+  }).join('\n');
+}
+
 // ============ Sample Templates ============
 const SAMPLE_LLDP = `# LLDP Neighbors - CORE-SW-01
 Device ID           Local Intf     Hold-time  Capability      Port ID
@@ -396,6 +418,9 @@ export class NetworkTopologyVisualizer {
   private countEl: HTMLElement;
   private errorEl: HTMLElement;
   private detailsEl: HTMLElement;
+  private highlightEl: HTMLElement;
+  private lineNumbersEl: HTMLElement;
+  private filenameEl: HTMLElement;
 
   private devices: NetworkDevice[] = [];
   private deviceMap: Map<string, NetworkDevice> = new Map();
@@ -448,6 +473,9 @@ export class NetworkTopologyVisualizer {
     this.countEl = container.querySelector('#netmap-count')!;
     this.errorEl = container.querySelector('#netmap-errors')!;
     this.detailsEl = container.querySelector('#netmap-details')!;
+    this.highlightEl = container.querySelector('#netmap-highlight code')!;
+    this.lineNumbersEl = container.querySelector('#netmap-line-numbers')!;
+    this.filenameEl = container.querySelector('#netmap-filename')!;
 
     this.zoomEl = container.querySelector('#netmap-zoom') as HTMLElement;
 
@@ -463,6 +491,8 @@ export class NetworkTopologyVisualizer {
       touchmove: this.handleTouchMove.bind(this),
       touchend: this.handleTouchEnd.bind(this),
       input: this.handleInput.bind(this),
+      editorscroll: this.syncEditorScroll.bind(this),
+      editorkeydown: this.handleEditorKeyDown.bind(this),
       lldp: () => this.loadTemplate('lldp'),
       cdp: () => this.loadTemplate('cdp'),
       routing: () => this.loadTemplate('routing'),
@@ -484,6 +514,8 @@ export class NetworkTopologyVisualizer {
 
     // Code input
     this.textarea.addEventListener('input', this.handlers.input);
+    this.textarea.addEventListener('scroll', this.handlers.editorscroll);
+    this.textarea.addEventListener('keydown', this.handlers.editorkeydown);
 
     // Canvas interactions
     this.canvas.addEventListener('mousedown', this.handlers.mousedown);
@@ -515,6 +547,7 @@ export class NetworkTopologyVisualizer {
     // Initialize
     this.textarea.value = SAMPLE_LLDP;
     this.setTemplateActive('lldp');
+    this.updateEditorPresentation();
     this.parseAndRender();
     this.startAnimation();
   }
@@ -538,7 +571,32 @@ export class NetworkTopologyVisualizer {
   }
 
   private handleInput(): void {
+    this.updateEditorPresentation();
     this.parseAndRender();
+  }
+
+  private updateEditorPresentation(): void {
+    const data = this.textarea.value;
+    this.highlightEl.innerHTML = highlightNetworkData(data) + (data.endsWith('\n') ? '\n ' : '');
+    const lineCount = Math.max(1, data.split('\n').length);
+    this.lineNumbersEl.textContent = Array.from({ length: lineCount }, (_, index) => index + 1).join('\n');
+    this.syncEditorScroll();
+  }
+
+  private syncEditorScroll(): void {
+    const pre = this.highlightEl.parentElement as HTMLElement | null;
+    if (pre) {
+      pre.scrollTop = this.textarea.scrollTop;
+      pre.scrollLeft = this.textarea.scrollLeft;
+    }
+    this.lineNumbersEl.scrollTop = this.textarea.scrollTop;
+  }
+
+  private handleEditorKeyDown(event: KeyboardEvent): void {
+    if (event.key !== 'Tab') return;
+    event.preventDefault();
+    this.textarea.setRangeText('  ', this.textarea.selectionStart, this.textarea.selectionEnd, 'end');
+    this.handleInput();
   }
 
   private screenToWorld(sx: number, sy: number): { x: number; y: number } {
@@ -713,6 +771,7 @@ export class NetworkTopologyVisualizer {
       case 'routing': this.textarea.value = SAMPLE_ROUTING; break;
     }
     this.setTemplateActive(type);
+    this.updateEditorPresentation();
     this.selectedDevice = null;
     this.hoveredDevice = null;
     // Force a fresh layout for the new template (no position carry-over)
@@ -729,6 +788,9 @@ export class NetworkTopologyVisualizer {
       button?.setAttribute('data-active', String(option === type));
       button?.setAttribute('aria-pressed', String(option === type));
     }
+    this.filenameEl.textContent = type === 'lldp'
+      ? 'lldp-neighbors.log'
+      : type === 'cdp' ? 'cdp-neighbors.log' : 'routing-table.txt';
   }
 
   private parseAndRender(): void {
@@ -1397,6 +1459,8 @@ export class NetworkTopologyVisualizer {
     this.zoomEl?.removeEventListener('click', this.handlers.zoomreset);
     
     this.textarea.removeEventListener('input', this.handlers.input);
+    this.textarea.removeEventListener('scroll', this.handlers.editorscroll);
+    this.textarea.removeEventListener('keydown', this.handlers.editorkeydown);
 
     this.canvas.removeEventListener('mousedown', this.handlers.mousedown);
     this.canvas.removeEventListener('mousemove', this.handlers.mousemove);
