@@ -1,4 +1,3 @@
-import { marked } from 'marked';
 
 // Lab Icons
 import snakeIcon from './assets/icons/lab/snake.png';
@@ -12,13 +11,43 @@ import doomIcon from './assets/icons/lab/doom.png';
 // config - static data
 import { fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
 import { vaultData } from './vault';
-// Games and heavier apps (tetris, threes, doom, snake, tic-tac-toe, gym-routine,
-// iac-visualizer, network-topology) are dynamically imported at open-time below —
-// see each window config's onOpen/onClose — so they don't bloat the initial bundle.
 import { initDock, dockBounce, refreshDockItems } from './dock';
 import { animateWindowContent } from './animations';
-import { initVanta, destroyVanta, updateVantaTheme, isVantaActive } from './vanta';
 import { initAudio, playClick, playWindowOpen, isSoundEnabled, toggleSound } from './audio';
+import { initSpotlight, trapFocusInSpotlight } from './spotlight';
+import { registerServiceWorker } from './sw-register';
+import { initClock } from './clock';
+import { initMonitor, startMonitor } from './monitor';
+import { initLaunchpadModule } from './launchpad';
+import { initMarkdownViewer } from './markdown-viewer';
+import { initTheme, updateThemeUI } from './theme';
+
+// Lazy-loaded games and apps — split into separate Vite chunks
+const loadTetris = () => import('./games/tetris');
+const loadIaC = () => import('./apps/iac-visualizer');
+const loadNetwork = () => import('./apps/network-topology');
+const loadThrees = () => import('./games/threes');
+const loadTicTacToe = () => import('./games/tic-tac-toe');
+const loadSnake = () => import('./games/snake');
+const loadDoom = () => import('./games/doom');
+const loadGym = () => import('./apps/gym-routine');
+
+const initTetris = (c: HTMLElement) => loadTetris().then(m => m.initTetris(c));
+const destroyTetris = () => loadTetris().then(m => m.destroyTetris());
+const initIaCVisualizer = (c: HTMLElement) => loadIaC().then(m => m.initIaCVisualizer(c));
+const destroyIaCVisualizer = () => loadIaC().then(m => m.destroyIaCVisualizer());
+const initNetworkTopology = (c: HTMLElement) => loadNetwork().then(m => m.initNetworkTopology(c));
+const destroyNetworkTopology = () => loadNetwork().then(m => m.destroyNetworkTopology());
+const initThrees = (c: HTMLElement) => loadThrees().then(m => m.initThrees(c));
+const destroyThrees = () => loadThrees().then(m => m.destroyThrees());
+const initTicTacToe = (c: HTMLElement) => loadTicTacToe().then(m => m.initTicTacToe(c));
+const destroyTicTacToe = () => loadTicTacToe().then(m => m.destroyTicTacToe());
+const initSnake = (c: HTMLElement) => loadSnake().then(m => m.initSnake(c));
+const destroySnake = () => loadSnake().then(m => m.destroySnake());
+const initDoom = (c: HTMLElement) => loadDoom().then(m => m.initDoom(c));
+const destroyDoom = () => loadDoom().then(m => m.destroyDoom());
+const initGymRoutine = (c: HTMLElement) => loadGym().then(m => m.initGymRoutine(c));
+const destroyGymRoutine = () => loadGym().then(m => m.destroyGymRoutine());
 import { handleTerminalCommand } from './terminal/core';
 import { handlePietrOSCommand, resetTerminalSubModes } from './terminal/pietros';
 import { handleCyberpunkCommand } from './terminal/cyberpunk';
@@ -28,11 +57,10 @@ import { handleFalloutCommand } from './terminal/fallout';
 
 // state - shared app state with setters for mutations
 import {
-  activeWindows, incrementZIndex, wallpapers, allWallpaperClasses,
+  activeWindows, incrementZIndex,
   currentPath, setCurrentPath, terminalHistory, pushTerminalHistory,
   terminalHistoryIndex, setTerminalHistoryIndex, guessGame, ciscoMode, terraformMode,
   shuffledQuotes, quoteIndex, setQuoteIndex, reshuffleQuotes, TERMINAL_STATE,
-  activeWallpaperIndex, setActiveWallpaperIndex, monitorInterval, setMonitorInterval,
   tabCompletionIndex, setTabCompletionIndex, lastTabInput, setLastTabInput,
   registerTerminalCleanup, runTerminalCleanups, hasActiveCleanups
 } from './state';
@@ -83,6 +111,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // initialize dock fish-eye magnification
         initDock();
 
+        // initialize monitor app handlers
+        initMonitor();
+
+        // initialize launchpad app handlers
+        initLaunchpadModule();
+
+        // expose markdown viewer (sanitized via DOMPurify)
+        initMarkdownViewer();
+
         // expose sound toggle for settings
         window.toggleSound = toggleSound;
         window.isSoundEnabled = isSoundEnabled;
@@ -93,125 +130,8 @@ document.addEventListener("DOMContentLoaded", () => {
           dockContainer.addEventListener('click', () => playClick());
         }
 
-        function applyWallpaperClasses(wp: (typeof wallpapers)[0], isDark: boolean, desktop: HTMLElement) {
-          desktop.style.background = "";
-          allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
-          if (wp.type === "class") {
-            desktop.classList.add(isDark ? wp.dark : wp.light);
-            destroyVanta();
-          } else if (wp.type === "gradient") {
-            desktop.style.background = isDark ? wp.dark : wp.light;
-            destroyVanta();
-          } else if (wp.type === "vanta" && wp.vantaEffect) {
-            desktop.style.background = "";
-            initVanta(wp.vantaEffect, isDark, desktop);
-          }
-        }
+        // Theme + wallpaper — implemented in src/theme.ts (initTheme() called below)
 
-        function applyWallpaper(animate = false) {
-          const isDark = document.documentElement.classList.contains("dark");
-          const wp = wallpapers[activeWallpaperIndex];
-          const desktop = document.getElementById("desktop");
-          if (!desktop) return;
-
-          // If switching away from vanta, no cross-fade needed (canvas unmounts)
-          const skipFade = wp.type === "vanta" || isVantaActive();
-
-          if (animate && !skipFade) {
-            // Cross-fade: freeze current look in ::before, swap underneath, then fade ::before out
-            desktop.classList.add("wallpaper-transitioning");
-            requestAnimationFrame(() => {
-              applyWallpaperClasses(wp, isDark, desktop);
-              requestAnimationFrame(() => {
-                desktop.classList.remove("wallpaper-transitioning");
-              });
-            });
-          } else {
-            applyWallpaperClasses(wp, isDark, desktop);
-          }
-
-        }
-
-        // theme + wallpaper
-        function setTheme(dark: boolean) {
-          const desktop = document.getElementById("desktop");
-          if (dark) {
-            document.documentElement.classList.add("dark");
-          } else {
-            document.documentElement.classList.remove("dark");
-          }
-          desktop.classList.remove("her-bg", "her-bg-dark");
-          // If a vanta effect is active, update its colors live rather than full reinit
-          if (isVantaActive()) {
-            updateVantaTheme(dark);
-          }
-          applyWallpaper();
-
-          // notify iframes
-          const newTheme = dark ? "dark" : "light";
-          document.querySelectorAll("iframe").forEach((frame) => {
-            frame.contentWindow.postMessage(
-              { type: "theme-change", theme: newTheme },
-              "*"
-            );
-          });
-        }
-
-        function initTheme() {
-          // Resolve initial theme: explicit localStorage > system preference
-          const prefersDark =
-            localStorage.theme === "dark" ||
-            (!("theme" in localStorage) &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches);
-          setTheme(prefersDark);
-          updateThemeUI();
-
-          // Live-sync with OS preference when user hasn't manually overridden
-          window
-            .matchMedia("(prefers-color-scheme: dark)")
-            .addEventListener("change", (e) => {
-              if (!("theme" in localStorage)) {
-                setTheme(e.matches);
-                updateThemeUI();
-              }
-            });
-        }
-
-        function updateThemeUI() {
-          const mode = localStorage.theme || "system";
-          const isDark = document.documentElement.classList.contains("dark");
-          // Update settings label
-          const label = document.getElementById("settings-theme-label");
-          if (label) {
-            const labels: Record<string, string> = { light: "Light Mode", dark: "Dark Mode", system: "System (" + (isDark ? "Dark" : "Light") + ")" };
-            label.textContent = labels[mode] || labels.system;
-          }
-          // Update segmented control active state
-          document.querySelectorAll(".theme-seg-btn").forEach((btn) => {
-            const el = btn as HTMLElement;
-            const isActive = el.dataset.mode === mode;
-            if (isActive) {
-              el.classList.add("bg-her-red", "text-white");
-              el.classList.remove("hover:bg-black/10", "dark:hover:bg-white/10");
-            } else {
-              el.classList.remove("bg-her-red", "text-white");
-              el.classList.add("hover:bg-black/10", "dark:hover:bg-white/10");
-            }
-          });
-        }
-
-        window.setThemeMode = function (mode: string) {
-          if (mode === "system") {
-            localStorage.removeItem("theme");
-            setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
-          } else {
-            localStorage.theme = mode;
-            setTheme(mode === "dark");
-          }
-          updateThemeUI();
-        };
-
-        // Menu bar button — simple light/dark flip (pins the choice)
         // Lab filter for experiments window
         (window as any).labFilter = function (filter: string) {
           const items = document.querySelectorAll<HTMLElement>('#lab-grid [data-category]');
@@ -231,24 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         };
 
-        window.toggleTheme = function () {
-          const goingDark = !document.documentElement.classList.contains("dark");
-          window.setThemeMode(goingDark ? "dark" : "light");
-        };
-
-        window.cycleWallpaper = function () {
-          setActiveWallpaperIndex((activeWallpaperIndex + 1) % wallpapers.length);
-          applyWallpaper(true);
-        };
-
-        // set wallpaper by index (for settings grid)
-        window.setWallpaper = function (index: number) {
-          if (index >= 0 && index < wallpapers.length) {
-            setActiveWallpaperIndex(index);
-            applyWallpaper(true);
-          }
-        };
-
         window.addEventListener("message", (event) => {
           if (event.data && event.data.type === "request-theme") {
             const currentTheme = document.documentElement.classList.contains(
@@ -256,68 +158,17 @@ document.addEventListener("DOMContentLoaded", () => {
             )
               ? "dark"
               : "light";
-            event.source.postMessage(
+            (event.source as Window).postMessage(
               { type: "theme-change", theme: currentTheme },
-              "*"
+              { targetOrigin: "*" }
             );
           }
         });
 
         initTheme();
 
-        // spotlight (ctrl+k)
-        window.toggleSpotlight = function () {
-          const spot = document.getElementById("spotlight");
-          const box = document.getElementById("spotlight-box");
-          const input = document.getElementById("spotlight-input");
-
-          if (spot.classList.contains("hidden")) {
-            spot.classList.remove("hidden");
-            spot.classList.add("flex");
-            setTimeout(() => {
-              box.classList.remove("scale-95", "opacity-0");
-              box.classList.add("scale-100", "opacity-100");
-              input.focus();
-            }, 10);
-            window.handleSearch("");
-          } else {
-            box.classList.remove("scale-100", "opacity-100");
-            box.classList.add("scale-95", "opacity-0");
-            setTimeout(() => {
-              spot.classList.add("hidden");
-              spot.classList.remove("flex");
-            }, 300);
-          }
-        };
-
-        // Focus trapping for spotlight
-        function trapFocusInSpotlight(e) {
-          const spot = document.getElementById("spotlight");
-          if (spot.classList.contains("hidden")) return;
-
-          const spotlightBox = document.getElementById("spotlight-box");
-          const focusableElements = spotlightBox.querySelectorAll(
-            'input, button, [tabindex]:not([tabindex="-1"]), .spotlight-result'
-          );
-          const firstFocusable = focusableElements[0];
-          const lastFocusable = focusableElements[focusableElements.length - 1];
-
-          if (e.key === "Tab") {
-            if (e.shiftKey) {
-              // Shift + Tab
-              if (document.activeElement === firstFocusable) {
-                e.preventDefault();
-                lastFocusable?.focus();
-              }
-            } else {
-              // Tab
-              if (document.activeElement === lastFocusable) {
-                e.preventDefault();
-                firstFocusable?.focus();
-              }
-            }
-          }
-        }
+        // spotlight (ctrl+k) — implemented in src/spotlight.ts
+        initSpotlight();
 
         document.addEventListener("keydown", (e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -339,115 +190,6 @@ document.addEventListener("DOMContentLoaded", () => {
           // Trap focus in spotlight when open
           trapFocusInSpotlight(e);
         });
-
-        window.handleSearch = function (query) {
-          const container = document.getElementById("spotlight-results");
-          container.innerHTML = "";
-          const term = query.toLowerCase().trim();
-
-          // Define all apps with same icons as dock
-          const spotlightApps = [
-            { id: "finder", title: "Finder", icon: "assets/icons/org.gnome.Nautilus.svg" },
-            { id: "about", title: "README.md", icon: "assets/icons/org.gnome.Logs.svg" },
-            { id: "projects", title: "Projects", icon: "assets/icons/org.gnome.tweaks.svg" },
-            { id: "vault", title: "Vault", icon: "assets/icons/org.gnome.FileRoller.svg" },
-            { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
-            { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
-            { id: "experiments", title: "Lab", icon: "assets/icons/characters.svg" },
-            { id: "sysinfo", title: "About", icon: "assets/icons/contacts.svg" },
-          ];
-
-          // If no search term, show app grid (like macOS 26 Siri/Spotlight)
-          if (!term) {
-            container.innerHTML = `
-              <div class="p-4">
-                <div class="text-[10px] uppercase font-bold opacity-40 tracking-wider mb-3">Applications</div>
-                <div class="grid grid-cols-5 gap-3">
-                  ${spotlightApps.map(app => `
-                    <div 
-                      class="spotlight-app flex flex-col items-center gap-1 p-2 rounded-lg cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-all hover:scale-105"
-                      onclick="restoreWindow('${app.id}'); toggleSpotlight();"
-                      role="button"
-                      tabindex="0"
-                      onkeydown="if(event.key==='Enter'){restoreWindow('${app.id}'); toggleSpotlight();}"
-                    >
-                      <img src="${app.icon}" alt="${app.title}" class="w-10 h-10 drop-shadow-sm" />
-                      <span class="text-[10px] text-center truncate w-full opacity-70">${app.title}</span>
-                    </div>
-                  `).join("")}
-                </div>
-              </div>
-            `;
-            return;
-          }
-
-          const results = [];
-
-          // Search apps
-          spotlightApps.forEach(app => {
-            if (app.title.toLowerCase().includes(term) || app.id.includes(term)) {
-              results.push({
-                title: app.title,
-                desc: "Application",
-                action: `restoreWindow('${app.id}'); toggleSpotlight();`,
-                icon: `<img src="${app.icon}" alt="${app.title}" class="w-8 h-8" />`,
-              });
-            }
-          });
-
-          // Search Vault
-          vaultData.forEach((item) => {
-            if (
-              item.title.toLowerCase().includes(term) ||
-              item.desc.toLowerCase().includes(term)
-            ) {
-              results.push({
-                title: item.title,
-                desc: `Vault • ${item.desc}`,
-                action: item.url
-                  ? `window.open('${item.url}', '_blank'); toggleSpotlight();`
-                  : `restoreWindow('vault'); toggleSpotlight();`,
-                icon: `<div class="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>`,
-              });
-            }
-          });
-
-          if (results.length === 0) {
-            container.innerHTML = `<div class="p-4 text-center opacity-50 text-sm">No results found.</div>`;
-            return;
-          }
-
-          results.forEach((res, idx) => {
-            const div = document.createElement("div");
-            div.className = `spotlight-result p-3 flex items-center gap-3 border-b border-her-red/5 last:border-0 ${
-              idx === 0 ? "selected" : ""
-            }`;
-            div.setAttribute("tabindex", "0");
-            div.setAttribute("role", "option");
-            div.setAttribute("aria-selected", idx === 0 ? "true" : "false");
-            if (res.action) {
-              div.setAttribute("onclick", res.action);
-              div.setAttribute(
-                "onkeydown",
-                `if(event.key==='Enter'){${res.action}}`
-              );
-            }
-
-            div.innerHTML = `
-                    ${res.icon}
-                    <div>
-                        <div class="font-bold text-sm text-her-text dark:text-her-textLight">${res.title}</div>
-                        <div class="text-xs opacity-60">${res.desc}</div>
-                    </div>
-                 `;
-            container.appendChild(div);
-          });
-        };
-
-        window.executeSearchResult = function () {
-          const first = document.querySelector(".spotlight-result");
-          if (first) first.click();
-        };
 
         // windows
         const windows = {
@@ -531,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
                                 <p class="opacity-90 mb-4">
-                                    I have several projects here — a mix of infrastructure work and things I built out of curiosity. Check out <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" class="content-link">GitHub</a> to see what I'm working on.</p>
+                                    I have several projects here — a mix of infrastructure work and things I built out of curiosity. Check out <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" rel="noopener noreferrer" class="content-link">GitHub</a> to see what I'm working on.</p>
                             </div>
 
                             <!-- How I Think -->
@@ -560,10 +302,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <a href="mailto:pietrouni@gmail.com" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="Email">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                     </a>
-                                    <a href="https://github.com/pietrocious" target="_blank" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="GitHub">
+                                    <a href="https://github.com/pietrocious" target="_blank" rel="noopener noreferrer" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="GitHub">
                                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                                     </a>
-                                    <a href="https://linkedin.com/in/pietrouni" target="_blank" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="LinkedIn">
+                                    <a href="https://linkedin.com/in/pietrouni" target="_blank" rel="noopener noreferrer" class="text-her-red dark:text-her-red hover:opacity-70 transition-opacity" title="LinkedIn">
                                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                                     </a>
                                 </div>
@@ -600,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
                                     <!-- Terraform AWS Modules -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank', 'noopener,noreferrer')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
@@ -619,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </div>
 
                                     <!-- pietrouni.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank', 'noopener,noreferrer')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Portfolio</span>
@@ -698,7 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                                     <!-- suprsymmetry.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://suprsymmetry.com/', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://suprsymmetry.com/', '_blank', 'noopener,noreferrer')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">suprsymmetry.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
@@ -717,7 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </div>
 
                                     <!-- cerebralwwaves.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://cerebralwwaves.com/', '_blank')">
+                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://cerebralwwaves.com/', '_blank', 'noopener,noreferrer')">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">cerebralwwaves.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Creative</span>
@@ -1717,7 +1459,7 @@ document.addEventListener("DOMContentLoaded", () => {
           winEl.style.height = heightStyle;
           winEl.style.left = `${leftPos}px`;
           winEl.style.top = `${topPos}px`;
-          winEl.style.zIndex = incrementZIndex();
+          winEl.style.zIndex = incrementZIndex().toString();
 
           // macOS Header + Content
           winEl.innerHTML = `
@@ -1888,120 +1630,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         // md viewer
-        window.openMarkdownViewer = async function (filePath, title) {
-          const viewerId = "md-viewer-" + title.replace(/[^a-z0-9]/gi, "");
-
-          // If already open, bring to front
-          if (activeWindows[viewerId]) {
-            restoreWindow(viewerId);
-            return;
-          }
-
-          // Fetch and parse markdown
-          let htmlContent = "";
-          try {
-            const response = await fetch(filePath);
-            if (!response.ok) throw new Error("File not found");
-            const markdown = await response.text();
-            htmlContent = marked.parse(markdown);
-          } catch (error) {
-            // Check if it's a CORS/local file issue
-            const isLocalFile = window.location.protocol === "file:";
-            if (isLocalFile) {
-              htmlContent = `
-                            <div class="text-center p-8">
-                                <div class="text-4xl mb-4">📁</div>
-                                <h3 class="text-lg font-bold mb-2 text-her-dark dark:text-her-textLight">Local Server Required</h3>
-                                <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or deploy to a static host.</p>
-                                <code class="text-xs bg-black/10 dark:bg-white/10 px-3 py-2 rounded block">npx serve .</code>
-                            </div>
-                        `;
-            } else {
-              htmlContent = `<div class="text-red-500 p-4">Error loading file: ${error.message}</div>`;
-            }
-          }
-
-          // Create window config dynamically
-          const viewerConfig = {
-            title: title,
-            content: `
-                        <div class="h-full overflow-y-auto p-6 md:p-8">
-                            <article class="markdown-body prose prose-sm dark:prose-invert max-w-none">
-                                ${htmlContent}
-                            </article>
-                        </div>
-                    `,
-            width: 700,
-            height: 600,
-          };
-
-          // Use similar logic to openWindow
-          const container = document.getElementById("windows-container");
-          const containerW = container.clientWidth;
-          const containerH = container.clientHeight;
-          const isMobile = window.innerWidth < 768;
-          const dockBuffer = isMobile ? 68 : 120;
-          const maxAvailableHeight = containerH - dockBuffer;
-
-          let finalW = isMobile ? containerW : viewerConfig.width;
-          let finalH = isMobile
-            ? maxAvailableHeight
-            : Math.min(viewerConfig.height, maxAvailableHeight);
-          let leftPos = isMobile
-            ? 0
-            : Math.max(0, (containerW - finalW) / 2) +
-              Math.floor(Math.random() * 30);
-          let topPos = isMobile
-            ? 0
-            : Math.max(10, (maxAvailableHeight - finalH) / 2) +
-              Math.floor(Math.random() * 30);
-
-          const winEl = document.createElement("div");
-          winEl.className =
-            "window absolute flex flex-col active-window window-opening";
-          winEl.id = `win-${viewerId}`;
-          winEl.setAttribute("role", "dialog");
-          winEl.setAttribute("aria-labelledby", `win-title-${viewerId}`);
-          winEl.style.width = `${finalW}px`;
-          winEl.style.height = `${finalH}px`;
-          winEl.style.left = `${leftPos}px`;
-          winEl.style.top = `${topPos}px`;
-          winEl.style.zIndex = ++zIndexCounter;
-
-          winEl.innerHTML = `
-                    <div class="window-header" onmousedown="window.startDrag(event, '${viewerId}')" ondblclick="window.toggleMaximize('${viewerId}')">
-                        <div class="controls-neon-flat" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
-                            <button class="btn-neon min" onclick="window.minimizeWindow('${viewerId}')" aria-label="Minimize window"></button>
-                            <button class="btn-neon max" onclick="window.toggleMaximize('${viewerId}')" aria-label="Maximize window"></button>
-                            <button class="btn-neon close" onclick="window.closeWindow('${viewerId}')" aria-label="Close window"></button>
-                        </div>
-                        <span class="window-title" id="win-title-${viewerId}">${viewerConfig.title}</span>
-                    </div>
-                    <div class="flex-1 relative overflow-hidden">
-                        ${viewerConfig.content}
-                    </div>
-                `;
-
-          winEl.addEventListener("mousedown", () => bringToFront(viewerId));
-          winEl.addEventListener("touchstart", () => bringToFront(viewerId), {
-            passive: true,
-          });
-          winEl.onmousemove = (e) => updateWindowCursor(e, winEl);
-          winEl.onmousedown = (e) => {
-            bringToFront(viewerId);
-            handleResizeStart(e, winEl, viewerId);
-          };
-          addTouchListeners(winEl, viewerId);
-
-          container.appendChild(winEl);
-          activeWindows[viewerId] = {
-            element: winEl,
-            config: viewerConfig,
-            maximized: false,
-            prevRect: null,
-          };
-          setTimeout(() => winEl.classList.remove("window-opening"), 350);
-        };
+        // Markdown viewer — implemented in src/markdown-viewer.ts
 
 
 
@@ -2015,54 +1644,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-        // clock with flip-digit animation
-        let prevClockText = '';
-        function updateClock() {
-          const now = new Date();
-          const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-          const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-          const day = days[now.getDay()];
-          const month = months[now.getMonth()];
-          const date = now.getDate();
-          const time = now.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: false,
-          });
-          const text = `${day} ${month} ${date} ${time}`;
-          const clockEl = document.getElementById("clock");
-          if (!clockEl) return;
-
-          // First render or text length changed — just set it
-          if (!prevClockText || prevClockText.length !== text.length) {
-            clockEl.innerHTML = '';
-            for (const ch of text) {
-              const span = document.createElement('span');
-              span.className = 'clock-char';
-              span.textContent = ch;
-              span.dataset.char = ch;
-              clockEl.appendChild(span);
-            }
-            prevClockText = text;
-            return;
-          }
-
-          // Animate only changed characters
-          const spans = clockEl.querySelectorAll('.clock-char');
-          for (let i = 0; i < text.length; i++) {
-            if (prevClockText[i] !== text[i] && spans[i]) {
-              const span = spans[i] as HTMLElement;
-              span.classList.add('clock-char-flip');
-              span.textContent = text[i];
-              span.dataset.char = text[i];
-              // Remove animation class after it completes
-              setTimeout(() => span.classList.remove('clock-char-flip'), 400);
-            }
-          }
-          prevClockText = text;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        // clock — implemented in src/clock.ts
+        initClock();
 
         // terminal
         function resolvePath(path) {
@@ -2116,7 +1699,7 @@ document.addEventListener("DOMContentLoaded", () => {
               "p-3 md:p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-red/50 hover:-translate-y-0.5 transition-all group vault-card-animate" +
               (isClickable ? " cursor-pointer" : "");
             card.style.animationDelay = `${i * 50}ms`;
-            if (item.url) card.setAttribute("onclick", `window.open('${item.url}', '_blank')`);
+            if (item.url) card.setAttribute("onclick", `window.open('${item.url}', '_blank', 'noopener,noreferrer')`);
             else if (hasItems) card.setAttribute("onclick", `window.vaultShowDetail('${item.id}')`);
 
             // Badge icon
@@ -2343,6 +1926,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
 
+        // (markdown viewer is in src/markdown-viewer.ts; an old duplicate stub was removed)
+
         window.finderRender = function () {
           const pathEl = document.getElementById("finder-path");
           const filesEl = document.getElementById("finder-files");
@@ -2439,201 +2024,11 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         };
 
-        // =====================================
-        // LAUNCHPAD APP FUNCTIONS
-        // =====================================
-        const launchpadApps = [
-          { id: "about", title: "README.md", icon: "📄", color: "bg-blue-500" },
-          { id: "projects", title: "Projects", icon: "📁", color: "bg-purple-500" },
-          { id: "vault", title: "Vault", icon: "🔒", color: "bg-amber-500" },
-          { id: "terminal", title: "Terminal", icon: "💻", color: "bg-gray-700" },
-          { id: "finder", title: "Finder", icon: "📂", color: "bg-blue-400" },
-          { id: "monitor", title: "Monitoring", icon: "📊", color: "bg-teal-500" },
-          { id: "settings", title: "Settings", icon: "⚙️", color: "bg-gray-500" },
-          { id: "sysinfo", title: "About", icon: "ℹ️", color: "bg-rose-500" },
-          { id: "experiments", title: "Lab", icon: "🧪", color: "bg-lime-500" },
-        ];
-
-        window.initLaunchpad = function () {
-          window.filterLaunchpad("");
-        };
-
-        window.filterLaunchpad = function (query: string) {
-          const grid = document.getElementById("launchpad-grid");
-          if (!grid) return;
-          
-          const term = query.toLowerCase();
-          const filtered = launchpadApps.filter(app => 
-            app.title.toLowerCase().includes(term) || app.id.includes(term)
-          );
-          
-          grid.innerHTML = "";
-          
-          filtered.forEach((app, idx) => {
-            const item = document.createElement("div");
-            item.className = "launchpad-item flex flex-col items-center gap-2 cursor-pointer group";
-            item.style.animationDelay = `${idx * 30}ms`;
-            item.innerHTML = `
-              <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl ${app.color} flex items-center justify-center text-2xl md:text-3xl shadow-lg group-hover:scale-110 transition-transform">
-                ${app.icon}
-              </div>
-              <span class="text-white text-xs text-center truncate w-full opacity-80 group-hover:opacity-100">${app.title}</span>
-            `;
-            
-            item.onclick = () => {
-              window.closeWindow("launchpad");
-              setTimeout(() => window.restoreWindow(app.id), 100);
-            };
-            
-            grid.appendChild(item);
-          });
-        };
-        window.switchMonitorTab = function (tab) {
-          document.getElementById("mon-view-infra").style.display = "none";
-          document.getElementById("mon-view-cdn").style.display = "none";
-          document.getElementById("mon-view-billing").style.display = "none";
-
-          // Layout logic: Infra is default (block/space-y), CDN block, Billing flex (center)
-          if (tab === "infra")
-            document.getElementById("mon-view-infra").style.display = "block";
-          else if (tab === "cf")
-            document.getElementById("mon-view-cdn").style.display =
-              "block";
-          else if (tab === "bill")
-            document.getElementById("mon-view-billing").style.display = "flex";
-
-          // Tab styling
-          ["infra", "cf", "bill"].forEach((t) => {
-            const el = document.getElementById(`tab-${t}`);
-            if (t === tab) {
-              el.classList.add(
-                "border-her-red",
-                "text-her-red",
-                "bg-white/50",
-                "dark:bg-black/20"
-              );
-              el.classList.remove("border-transparent", "opacity-60");
-            } else {
-              el.classList.remove(
-                "border-her-red",
-                "text-her-red",
-                "bg-white/50",
-                "dark:bg-black/20"
-              );
-              el.classList.add("border-transparent", "opacity-60");
-            }
-          });
-        };
-
-        function startMonitor() {
-          if (monitorInterval) clearInterval(monitorInterval);
-
-          // Canvas Setup
-          const canvas = document.getElementById("monitor-canvas");
-          const ctx = canvas.getContext("2d");
-          let dataPoints = new Array(50).fill(20);
-          let errorPoints = new Array(50).fill(5); // Error rate series
-
-          // KPI Simulation
-          const kpiReq = document.getElementById("kpi-req");
-          const kpiData = document.getElementById("kpi-data");
-          const logContainer = document.getElementById("sys-log");
-
-          const logs = [
-            "[INFO] Auto-scaling group: +1 instance",
-            "[INFO] DNS health check: Healthy",
-            "[WARN] High latency detected in the eu-west region",
-            "[INFO] Object storage lifecycle rule executed",
-            "[INFO] CDN cache refresh",
-          ];
-
-          setMonitorInterval(setInterval(() => {
-            // Update Graph Data
-            dataPoints.shift();
-            errorPoints.shift();
-            const base = 40 + Math.random() * 30;
-            dataPoints.push(base);
-            errorPoints.push(Math.max(0, 5 + (Math.random() * 10 - 5))); // Sim error
-
-            // Render Graph
-            // Check visibility to save resources
-            if (canvas && canvas.offsetParent !== null) {
-              // Resize if needed
-              if (canvas.width !== canvas.clientWidth) {
-                canvas.width = canvas.clientWidth;
-                canvas.height = canvas.clientHeight;
-              }
-              const w = canvas.width;
-              const h = canvas.height;
-
-              ctx.clearRect(0, 0, w, h);
-
-              // Draw Main Traffic
-              ctx.beginPath();
-              ctx.moveTo(0, h);
-              dataPoints.forEach((p, i) => {
-                const x = (i / (dataPoints.length - 1)) * w;
-                const y = h - (p / 100) * h;
-                ctx.lineTo(x, y);
-              });
-              ctx.lineTo(w, h);
-              ctx.fillStyle = "rgba(74, 124, 157, 0.2)"; // Blue tint #4A7C9D
-              ctx.fill();
-
-              // Stroke Main
-              ctx.beginPath();
-              dataPoints.forEach((p, i) => {
-                const x = (i / (dataPoints.length - 1)) * w;
-                const y = h - (p / 100) * h;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-              });
-              ctx.strokeStyle = "#4A7C9D"; // Blue
-              ctx.lineWidth = 2;
-              ctx.stroke();
-
-              // Draw Error Rate (Dashed)
-              ctx.beginPath();
-              ctx.setLineDash([5, 5]);
-              errorPoints.forEach((p, i) => {
-                const x = (i / (errorPoints.length - 1)) * w;
-                const y = h - (p / 100) * h; // Scale differently realistically, but for viz ok
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-              });
-              ctx.strokeStyle = "#4A7C9D";
-              ctx.lineWidth = 1;
-              ctx.stroke();
-              ctx.setLineDash([]);
-            }
-
-            // Update KPIs
-            if (kpiReq && Math.random() > 0.7)
-              kpiReq.innerText = (2.4 + Math.random() * 0.2).toFixed(1) + "k";
-            if (logContainer && Math.random() > 0.9) {
-              const log = logs[Math.floor(Math.random() * logs.length)];
-              const div = document.createElement("div");
-              div.innerText = log;
-              logContainer.prepend(div);
-              if (logContainer.children.length > 5)
-                logContainer.lastChild.remove();
-            }
-          }, 1000));
-        }
+        // Launchpad — implemented in src/launchpad.ts
+        // Monitor (system dashboard) — implemented in src/monitor.ts
 
         // Initial site Launch - start with clean desktop
         // (Windows can be opened from the dock)
       });
 
-// register service worker for pwa
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('[SW] Registration successful, scope:', registration.scope);
-      })
-      .catch((error) => {
-        console.error('[SW] Registration failed:', error);
-      });
-  });
-}
+registerServiceWorker();

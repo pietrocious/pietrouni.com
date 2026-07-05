@@ -24,6 +24,8 @@
     "vitest": "^4.0.16"
   },
   "dependencies": {
+    "@types/dompurify": "^3.0.5",
+    "dompurify": "^3.4.2",
     "marked": "^17.0.1",
     "three": "^0.134.0",
     "vanta": "^0.5.24"
