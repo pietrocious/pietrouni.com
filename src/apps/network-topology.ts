@@ -63,8 +63,15 @@ const LINK_COLORS: Record<string, string> = {
   unknown: '#6b7280',
 };
 
+// ============ HTML Escaping ============
+function escapeHtml(value: unknown): string {
+  return String(value).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!
+  ));
+}
+
 // ============ Sample Templates ============
-const SAMPLE_LLDP = `# LLDP Neighbors - Core Switch
+const SAMPLE_LLDP = `# LLDP Neighbors - CORE-SW-01
 Device ID           Local Intf     Hold-time  Capability      Port ID
 CORE-RTR-01         Gi0/1          120        R               Gi0/0
 DIST-SW-01          Gi0/2          120        B               Gi1/0/24
@@ -74,7 +81,7 @@ ACCESS-SW-02        Gi0/5          120        B               Gi1/0/1
 FW-01               Gi0/6          120        R               eth0
 WLC-01              Gi0/7          120        R               Gi0/0/0
 
-# LLDP Neighbors - Distribution Switch 01
+# LLDP Neighbors - DIST-SW-01
 Device ID           Local Intf     Hold-time  Capability      Port ID
 CORE-SW-01          Gi1/0/24       120        B               Gi0/2
 ACCESS-SW-03        Gi1/0/1        120        B               Gi1/0/48
@@ -135,7 +142,9 @@ function detectDeviceType(capabilities: string, platform: string, name: string):
   
   if (capLower.includes('router') || platLower.includes('isr') || nameLower.includes('rtr')) return 'router';
   if (platLower.includes('asa') || nameLower.includes('fw') || nameLower.includes('firewall')) return 'firewall';
-  if (platLower.includes('air') || platLower.includes('wlc') || nameLower.includes('wlc') || nameLower.includes('ap')) return 'wireless';
+  // Match "ap" only as its own hostname segment (AP-01, floor2-ap) so names
+  // like "api-server" don't classify as wireless
+  if (platLower.includes('air') || platLower.includes('wlc') || nameLower.includes('wlc') || /(^|-)ap(\d|-|$)/.test(nameLower)) return 'wireless';
   if (capLower.includes('switch') || capLower === 'b' || platLower.includes('ws-c') || nameLower.includes('sw')) return 'switch';
   if (capLower === 's' || platLower.includes('server') || nameLower.includes('server') || nameLower.includes('srv')) return 'server';
   return 'unknown';
@@ -149,10 +158,12 @@ function parseLLDP(data: string): ParsedTopology {
   
   let currentLocalDevice = 'LOCAL-DEVICE';
   const lines = data.split('\n');
-  
+  const seenLinks = new Set<string>();
+
   for (const line of lines) {
-    // Check for local device header comments
-    const headerMatch = line.match(/^#.*?[:-]\s*(.+?)(?:\s+Switch|\s+Router)?$/i);
+    // Check for local device header comments; capture the full device name
+    // after a spaced separator, e.g. "# LLDP Neighbors - CORE-SW-01"
+    const headerMatch = line.match(/^#\s*(?:.*?\s[-:]\s+)?(\S.*)$/);
     if (headerMatch) {
       currentLocalDevice = headerMatch[1].trim().replace(/\s+/g, '-').toUpperCase();
       if (!deviceMap.has(currentLocalDevice)) {
@@ -185,15 +196,27 @@ function parseLLDP(data: string): ParsedTopology {
           x: 0, y: 0, vx: 0, vy: 0,
         });
       }
-      
-      // Add link
-      links.push({
-        source: currentLocalDevice,
-        target: deviceId,
-        sourcePort: localIntf,
-        targetPort: portId || 'unknown',
-        type: 'trunk',
-      });
+
+      // Infer link type from the neighbour's capability code
+      const capUpper = capability.toUpperCase();
+      const linkType: NetworkLink['type'] =
+        capUpper.includes('R') ? 'routed' :
+        capUpper.includes('S') || capUpper.includes('H') ? 'access' : 'trunk';
+
+      // Skip the reverse entry of a link we already have (both ends of a
+      // cable report each other in multi-device dumps)
+      const key = `${currentLocalDevice}|${localIntf}|${deviceId}|${portId}`;
+      const reverseKey = `${deviceId}|${portId}|${currentLocalDevice}|${localIntf}`;
+      if (!seenLinks.has(key) && !seenLinks.has(reverseKey)) {
+        seenLinks.add(key);
+        links.push({
+          source: currentLocalDevice,
+          target: deviceId,
+          sourcePort: localIntf,
+          targetPort: portId || 'unknown',
+          type: linkType,
+        });
+      }
     }
   }
   
@@ -347,14 +370,14 @@ function parseRouting(data: string): ParsedTopology {
   return { devices, links, format: 'routing', errors };
 }
 
-function detectFormat(data: string): 'lldp' | 'cdp' | 'routing' | 'unknown' {
+export function detectFormat(data: string): 'lldp' | 'cdp' | 'routing' | 'unknown' {
   if (data.includes('Device ID:') && data.includes('Platform:')) return 'cdp';
   if (data.match(/Device ID\s+Local Intf/i) || data.includes('LLDP')) return 'lldp';
   if (data.match(/^[CSORB]\s+\d+\.\d+\.\d+\.\d+/m) || data.includes('Gateway of last resort')) return 'routing';
   return 'unknown';
 }
 
-function parseTopology(data: string): ParsedTopology {
+export function parseTopology(data: string): ParsedTopology {
   const format = detectFormat(data);
   switch (format) {
     case 'lldp': return parseLLDP(data);
@@ -406,6 +429,16 @@ export class NetworkTopologyVisualizer {
   private pinchStartZoom = 1;
   private lineDashOffset = 0;
   private reducedMotion = false;
+  private motionQuery: MediaQueryList | null = null;
+  private motionHandler: ((e: MediaQueryListEvent) => void) | null = null;
+
+  // Minimap hit area (screen space), refreshed each frame it is drawn
+  private minimapRect: { x: number; y: number; size: number; pad: number; minX: number; minY: number; scale: number } | null = null;
+  private isMinimapDrag = false;
+
+  // True once the pointer moved while dragging/panning, so the click that
+  // follows mouseup doesn't change the selection.
+  private didMove = false;
 
   constructor(container: HTMLElement) {
     this.canvas = container.querySelector('#netmap-canvas') as HTMLCanvasElement;
@@ -435,6 +468,7 @@ export class NetworkTopologyVisualizer {
       routing: () => this.loadTemplate('routing'),
       export: () => this.exportPNG(),
       fit: () => this.fitToView(),
+      zoomreset: () => this.resetZoom(),
       keydown: this.handleKeyDown.bind(this),
     };
 
@@ -446,6 +480,7 @@ export class NetworkTopologyVisualizer {
     // Toolbar buttons
     container.querySelector('#netmap-export')?.addEventListener('click', this.handlers.export);
     container.querySelector('#netmap-fit')?.addEventListener('click', this.handlers.fit);
+    this.zoomEl?.addEventListener('click', this.handlers.zoomreset);
 
     // Code input
     this.textarea.addEventListener('input', this.handlers.input);
@@ -467,10 +502,10 @@ export class NetworkTopologyVisualizer {
     window.addEventListener('keydown', this.handlers.keydown);
 
     // Reduced motion
-    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
-      this.reducedMotion = e.matches;
-    });
+    this.motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this.reducedMotion = this.motionQuery.matches;
+    this.motionHandler = (e) => { this.reducedMotion = e.matches; };
+    this.motionQuery.addEventListener('change', this.motionHandler);
 
     // Responsive Canvas
     this.resizeObserver = new ResizeObserver(() => this.resize());
@@ -493,10 +528,11 @@ export class NetworkTopologyVisualizer {
     this.canvas.style.width = `${rect.width}px`;
     this.canvas.style.height = `${rect.height}px`;
 
+    // Assigning width/height resets the transform to identity; render()
+    // applies the DPR scale explicitly, so no persistent scale here.
     this.canvas.width = rect.width * dpr;
     this.canvas.height = rect.height * dpr;
 
-    this.ctx.scale(dpr, dpr);
     this.render();
   }
 
@@ -579,6 +615,13 @@ export class NetworkTopologyVisualizer {
       const scale = dist / this.pinchStartDist;
       
       const newZoom = Math.max(0.2, Math.min(4, this.pinchStartZoom * scale));
+
+      // Zoom towards the pinch midpoint
+      const rect = this.canvas.getBoundingClientRect();
+      const mx = (t1.clientX + t2.clientX) / 2 - rect.left;
+      const my = (t1.clientY + t2.clientY) / 2 - rect.top;
+      this.panX = mx - (mx - this.panX) * (newZoom / this.zoomLevel);
+      this.panY = my - (my - this.panY) * (newZoom / this.zoomLevel);
       this.zoomLevel = newZoom;
       if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
     }
@@ -593,13 +636,37 @@ export class NetworkTopologyVisualizer {
   }
   
   private handleKeyDown(e: KeyboardEvent): void {
+    const active = document.activeElement;
+    const isTyping = active instanceof HTMLInputElement ||
+      active instanceof HTMLTextAreaElement ||
+      (active instanceof HTMLElement && active.isContentEditable);
+
     if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
       e.preventDefault();
       this.exportPNG();
     }
-    if (e.key === 'f' && !e.ctrlKey && !e.metaKey && document.activeElement !== this.textarea) {
+    if (isTyping) return;
+    if (e.key === 'f' && !e.ctrlKey && !e.metaKey) {
       this.fitToView();
     }
+    if (e.key === '0' && !e.ctrlKey && !e.metaKey) {
+      this.resetZoom();
+    }
+    if (e.key === 'Escape' && this.selectedDevice) {
+      this.selectedDevice = null;
+      this.updateDetails();
+    }
+  }
+
+  private resetZoom(): void {
+    // Return to 100% while keeping the canvas centre fixed
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const cx = this.canvas.width / dpr / 2;
+    const cy = this.canvas.height / dpr / 2;
+    this.panX = cx - (cx - this.panX) / this.zoomLevel;
+    this.panY = cy - (cy - this.panY) / this.zoomLevel;
+    this.zoomLevel = 1;
+    if (this.zoomEl) this.zoomEl.textContent = '100%';
   }
 
   private fitToView(): void {
@@ -645,6 +712,10 @@ export class NetworkTopologyVisualizer {
       case 'routing': this.textarea.value = SAMPLE_ROUTING; break;
     }
     this.selectedDevice = null;
+    this.hoveredDevice = null;
+    // Force a fresh layout for the new template (no position carry-over)
+    this.devices = [];
+    this.deviceMap.clear();
     this.parseAndRender();
     if (isSoundEnabled()) playClick();
   }
@@ -652,6 +723,7 @@ export class NetworkTopologyVisualizer {
   private parseAndRender(): void {
     const data = this.textarea.value;
     const parsed = parseTopology(data);
+    const previous = this.deviceMap;
     this.format = parsed.format;
     this.devices = parsed.devices;
     this.links = parsed.links;
@@ -673,22 +745,36 @@ export class NetworkTopologyVisualizer {
       this.errorEl.classList.add('hidden');
     }
 
-    // Initialize device positions in a circle
+    // Keep positions of devices that survive the re-parse so live edits
+    // don't scatter the layout; only new devices enter on the circle.
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const width = this.canvas.width / dpr;
     const height = this.canvas.height / dpr;
     const centerX = width / 2;
     const centerY = height / 2;
-    
+
     this.devices.forEach((device, i) => {
-      const angle = (i / this.devices.length) * Math.PI * 2;
-      const radius = 120 + Math.random() * 60;
-      device.x = centerX + Math.cos(angle) * radius;
-      device.y = centerY + Math.sin(angle) * radius;
-      device.scale = 0; // Start invisible
+      const prev = previous.get(device.id);
+      if (prev) {
+        device.x = prev.x;
+        device.y = prev.y;
+        device.vx = prev.vx;
+        device.vy = prev.vy;
+        device.scale = prev.scale ?? 1;
+      } else {
+        const angle = (i / this.devices.length) * Math.PI * 2;
+        const radius = 120 + Math.random() * 60;
+        device.x = centerX + Math.cos(angle) * radius;
+        device.y = centerY + Math.sin(angle) * radius;
+        device.scale = 0; // Start invisible
+      }
     });
 
     this.deviceMap = new Map(this.devices.map(d => [d.id, d]));
+
+    // Re-point selection/hover at the fresh device objects
+    this.selectedDevice = this.selectedDevice ? this.deviceMap.get(this.selectedDevice.id) ?? null : null;
+    this.hoveredDevice = this.hoveredDevice ? this.deviceMap.get(this.hoveredDevice.id) ?? null : null;
     this.updateDetails();
   }
 
@@ -808,36 +894,54 @@ export class NetworkTopologyVisualizer {
       ctx.beginPath(); ctx.moveTo(worldX0, y); ctx.lineTo(worldX1, y); ctx.stroke();
     }
 
+    // Focus mode: when a device is selected (or hovered), spotlight it and
+    // its direct neighbours by dimming everything else.
+    const focus = this.selectedDevice || this.hoveredDevice;
+    let focusIds: Set<string> | null = null;
+    if (focus) {
+      focusIds = new Set([focus.id]);
+      for (const link of this.links) {
+        if (link.source === focus.id) focusIds.add(link.target);
+        if (link.target === focus.id) focusIds.add(link.source);
+      }
+    }
+
     // Links
     if (!reducedMotion) this.lineDashOffset = (this.lineDashOffset - 0.2) % 100;
     ctx.lineDashOffset = this.lineDashOffset;
     ctx.lineWidth = 2 / this.zoomLevel;
+    // Port labels get unreadable and cluttered when zoomed out
+    const showPortLabels = this.zoomLevel >= 0.6;
     for (const link of this.links) {
       const source = this.deviceMap.get(link.source);
       const target = this.deviceMap.get(link.target);
       if (source && target) {
         const color = LINK_COLORS[link.type] || LINK_COLORS.unknown;
+        ctx.globalAlpha = !focus || link.source === focus.id || link.target === focus.id ? 1 : 0.12;
         ctx.strokeStyle = color + '80';
         ctx.setLineDash([6, 4]);
         ctx.beginPath();
         ctx.moveTo(source.x, source.y);
         ctx.lineTo(target.x, target.y);
         ctx.stroke();
-        
-        ctx.save();
-        ctx.setLineDash([]);
-        ctx.lineDashOffset = 0;
 
-        // Midpoint label for ports
-        const midX = (source.x + target.x) / 2;
-        const midY = (source.y + target.y) / 2;
-        ctx.fillStyle = color;
-        ctx.font = '9px system-ui';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${link.sourcePort}↔${link.targetPort}`, midX, midY - 5);
-        ctx.restore();
+        if (showPortLabels) {
+          ctx.save();
+          ctx.setLineDash([]);
+          ctx.lineDashOffset = 0;
+
+          // Midpoint label for ports
+          const midX = (source.x + target.x) / 2;
+          const midY = (source.y + target.y) / 2;
+          ctx.fillStyle = color;
+          ctx.font = '9px system-ui';
+          ctx.textAlign = 'center';
+          ctx.fillText(`${link.sourcePort}↔${link.targetPort}`, midX, midY - 5);
+          ctx.restore();
+        }
       }
     }
+    ctx.globalAlpha = 1;
     ctx.setLineDash([]);
     ctx.lineDashOffset = 0;
 
@@ -849,10 +953,11 @@ export class NetworkTopologyVisualizer {
       const nodeWidth = 100;
       const nodeHeight = 50;
       const scale = device.scale || 0;
-      
+
       if (scale < 0.01) continue;
 
       ctx.save();
+      ctx.globalAlpha = !focusIds || focusIds.has(device.id) ? 1 : 0.25;
       ctx.translate(device.x, device.y);
       ctx.scale(scale, scale);
 
@@ -904,32 +1009,36 @@ export class NetworkTopologyVisualizer {
       const screenY = this.hoveredDevice.y * this.zoomLevel + this.panY;
       
       const text = `${this.hoveredDevice.type.toUpperCase()}: ${this.hoveredDevice.name}`;
-      
+
       ctx.font = '12px system-ui';
       const metrics = ctx.measureText(text);
       const padding = 8;
       const boxW = metrics.width + padding * 2;
       const boxH = 26;
-      
-      const boxX = screenX - boxW / 2;
-      const boxY = screenY - 45; // Above device
-      
+
+      // Clamp inside the canvas, flipping below the device if there is no room above
+      let boxX = screenX - boxW / 2;
+      let boxY = screenY - 45;
+      boxX = Math.max(4, Math.min(width - boxW - 4, boxX));
+      if (boxY < 4) boxY = screenY + 40;
+      boxY = Math.max(4, Math.min(height - boxH - 4, boxY));
+
       ctx.shadowColor = 'rgba(0,0,0,0.5)';
       ctx.shadowBlur = 10;
       ctx.fillStyle = '#1e293b';
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 1;
-      
+
       ctx.beginPath();
       ctx.roundRect(boxX, boxY, boxW, boxH, 4);
       ctx.fill();
       ctx.stroke();
-      
+
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#e2e8f0';
       ctx.textAlign = 'center';
-      ctx.fillText(text, screenX, boxY + 17);
-      
+      ctx.fillText(text, boxX + boxW / 2, boxY + 17);
+
       ctx.restore();
     }
 
@@ -939,12 +1048,15 @@ export class NetworkTopologyVisualizer {
 
     // Empty state
     if (this.devices.length === 0) {
+      ctx.save();
+      ctx.scale(dpr, dpr);
       ctx.fillStyle = '#64748b';
       ctx.font = '16px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText('No network topology to visualize', width / 2, height / 2);
       ctx.font = '12px system-ui';
       ctx.fillText('Paste LLDP, CDP, or routing table output', width / 2, height / 2 + 20);
+      ctx.restore();
     }
   }
 
@@ -1028,7 +1140,10 @@ export class NetworkTopologyVisualizer {
   }
 
   private drawMinimap(): void {
-    if (this.devices.length < 5) return;
+    if (this.devices.length < 5) {
+      this.minimapRect = null;
+      return;
+    }
     const ctx = this.ctx;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const cssW = this.canvas.width / dpr;
@@ -1048,6 +1163,9 @@ export class NetworkTopologyVisualizer {
     const graphW = (maxX - minX) || 1;
     const graphH = (maxY - minY) || 1;
     const scale = Math.min((mapSize - mapPad * 2) / graphW, (mapSize - mapPad * 2) / graphH);
+
+    // Remember geometry so mouse handlers can hit-test the minimap
+    this.minimapRect = { x: mapX, y: mapY, size: mapSize, pad: mapPad, minX, minY, scale };
 
     ctx.save();
     ctx.scale(dpr, dpr);
@@ -1088,14 +1206,19 @@ export class NetworkTopologyVisualizer {
       ctx.fill();
     }
 
-    // Viewport rectangle
+    // Viewport rectangle (clipped so it never spills outside the minimap)
     const vpX = (-this.panX / this.zoomLevel - minX) * scale + mapX + mapPad;
     const vpY = (-this.panY / this.zoomLevel - minY) * scale + mapY + mapPad;
     const vpW = (cssW / this.zoomLevel) * scale;
     const vpH = (cssH / this.zoomLevel) * scale;
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(mapX, mapY, mapSize, mapSize, 6);
+    ctx.clip();
     ctx.strokeStyle = '#ffffff40';
     ctx.lineWidth = 1;
     ctx.strokeRect(vpX, vpY, vpW, vpH);
+    ctx.restore();
 
     ctx.restore();
   }
@@ -1108,10 +1231,34 @@ export class NetworkTopologyVisualizer {
     return null;
   }
 
+  private isInMinimap(sx: number, sy: number): boolean {
+    const m = this.minimapRect;
+    return !!m && sx >= m.x && sx <= m.x + m.size && sy >= m.y && sy <= m.y + m.size;
+  }
+
+  private navigateMinimap(sx: number, sy: number): void {
+    const m = this.minimapRect;
+    if (!m) return;
+    // Centre the viewport on the clicked world position
+    const wx = (sx - m.x - m.pad) / m.scale + m.minX;
+    const wy = (sy - m.y - m.pad) / m.scale + m.minY;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.panX = this.canvas.width / dpr / 2 - wx * this.zoomLevel;
+    this.panY = this.canvas.height / dpr / 2 - wy * this.zoomLevel;
+  }
+
   private handleMouseDown(e: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
+    this.didMove = false;
+
+    if (this.isInMinimap(sx, sy)) {
+      this.isMinimapDrag = true;
+      this.navigateMinimap(sx, sy);
+      return;
+    }
+
     const { x, y } = this.screenToWorld(sx, sy);
     const device = this.getDeviceAt(x, y);
 
@@ -1133,7 +1280,15 @@ export class NetworkTopologyVisualizer {
     const rect = this.canvas.getBoundingClientRect();
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
+
+    if (this.isMinimapDrag) {
+      this.didMove = true;
+      this.navigateMinimap(sx, sy);
+      return;
+    }
+
     const { x, y } = this.screenToWorld(sx, sy);
+    if (this.isDragging || this.isPanning) this.didMove = true;
 
     if (this.isDragging && this.dragDevice) {
       this.dragDevice.x = x - this.dragOffsetX;
@@ -1143,6 +1298,9 @@ export class NetworkTopologyVisualizer {
     } else if (this.isPanning) {
       this.panX = sx - this.panStartX;
       this.panY = sy - this.panStartY;
+    } else if (this.isInMinimap(sx, sy)) {
+      this.hoveredDevice = null;
+      this.canvas.style.cursor = 'pointer';
     } else {
       this.hoveredDevice = this.getDeviceAt(x, y);
       this.canvas.style.cursor = this.hoveredDevice ? 'grab' : 'default';
@@ -1153,14 +1311,16 @@ export class NetworkTopologyVisualizer {
     this.isDragging = false;
     this.dragDevice = null;
     this.isPanning = false;
+    this.isMinimapDrag = false;
     this.canvas.style.cursor = 'default';
   }
 
   private handleClick(e: MouseEvent): void {
-    if (this.isDragging || this.isPanning) return;
+    if (this.didMove) return;
     const rect = this.canvas.getBoundingClientRect();
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
+    if (this.isInMinimap(sx, sy)) return;
     const { x, y } = this.screenToWorld(sx, sy);
     this.selectedDevice = this.getDeviceAt(x, y);
     this.updateDetails();
@@ -1184,25 +1344,25 @@ export class NetworkTopologyVisualizer {
          <div class="text-xs opacity-70 mt-1">${connections.map(c => {
            const other = c.source === device.id ? c.target : c.source;
            const port = c.source === device.id ? c.sourcePort : c.targetPort;
-           return `${port} → ${other}`;
+           return `${escapeHtml(port)} → ${escapeHtml(other)}`;
          }).join('<br>')}</div></div>`
       : '';
 
     const platformHtml = device.platform
       ? `<div class="mt-2"><div class="text-xs uppercase font-bold opacity-50">Platform</div>
-         <div class="text-xs opacity-70 mt-1">${device.platform}</div></div>`
+         <div class="text-xs opacity-70 mt-1">${escapeHtml(device.platform)}</div></div>`
       : '';
 
     this.detailsEl.innerHTML = `
       <div class="mb-2">
         <div class="text-xs uppercase font-bold opacity-50">Device</div>
-        <div class="font-bold" style="color: ${colors.text}">${colors.icon} ${device.name}</div>
+        <div class="font-bold" style="color: ${colors.text}">${colors.icon} ${escapeHtml(device.name)}</div>
       </div>
       <div class="mb-2">
         <div class="text-xs uppercase font-bold opacity-50">Type</div>
-        <div class="capitalize">${device.type}</div>
+        <div class="capitalize">${escapeHtml(device.type)}</div>
       </div>
-      ${device.ip ? `<div class="mb-2"><div class="text-xs uppercase font-bold opacity-50">IP Address</div><div class="font-mono text-xs">${device.ip}</div></div>` : ''}
+      ${device.ip ? `<div class="mb-2"><div class="text-xs uppercase font-bold opacity-50">IP Address</div><div class="font-mono text-xs">${escapeHtml(device.ip)}</div></div>` : ''}
       ${platformHtml}${connectionsHtml}
     `;
   }
@@ -1210,6 +1370,9 @@ export class NetworkTopologyVisualizer {
   destroy(): void {
     if (this.animationId) cancelAnimationFrame(this.animationId);
     if (this.resizeObserver) this.resizeObserver.disconnect();
+    if (this.motionQuery && this.motionHandler) {
+      this.motionQuery.removeEventListener('change', this.motionHandler);
+    }
 
     // Remove event listeners
     const container = this.canvas.parentElement?.parentElement;
@@ -1220,6 +1383,7 @@ export class NetworkTopologyVisualizer {
       container.querySelector('#netmap-export')?.removeEventListener('click', this.handlers.export);
       container.querySelector('#netmap-fit')?.removeEventListener('click', this.handlers.fit);
     }
+    this.zoomEl?.removeEventListener('click', this.handlers.zoomreset);
     
     this.textarea.removeEventListener('input', this.handlers.input);
 

@@ -54,7 +54,21 @@ const RESOURCE_DOCS: Record<string, { url: string; description: string }> = {
   'ConfigMap': { url: 'https://kubernetes.io/docs/concepts/configuration/configmap/', description: 'A ConfigMap stores non-confidential configuration data.' },
   'Secret': { url: 'https://kubernetes.io/docs/concepts/configuration/secret/', description: 'A Secret stores sensitive data like passwords or tokens.' },
   'PersistentVolumeClaim': { url: 'https://kubernetes.io/docs/concepts/storage/persistent-volumes/', description: 'A PVC is a request for storage by a user.' },
+  'aws_nat_gateway': { url: 'https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway', description: 'A NAT gateway lets private subnets reach the internet without inbound exposure.' },
+  'aws_route_table': { url: 'https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table', description: 'A route table controls where network traffic from your subnets is directed.' },
+  'aws_lambda_function': { url: 'https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function', description: 'Lambda runs code without provisioning or managing servers.' },
+  'aws_dynamodb_table': { url: 'https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/dynamodb_table', description: 'DynamoDB is a fully managed serverless NoSQL key-value database.' },
+  'aws_db_instance': { url: 'https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance', description: 'An RDS instance is a managed relational database in the cloud.' },
+  'StatefulSet': { url: 'https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/', description: 'A StatefulSet manages Pods with stable identities and persistent storage.' },
+  'DaemonSet': { url: 'https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/', description: 'A DaemonSet ensures a copy of a Pod runs on every node.' },
 };
+
+// ============ HTML Escaping ============
+function escapeHtml(value: unknown): string {
+  return String(value).replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!
+  ));
+}
 
 const LEARNING_TIPS: Record<string, string[]> = {
   compute: ['Consider auto-scaling for variable traffic', 'Right-size instances to optimize costs'],
@@ -210,7 +224,8 @@ function getNodeType(resourceType: string): IaCNode['type'] {
   const typeMap: Record<string, IaCNode['type']> = {
     'aws_instance': 'compute', 'aws_ec2_instance': 'compute', 'aws_lambda_function': 'compute',
     'aws_ecs_service': 'compute', 'aws_ecs_cluster': 'compute',
-    'aws_s3_bucket': 'storage', 'aws_ebs_volume': 'storage', 'aws_rds_instance': 'storage', 'aws_dynamodb_table': 'storage',
+    'aws_s3_bucket': 'storage', 'aws_ebs_volume': 'storage', 'aws_rds_instance': 'storage',
+    'aws_db_instance': 'storage', 'aws_dynamodb_table': 'storage',
     'aws_vpc': 'network', 'aws_subnet': 'network', 'aws_security_group': 'network',
     'aws_internet_gateway': 'network', 'aws_nat_gateway': 'network', 'aws_route_table': 'network',
     'aws_lb': 'network', 'aws_alb': 'network', 'aws_elb': 'network',
@@ -341,7 +356,7 @@ function parseKubernetes(code: string): ParsedIaC {
   return { nodes, format: 'kubernetes', errors };
 }
 
-function detectFormat(code: string): 'terraform' | 'kubernetes' | 'unknown' {
+export function detectFormat(code: string): 'terraform' | 'kubernetes' | 'unknown' {
   const tfPatterns = [/resource\s+"/, /provider\s+"/, /variable\s+"/, /data\s+"/];
   const k8sPatterns = [/apiVersion:/, /kind:/, /metadata:/, /spec:/];
   const tfScore = tfPatterns.filter(p => p.test(code)).length;
@@ -351,7 +366,7 @@ function detectFormat(code: string): 'terraform' | 'kubernetes' | 'unknown' {
   return 'unknown';
 }
 
-function parseIaC(code: string): ParsedIaC {
+export function parseIaC(code: string): ParsedIaC {
   const format = detectFormat(code);
   if (format === 'terraform') return parseTerraform(code);
   if (format === 'kubernetes') return parseKubernetes(code);
@@ -399,6 +414,16 @@ export class IaCVisualizer {
   private pinchStartZoom = 1;
   private lineDashOffset = 0;
   private reducedMotion = false;
+  private motionQuery: MediaQueryList | null = null;
+  private motionHandler: ((e: MediaQueryListEvent) => void) | null = null;
+
+  // Minimap hit area (screen space), refreshed each frame it is drawn
+  private minimapRect: { x: number; y: number; size: number; pad: number; minX: number; minY: number; scale: number } | null = null;
+  private isMinimapDrag = false;
+
+  // True once the pointer moved while dragging/panning, so the click that
+  // follows mouseup doesn't change the selection.
+  private didMove = false;
 
   constructor(container: HTMLElement) {
     this.canvas = container.querySelector('#iac-canvas') as HTMLCanvasElement;
@@ -428,6 +453,7 @@ export class IaCVisualizer {
       microservices: () => this.loadTemplate('microservices'),
       export: () => this.exportPNG(),
       fit: () => this.fitToView(),
+      zoomreset: () => this.resetZoom(),
       keydown: this.handleKeyDown.bind(this),
     };
 
@@ -439,6 +465,7 @@ export class IaCVisualizer {
     // Toolbar buttons
     container.querySelector('#iac-export')?.addEventListener('click', this.handlers.export);
     container.querySelector('#iac-fit')?.addEventListener('click', this.handlers.fit);
+    this.zoomEl?.addEventListener('click', this.handlers.zoomreset);
 
     // Code input
     this.textarea.addEventListener('input', this.handlers.input);
@@ -460,10 +487,10 @@ export class IaCVisualizer {
     window.addEventListener('keydown', this.handlers.keydown);
 
     // Reduced motion
-    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
-      this.reducedMotion = e.matches;
-    });
+    this.motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this.reducedMotion = this.motionQuery.matches;
+    this.motionHandler = (e) => { this.reducedMotion = e.matches; };
+    this.motionQuery.addEventListener('change', this.motionHandler);
 
     // Responsive Canvas
     this.resizeObserver = new ResizeObserver(() => this.resize());
@@ -482,18 +509,17 @@ export class IaCVisualizer {
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const rect = parent.getBoundingClientRect();
-    
+
     // Set display size (css)
     this.canvas.style.width = `${rect.width}px`;
     this.canvas.style.height = `${rect.height}px`;
 
-    // Set actual size in memory (scaled to account for extra pixel density)
+    // Set actual size in memory (scaled to account for extra pixel density).
+    // Assigning width/height resets the transform to identity; render()
+    // applies the DPR scale explicitly, so no persistent scale here.
     this.canvas.width = rect.width * dpr;
     this.canvas.height = rect.height * dpr;
 
-    // Normalize coordinate system to use css pixels
-    this.ctx.scale(dpr, dpr);
-    
     // Trigger re-render
     this.render();
   }
@@ -509,6 +535,10 @@ export class IaCVisualizer {
       case 'microservices': this.textarea.value = SAMPLE_MICROSERVICES; break;
     }
     this.selectedNode = null;
+    this.hoveredNode = null;
+    // Force a fresh layout for the new template (no position carry-over)
+    this.nodes = [];
+    this.nodeMap.clear();
     this.parseAndRender();
     if (isSoundEnabled()) playClick();
   }
@@ -588,10 +618,15 @@ export class IaCVisualizer {
       const scale = dist / this.pinchStartDist;
       
       const newZoom = Math.max(0.2, Math.min(4, this.pinchStartZoom * scale));
+
+      // Zoom towards the pinch midpoint
+      const rect = this.canvas.getBoundingClientRect();
+      const mx = (t1.clientX + t2.clientX) / 2 - rect.left;
+      const my = (t1.clientY + t2.clientY) / 2 - rect.top;
+      this.panX = mx - (mx - this.panX) * (newZoom / this.zoomLevel);
+      this.panY = my - (my - this.panY) * (newZoom / this.zoomLevel);
       this.zoomLevel = newZoom;
       if (this.zoomEl) this.zoomEl.textContent = `${Math.round(this.zoomLevel * 100)}%`;
-      
-      // Center pan on pinch center? Complicated for now, just zoom in place.
     }
   }
 
@@ -604,13 +639,37 @@ export class IaCVisualizer {
   }
   
   private handleKeyDown(e: KeyboardEvent): void {
+    const active = document.activeElement;
+    const isTyping = active instanceof HTMLInputElement ||
+      active instanceof HTMLTextAreaElement ||
+      (active instanceof HTMLElement && active.isContentEditable);
+
     if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
       e.preventDefault();
       this.exportPNG();
     }
-    if (e.key === 'f' && !e.ctrlKey && !e.metaKey && document.activeElement !== this.textarea) {
+    if (isTyping) return;
+    if (e.key === 'f' && !e.ctrlKey && !e.metaKey) {
       this.fitToView();
     }
+    if (e.key === '0' && !e.ctrlKey && !e.metaKey) {
+      this.resetZoom();
+    }
+    if (e.key === 'Escape' && this.selectedNode) {
+      this.selectedNode = null;
+      this.updateDetails();
+    }
+  }
+
+  private resetZoom(): void {
+    // Return to 100% while keeping the canvas centre fixed
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const cx = this.canvas.width / dpr / 2;
+    const cy = this.canvas.height / dpr / 2;
+    this.panX = cx - (cx - this.panX) / this.zoomLevel;
+    this.panY = cy - (cy - this.panY) / this.zoomLevel;
+    this.zoomLevel = 1;
+    if (this.zoomEl) this.zoomEl.textContent = '100%';
   }
 
   private fitToView(): void {
@@ -667,23 +726,38 @@ export class IaCVisualizer {
       this.errorEl.classList.add('hidden');
     }
 
-    // Initialize node positions in a circle
+    // Keep positions of nodes that survive the re-parse so live edits
+    // don't scatter the layout; only new nodes enter on the circle.
+    const previous = this.nodeMap;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const width = this.canvas.width / dpr;
     const height = this.canvas.height / dpr;
     const centerX = width / 2;
     const centerY = height / 2;
-    
+
     parsed.nodes.forEach((node, i) => {
-      const angle = (i / parsed.nodes.length) * Math.PI * 2;
-      const radius = 100 + Math.random() * 80;
-      node.x = centerX + Math.cos(angle) * radius;
-      node.y = centerY + Math.sin(angle) * radius;
-      node.scale = 0; // Start invisible
+      const prev = previous.get(node.id);
+      if (prev) {
+        node.x = prev.x;
+        node.y = prev.y;
+        node.vx = prev.vx;
+        node.vy = prev.vy;
+        node.scale = prev.scale ?? 1;
+      } else {
+        const angle = (i / parsed.nodes.length) * Math.PI * 2;
+        const radius = 100 + Math.random() * 80;
+        node.x = centerX + Math.cos(angle) * radius;
+        node.y = centerY + Math.sin(angle) * radius;
+        node.scale = 0; // Start invisible
+      }
     });
 
     this.nodes = parsed.nodes;
     this.nodeMap = new Map(this.nodes.map(n => [n.id, n]));
+
+    // Re-point selection/hover at the fresh node objects
+    this.selectedNode = this.selectedNode ? this.nodeMap.get(this.selectedNode.id) ?? null : null;
+    this.hoveredNode = this.hoveredNode ? this.nodeMap.get(this.hoveredNode.id) ?? null : null;
     this.updateDetails();
   }
 
@@ -807,6 +881,17 @@ export class IaCVisualizer {
       ctx.beginPath(); ctx.moveTo(worldX0, y); ctx.lineTo(worldX1, y); ctx.stroke();
     }
 
+    // Focus mode: when a node is selected (or hovered), spotlight it and
+    // its direct neighbours by dimming everything else.
+    const focus = this.selectedNode || this.hoveredNode;
+    let focusIds: Set<string> | null = null;
+    if (focus) {
+      focusIds = new Set([focus.id, ...focus.connections]);
+      for (const n of this.nodes) {
+        if (n.connections.includes(focus.id)) focusIds.add(n.id);
+      }
+    }
+
     // Connections
     if (!reducedMotion) this.lineDashOffset = (this.lineDashOffset - 0.2) % 100;
     ctx.lineDashOffset = this.lineDashOffset;
@@ -816,6 +901,7 @@ export class IaCVisualizer {
         const target = this.nodeMap.get(connId);
         if (target) {
           const colors = NODE_COLORS[node.type] || NODE_COLORS.aws;
+          ctx.globalAlpha = !focus || node === focus || target === focus ? 1 : 0.12;
           ctx.strokeStyle = colors.border + '60';
           ctx.setLineDash([6, 4]);
           ctx.beginPath();
@@ -843,6 +929,7 @@ export class IaCVisualizer {
         }
       }
     }
+    ctx.globalAlpha = 1;
     ctx.setLineDash([]);
     ctx.lineDashOffset = 0;
 
@@ -854,10 +941,11 @@ export class IaCVisualizer {
       const nodeWidth = 120;
       const nodeHeight = 55;
       const scale = node.scale || 0;
-      
+
       if (scale < 0.01) continue;
 
       ctx.save();
+      ctx.globalAlpha = !focusIds || focusIds.has(node.id) ? 1 : 0.25;
       ctx.translate(node.x, node.y);
       ctx.scale(scale, scale);
 
@@ -898,38 +986,42 @@ export class IaCVisualizer {
     if (this.hoveredNode) {
       ctx.save();
       ctx.scale(dpr, dpr);
-      
+
       const screenX = this.hoveredNode.x * this.zoomLevel + this.panX;
       const screenY = this.hoveredNode.y * this.zoomLevel + this.panY;
-      
-      const doc = RESOURCE_DOCS[this.hoveredNode.resourceType] || RESOURCE_DOCS.Deployment;
-      const text = doc ? doc.description : `ID: ${this.hoveredNode.id}`;
-      
+
+      const doc = RESOURCE_DOCS[this.hoveredNode.resourceType];
+      const text = doc ? doc.description : `${this.hoveredNode.resourceType} · ${this.hoveredNode.name}`;
+
       ctx.font = '12px system-ui';
       const metrics = ctx.measureText(text);
       const padding = 8;
       const boxW = metrics.width + padding * 2;
       const boxH = 26;
-      
-      const boxX = screenX - boxW / 2;
-      const boxY = screenY - 45; // Above node
-      
+
+      // Clamp inside the canvas, flipping below the node if there is no room above
+      let boxX = screenX - boxW / 2;
+      let boxY = screenY - 45;
+      boxX = Math.max(4, Math.min(width - boxW - 4, boxX));
+      if (boxY < 4) boxY = screenY + 40;
+      boxY = Math.max(4, Math.min(height - boxH - 4, boxY));
+
       ctx.shadowColor = 'rgba(0,0,0,0.5)';
       ctx.shadowBlur = 10;
       ctx.fillStyle = '#1e293b';
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 1;
-      
+
       ctx.beginPath();
       ctx.roundRect(boxX, boxY, boxW, boxH, 4);
       ctx.fill();
       ctx.stroke();
-      
+
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#e2e8f0';
       ctx.textAlign = 'center';
-      ctx.fillText(text, screenX, boxY + 17);
-      
+      ctx.fillText(text, boxX + boxW / 2, boxY + 17);
+
       ctx.restore();
     }
 
@@ -939,12 +1031,15 @@ export class IaCVisualizer {
 
     // Empty state
     if (this.nodes.length === 0) {
+      ctx.save();
+      ctx.scale(dpr, dpr);
       ctx.fillStyle = '#64748b';
       ctx.font = '16px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText('No infrastructure to visualize', width / 2, height / 2);
       ctx.font = '12px system-ui';
       ctx.fillText('Paste Terraform or Kubernetes YAML', width / 2, height / 2 + 20);
+      ctx.restore();
     }
   }
 
@@ -1000,7 +1095,10 @@ export class IaCVisualizer {
   }
 
   private drawMinimap(): void {
-    if (this.nodes.length < 5) return;
+    if (this.nodes.length < 5) {
+      this.minimapRect = null;
+      return;
+    }
     const ctx = this.ctx;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const cssW = this.canvas.width / dpr;
@@ -1019,6 +1117,9 @@ export class IaCVisualizer {
     const graphW = (maxX - minX) || 1;
     const graphH = (maxY - minY) || 1;
     const scale = Math.min((mapSize - mapPad * 2) / graphW, (mapSize - mapPad * 2) / graphH);
+
+    // Remember geometry so mouse handlers can hit-test the minimap
+    this.minimapRect = { x: mapX, y: mapY, size: mapSize, pad: mapPad, minX, minY, scale };
 
     ctx.save();
     ctx.scale(dpr, dpr);
@@ -1060,15 +1161,20 @@ export class IaCVisualizer {
       ctx.fill();
     }
 
-    // Viewport rectangle
+    // Viewport rectangle (clipped so it never spills outside the minimap)
     const cssH = this.canvas.height / dpr;
     const vpX = (-this.panX / this.zoomLevel - minX) * scale + mapX + mapPad;
     const vpY = (-this.panY / this.zoomLevel - minY) * scale + mapY + mapPad;
     const vpW = (cssW / this.zoomLevel) * scale;
     const vpH = (cssH / this.zoomLevel) * scale;
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(mapX, mapY, mapSize, mapSize, 6);
+    ctx.clip();
     ctx.strokeStyle = '#ffffff40';
     ctx.lineWidth = 1;
     ctx.strokeRect(vpX, vpY, vpW, vpH);
+    ctx.restore();
 
     ctx.restore();
   }
@@ -1081,10 +1187,34 @@ export class IaCVisualizer {
     return null;
   }
 
+  private isInMinimap(sx: number, sy: number): boolean {
+    const m = this.minimapRect;
+    return !!m && sx >= m.x && sx <= m.x + m.size && sy >= m.y && sy <= m.y + m.size;
+  }
+
+  private navigateMinimap(sx: number, sy: number): void {
+    const m = this.minimapRect;
+    if (!m) return;
+    // Centre the viewport on the clicked world position
+    const wx = (sx - m.x - m.pad) / m.scale + m.minX;
+    const wy = (sy - m.y - m.pad) / m.scale + m.minY;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.panX = this.canvas.width / dpr / 2 - wx * this.zoomLevel;
+    this.panY = this.canvas.height / dpr / 2 - wy * this.zoomLevel;
+  }
+
   private handleMouseDown(e: MouseEvent): void {
     const rect = this.canvas.getBoundingClientRect();
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
+    this.didMove = false;
+
+    if (this.isInMinimap(sx, sy)) {
+      this.isMinimapDrag = true;
+      this.navigateMinimap(sx, sy);
+      return;
+    }
+
     const { x, y } = this.screenToWorld(sx, sy);
     const node = this.getNodeAt(x, y);
 
@@ -1106,7 +1236,15 @@ export class IaCVisualizer {
     const rect = this.canvas.getBoundingClientRect();
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
+
+    if (this.isMinimapDrag) {
+      this.didMove = true;
+      this.navigateMinimap(sx, sy);
+      return;
+    }
+
     const { x, y } = this.screenToWorld(sx, sy);
+    if (this.isDragging || this.isPanning) this.didMove = true;
 
     if (this.isDragging && this.dragNode) {
       this.dragNode.x = x - this.dragOffsetX;
@@ -1116,6 +1254,9 @@ export class IaCVisualizer {
     } else if (this.isPanning) {
       this.panX = sx - this.panStartX;
       this.panY = sy - this.panStartY;
+    } else if (this.isInMinimap(sx, sy)) {
+      this.hoveredNode = null;
+      this.canvas.style.cursor = 'pointer';
     } else {
       this.hoveredNode = this.getNodeAt(x, y);
       this.canvas.style.cursor = this.hoveredNode ? 'grab' : 'default';
@@ -1126,14 +1267,16 @@ export class IaCVisualizer {
     this.isDragging = false;
     this.dragNode = null;
     this.isPanning = false;
+    this.isMinimapDrag = false;
     this.canvas.style.cursor = 'default';
   }
 
   private handleClick(e: MouseEvent): void {
-    if (this.isDragging || this.isPanning) return;
+    if (this.didMove) return;
     const rect = this.canvas.getBoundingClientRect();
     const sx = e.clientX - rect.left;
     const sy = e.clientY - rect.top;
+    if (this.isInMinimap(sx, sy)) return;
     const { x, y } = this.screenToWorld(sx, sy);
     this.selectedNode = this.getNodeAt(x, y);
     this.updateDetails();
@@ -1153,12 +1296,12 @@ export class IaCVisualizer {
 
     const propsHtml = Object.keys(node.properties).length > 0
       ? `<div class="mt-2"><div class="text-xs uppercase font-bold opacity-50">Properties</div>
-         <div class="text-xs opacity-70 mt-1">${Object.entries(node.properties).map(([k, v]) => `${k}: ${v}`).join('<br>')}</div></div>`
+         <div class="text-xs opacity-70 mt-1">${Object.entries(node.properties).map(([k, v]) => `${escapeHtml(k)}: ${escapeHtml(v)}`).join('<br>')}</div></div>`
       : '';
 
     const connsHtml = node.connections.length > 0
       ? `<div class="mt-2"><div class="text-xs uppercase font-bold opacity-50">Connections</div>
-         <div class="text-xs opacity-70 mt-1">${node.connections.map(c => `→ ${c}`).join('<br>')}</div></div>`
+         <div class="text-xs opacity-70 mt-1">${node.connections.map(c => `→ ${escapeHtml(c)}`).join('<br>')}</div></div>`
       : '';
 
     const docHtml = doc
@@ -1175,15 +1318,15 @@ export class IaCVisualizer {
     this.detailsEl.innerHTML = `
       <div class="mb-2">
         <div class="text-xs uppercase font-bold opacity-50">Resource</div>
-        <div class="font-bold" style="color: ${colors.text}">${node.resourceType}</div>
+        <div class="font-bold" style="color: ${colors.text}">${escapeHtml(node.resourceType)}</div>
       </div>
       <div class="mb-2">
         <div class="text-xs uppercase font-bold opacity-50">Name</div>
-        <div>${node.name}</div>
+        <div>${escapeHtml(node.name)}</div>
       </div>
       <div class="mb-2">
         <div class="text-xs uppercase font-bold opacity-50">ID</div>
-        <div class="text-xs font-mono opacity-70">${node.id}</div>
+        <div class="text-xs font-mono opacity-70">${escapeHtml(node.id)}</div>
       </div>
       ${docHtml}${propsHtml}${connsHtml}${tipsHtml}
     `;
@@ -1192,6 +1335,9 @@ export class IaCVisualizer {
   destroy(): void {
     if (this.animationId) cancelAnimationFrame(this.animationId);
     if (this.resizeObserver) this.resizeObserver.disconnect();
+    if (this.motionQuery && this.motionHandler) {
+      this.motionQuery.removeEventListener('change', this.motionHandler);
+    }
 
     // Remove event listeners
     const container = this.canvas.parentElement?.parentElement;
@@ -1202,6 +1348,7 @@ export class IaCVisualizer {
        container.querySelector('#iac-export')?.removeEventListener('click', this.handlers.export);
        container.querySelector('#iac-fit')?.removeEventListener('click', this.handlers.fit);
     }
+    this.zoomEl?.removeEventListener('click', this.handlers.zoomreset);
     
     this.textarea.removeEventListener('input', this.handlers.input);
 
