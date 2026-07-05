@@ -336,7 +336,7 @@ export function handlePietrOSCommand(
         { ip: "10.0.0.1", host: "isp-gateway.net", ms: [8, 9, 8] },
         { ip: "72.14.215.85", host: "edge-router-1.carrier.net", ms: [15, 14, 16] },
         { ip: "142.250.169.174", host: "core-switch-eu.backbone.net", ms: [24, 25, 23] },
-        { ip: "203.0.113.50", host: "cdn-edge.cloudfront.net", ms: [28, 29, 27] },
+        { ip: "203.0.113.50", host: "cdn-edge.fastly.net", ms: [28, 29, 27] },
         { ip: "151.101.1.140", host: traceTarget, ms: [32, 31, 33] },
       ];
       output.innerHTML += `<div class="text-cyan-400 text-xs">traceroute to ${traceTarget}, 30 hops max, 60 byte packets</div>`;
@@ -788,7 +788,7 @@ d4e5f6a1b2c3   db-postgres    1.20%     384MiB / 2GiB         2.3GB / 1.8GB</pre
 <span class="text-her-red">Role</span>: Infrastructure Engineer
 <span class="text-her-red">Location</span>: Barcelona
 <span class="text-her-red">Languages</span>: Spanish, English, Italian
-<span class="text-her-red">Stack</span>: AWS, Terraform, Docker, K8s, Python
+<span class="text-her-red">Stack</span>: Docker, K8s, Python, CI/CD
 <span class="text-gray-500">──────────────────────────────</span>`;
       output.innerHTML += `<div class="flex gap-4 my-2 font-mono text-xs"><pre class="text-purple-400 hidden sm:block">${pietroLogo}</pre><pre>${pietroInfo}</pre></div>`;
       break;

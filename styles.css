@@ -51,13 +51,13 @@
   }
 }
 
-/* Fonts: Copernicus (headlines) + Tiempos (body) from S3, terminal fonts from Google Fonts */
+/* Fonts: Copernicus (headlines) + Tiempos (body), self-hosted as WOFF2; terminal fonts from Google Fonts */
 
 /* Copernicus — Display/Headline */
 @font-face {
   font-family: "Copernicus";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Medium.ttf")
-    format("truetype");
+  src: url("/fonts/copernicus-title/CopernicusTrial-Medium.woff2") format("woff2"),
+    url("/fonts/copernicus-title/CopernicusTrial-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -65,8 +65,8 @@
 
 @font-face {
   font-family: "Copernicus";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Extrabold.ttf")
-    format("truetype");
+  src: url("/fonts/copernicus-title/CopernicusTrial-Extrabold.woff2") format("woff2"),
+    url("/fonts/copernicus-title/CopernicusTrial-Extrabold.ttf") format("truetype");
   font-weight: 800;
   font-style: normal;
   font-display: swap;
@@ -74,8 +74,8 @@
 
 @font-face {
   font-family: "Copernicus";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/CopernicusTrial-Heavy.ttf")
-    format("truetype");
+  src: url("/fonts/copernicus-title/CopernicusTrial-Heavy.woff2") format("woff2"),
+    url("/fonts/copernicus-title/CopernicusTrial-Heavy.ttf") format("truetype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -84,8 +84,8 @@
 /* Tiempos Headline — Large display serif */
 @font-face {
   font-family: "Tiempos Headline";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposHeadline-Regular.otf")
-    format("opentype");
+  src: url("/fonts/test-tiempos-text/TestTiemposHeadline-Regular.woff2") format("woff2"),
+    url("/fonts/test-tiempos-text/TestTiemposHeadline-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -94,8 +94,8 @@
 /* Tiempos Text — Body/UI */
 @font-face {
   font-family: "Tiempos Text";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Regular.otf")
-    format("opentype");
+  src: url("/fonts/test-tiempos-text/TestTiemposText-Regular.woff2") format("woff2"),
+    url("/fonts/test-tiempos-text/TestTiemposText-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -103,8 +103,8 @@
 
 @font-face {
   font-family: "Tiempos Text";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Medium.otf")
-    format("opentype");
+  src: url("/fonts/test-tiempos-text/TestTiemposText-Medium.woff2") format("woff2"),
+    url("/fonts/test-tiempos-text/TestTiemposText-Medium.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -112,8 +112,8 @@
 
 @font-face {
   font-family: "Tiempos Text";
-  src: url("https://s3.us-east-1.amazonaws.com/pietrouni.com/fonts/TestTiemposText-Bold.otf")
-    format("opentype");
+  src: url("/fonts/test-tiempos-text/TestTiemposText-Bold.woff2") format("woff2"),
+    url("/fonts/test-tiempos-text/TestTiemposText-Bold.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;

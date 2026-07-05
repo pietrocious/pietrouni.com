@@ -10,7 +10,7 @@ declare global {
     toggleMaximize: (id: string) => void;
     startDrag: (e: MouseEvent | TouchEvent, id: string) => void;
     openWindow: (id: string) => void;
-    openMarkdownViewer: (title: string, file: string) => void;
+    openMarkdownViewer: (filePath: string, title: string) => Promise<void>;
 
     // Finder
     initFinder: () => void;

@@ -80,6 +80,17 @@ window.addEventListener('unhandledrejection', (event) => {
   console.error('[Promise Error]', event.reason);
 });
 
+// Cached module refs for dynamically-imported games/apps — populated on first open,
+// reused on subsequent opens so onClose can call the matching destroy function.
+let tttModule: typeof import('./games/tic-tac-toe') | null = null;
+let snakeModule: typeof import('./games/snake') | null = null;
+let doomModule: typeof import('./games/doom') | null = null;
+let gymRoutineModule: typeof import('./apps/gym-routine') | null = null;
+let tetrisModule: typeof import('./games/tetris') | null = null;
+let iacVisualizerModule: typeof import('./apps/iac-visualizer') | null = null;
+let networkTopologyModule: typeof import('./apps/network-topology') | null = null;
+let threesModule: typeof import('./games/threes') | null = null;
+
 document.addEventListener("DOMContentLoaded", () => {
         // config object (kept for potential future use)
         const config = {};
@@ -254,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Background</h2>
                                 <p class="opacity-90">
-                                    I'm an infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers — that foundation gave me a deep understanding of how distributed systems actually work. These days I focus on cloud infrastructure: AWS, Terraform, CI/CD, and building things that are reliable by design.
+                                    I'm a network and infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers — that foundation gave me a deep understanding of how distributed systems actually work. More recently I've been growing into cloud infrastructure: a new interest that builds naturally on those networking fundamentals, and on making things that are reliable by design.
                                 </p>
                             </div>
 
@@ -417,44 +428,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- AWS Multi-Region DR Setup -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 200ms">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">AWS Multi-Region DR Setup</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Disaster recovery architecture demonstrating cross-region replication, failover automation, and backup strategies. Will showcase Route53 health checks, S3 cross-region replication, and RDS read replicas.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TERRAFORM</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AUTOMATION</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-50">
-                                                <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Kubernetes Homelab Cluster -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 250ms">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Kubernetes Homelab Cluster</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Self-hosted K8s cluster for learning container orchestration. Planning to deploy monitoring stack (Prometheus/Grafana), practice Helm charts, and document the full setup process.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">KUBERNETES</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">HELM</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">RASPBERRY PI</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-50">
-                                                <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
                                 </div>
                             </div>
 
@@ -563,13 +536,15 @@ document.addEventListener("DOMContentLoaded", () => {
             height: 680,
             onOpen: () => {
               // slight delay to ensure DOM is ready
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById("ttt-container");
-                if (container) initTicTacToe(container);
+                if (!container) return;
+                tttModule = await import('./games/tic-tac-toe');
+                if (container.isConnected) tttModule.initTicTacToe(container);
               }, 50);
             },
             onClose: () => {
-              destroyTicTacToe();
+              tttModule?.destroyTicTacToe();
             },
           },
 
@@ -583,13 +558,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 560,
             height: 680,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById("snake-container");
-                if (container) initSnake(container);
+                if (!container) return;
+                snakeModule = await import('./games/snake');
+                if (container.isConnected) snakeModule.initSnake(container);
               }, 50);
             },
             onClose: () => {
-              destroySnake();
+              snakeModule?.destroySnake();
             },
           },
 
@@ -601,13 +578,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 960,
             height: 720,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById("doom-container");
-                if (container) initDoom(container);
+                if (!container) return;
+                doomModule = await import('./games/doom');
+                if (container.isConnected) doomModule.initDoom(container);
               }, 100);
             },
             onClose: () => {
-              destroyDoom();
+              doomModule?.destroyDoom();
             },
           },
 
@@ -619,13 +598,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 1100,
             height: 820,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById("gym-routine-container");
-                if (container) initGymRoutine(container);
+                if (!container) return;
+                gymRoutineModule = await import('./apps/gym-routine');
+                if (container.isConnected) gymRoutineModule.initGymRoutine(container);
               }, 50);
             },
             onClose: () => {
-              destroyGymRoutine();
+              gymRoutineModule?.destroyGymRoutine();
             },
           },
 
@@ -711,11 +692,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gnome.SystemMonitor.svg" class="inline w-5 h-5 mr-1" alt="" /> Monitoring</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">WIP</span>
                                     </div>
-                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Live AWS infrastructure metrics dashboard. Currently under construction.</p>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Live infrastructure metrics dashboard. Currently under construction.</p>
                                     <div class="mt-auto">
                                         <div class="flex flex-wrap gap-1.5">
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">AWS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CLOUDWATCH</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">METRICS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">MONITORING</span>
                                         </div>
                                     </div>
                                 </div>
@@ -877,7 +858,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         
                         <!-- Description -->
                         <p class="text-sm opacity-70 max-w-sm mb-6 text-her-text dark:text-her-textLight">
-                            This dashboard will show live AWS infrastructure metrics once connected to CloudWatch.
+                            This dashboard will show live infrastructure metrics once connected to a metrics backend.
                         </p>
                         
                         <!-- Coming Soon Badge -->
@@ -892,11 +873,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             <ul class="space-y-2 text-xs opacity-60">
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
-                                    CloudFront traffic metrics
+                                    CDN traffic metrics
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
-                                    S3 storage analytics
+                                    Object storage analytics
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
@@ -904,7 +885,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
-                                    Edge location performance
+                                    Edge node performance
                                 </li>
                             </ul>
                         </div>
@@ -1123,13 +1104,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 520,
             height: 640,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById('tetris-app');
-                if (container) initTetris(container);
+                if (!container) return;
+                tetrisModule = await import('./games/tetris');
+                if (container.isConnected) tetrisModule.initTetris(container);
               }, 100);
             },
             onClose: () => {
-              destroyTetris();
+              tetrisModule?.destroyTetris();
             },
           },
           iacvisualizer: {
@@ -1179,13 +1162,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 1200,
             height: 740,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById('iac-app');
-                if (container) initIaCVisualizer(container);
+                if (!container) return;
+                iacVisualizerModule = await import('./apps/iac-visualizer');
+                if (container.isConnected) iacVisualizerModule.initIaCVisualizer(container);
               }, 100);
             },
             onClose: () => {
-              destroyIaCVisualizer();
+              iacVisualizerModule?.destroyIaCVisualizer();
             },
           },
           networktopology: {
@@ -1235,13 +1220,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 1200,
             height: 740,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById('netmap-app');
-                if (container) initNetworkTopology(container);
+                if (!container) return;
+                networkTopologyModule = await import('./apps/network-topology');
+                if (container.isConnected) networkTopologyModule.initNetworkTopology(container);
               }, 100);
             },
             onClose: () => {
-              destroyNetworkTopology();
+              networkTopologyModule?.destroyNetworkTopology();
             },
           },
           threes: {
@@ -1287,13 +1274,15 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 580,
             height: 720,
             onOpen: () => {
-              setTimeout(() => {
+              setTimeout(async () => {
                 const container = document.getElementById('threes-app');
-                if (container) initThrees(container);
+                if (!container) return;
+                threesModule = await import('./games/threes');
+                if (container.isConnected) threesModule.initThrees(container);
               }, 100);
             },
             onClose: () => {
-              destroyThrees();
+              threesModule?.destroyThrees();
             },
           },
           finder: {
@@ -1601,18 +1590,8 @@ document.addEventListener("DOMContentLoaded", () => {
           if (id === "finder") window.initFinder();
           if (id === "launchpad") window.initLaunchpad();
           if (id === "settings") updateThemeUI();
-          if (id === "tetris") {
-            setTimeout(() => {
-              const container = document.getElementById('tetris-app');
-              if (container) initTetris(container);
-            }, 100);
-          }
-          if (id === "threes") {
-            setTimeout(() => {
-              const container = document.getElementById('threes-app');
-              if (container) initThrees(container);
-            }, 100);
-          }
+          // Note: tetris/threes init already happens via their window config's onOpen below —
+          // this used to duplicate that call, double-initializing the game on every open.
 
           // Generic onOpen callback from window config
           if (winConfig.onOpen) {
@@ -1871,7 +1850,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (fileName.toLowerCase() === 'readme.md') {
                     window.openWindow('about'); 
                 } else {
-                    window.openMarkdownViewer(fileName, `/home/guest/${fileName}`); 
+                    window.openMarkdownViewer(`/home/guest/${fileName}`, fileName);
                 }
             } else if (['png', 'jpg', 'jpeg', 'gif', 'svg'].includes(ext || '')) {
                  const viewerId = `img-${fileName.replace(/[^a-z0-9]/gi, '')}`;
