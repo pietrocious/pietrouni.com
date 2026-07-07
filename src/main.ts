@@ -1,3 +1,6 @@
+// Vercel Speed Insights
+import { injectSpeedInsights } from '@vercel/speed-insights';
+
 
 // Lab Icons
 import snakeIcon from './assets/icons/lab/snake.png';
@@ -92,6 +95,9 @@ let networkTopologyModule: typeof import('./apps/network-topology') | null = nul
 let threesModule: typeof import('./games/threes') | null = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+        // Initialize Vercel Speed Insights
+        injectSpeedInsights();
+
         // config object (kept for potential future use)
         const config = {};
 

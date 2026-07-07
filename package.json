@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@types/dompurify": "^3.0.5",
+    "@vercel/speed-insights": "^2.0.0",
     "dompurify": "^3.4.2",
     "marked": "^17.0.1",
     "three": "^0.134.0",
