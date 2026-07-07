@@ -22,6 +22,9 @@ import { initLaunchpadModule } from './launchpad';
 import { initMarkdownViewer } from './markdown-viewer';
 import { initTheme, updateThemeUI } from './theme';
 
+// Vercel Web Analytics
+import { inject } from '@vercel/analytics';
+
 // Lazy-loaded games and apps — split into separate Vite chunks
 const loadTetris = () => import('./games/tetris');
 const loadIaC = () => import('./apps/iac-visualizer');
@@ -166,6 +169,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         initTheme();
+
+        // Initialize Vercel Web Analytics
+        inject();
+
 
         // spotlight (ctrl+k) — implemented in src/spotlight.ts
         initSpotlight();
