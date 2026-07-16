@@ -1932,7 +1932,8 @@ html.dark .markdown-body pre {
 }
 /* Shared visual language for the interactive infrastructure labs. */
 #iac-app,
-#netmap-app {
+#netmap-app,
+#subnet-app {
   --lab-accent: #4a7c9d;
   --lab-accent-rgb: 74, 124, 157;
   --lab-surface: #fdfbf7;
@@ -1955,8 +1956,14 @@ html.dark .markdown-body pre {
   --lab-accent-rgb: 91, 154, 184;
 }
 
+#subnet-app {
+  --lab-accent: #4caf82;
+  --lab-accent-rgb: 76, 175, 130;
+}
+
 html.dark #iac-app,
-html.dark #netmap-app {
+html.dark #netmap-app,
+html.dark #subnet-app {
   --lab-surface: #211b18;
   --lab-panel: #29221e;
   --lab-subtle: #332a25;
@@ -1970,7 +1977,8 @@ html.dark #netmap-app {
 .lab-shell { background-image: radial-gradient(circle at 70% 15%, rgba(var(--lab-accent-rgb), .06), transparent 34%); }
 .lab-rail { width: var(--lab-rail-width); background: var(--lab-panel); border-right: 1px solid var(--lab-border); transition: width .22s ease, opacity .18s ease; }
 #iac-app .lab-rail,
-#netmap-app .lab-rail { width: var(--lab-rail-width); }
+#netmap-app .lab-rail,
+#subnet-app .lab-rail { width: var(--lab-rail-width); }
 .lab-rail-header,
 .lab-filebar,
 .lab-toolbar { border-color: var(--lab-border); }
@@ -2041,6 +2049,7 @@ html.dark .iac-token-key { color: #68b6d3; }
   .lab-rail { width: 100%; min-height: 280px; max-height: 42%; border-right: 0; border-bottom: 1px solid var(--lab-border); }
   #iac-app .lab-rail { width: 100%; }
   #netmap-app .lab-rail { width: 100%; }
+  #subnet-app .lab-rail { width: 100%; }
   .lab-rail-resizer { display: none; }
   .lab-sidebar-collapsed .lab-rail { width: 100% !important; min-height: 0; max-height: 0; }
   .lab-workspace { min-height: 420px; }

@@ -92,6 +92,7 @@ let gymRoutineModule: typeof import('./apps/gym-routine') | null = null;
 let tetrisModule: typeof import('./games/tetris') | null = null;
 let iacVisualizerModule: typeof import('./apps/iac-visualizer') | null = null;
 let networkTopologyModule: typeof import('./apps/network-topology') | null = null;
+let subnetPlannerModule: typeof import('./apps/subnet-planner') | null = null;
 let threesModule: typeof import('./games/threes') | null = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -629,8 +630,24 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </div>
                                 </div>
 
+                                <!-- Subnet Planner -->
+                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 150ms" onclick="window.openWindow('subnetplanner');">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gnome.Calculator.svg" class="inline w-5 h-5 mr-1" alt="" /> Subnet Planner</h3>
+                                        <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">INTERACTIVE</span>
+                                    </div>
+                                    <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">Visual VLSM address planner. Auto-carve a CIDR block from host requirements, or split/join subnets by hand.</p>
+                                    <div class="mt-auto">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">VLSM</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CIDR</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Finder -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 150ms" onclick="window.openWindow('finder');">
+                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 200ms" onclick="window.openWindow('finder');">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">📁 Finder</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-bold border border-purple-200 dark:border-purple-800">PROTOTYPE</span>
@@ -645,7 +662,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
 
                                 <!-- Monitoring -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 200ms" onclick="window.openWindow('monitor');">
+                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 250ms" onclick="window.openWindow('monitor');">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gnome.SystemMonitor.svg" class="inline w-5 h-5 mr-1" alt="" /> Monitoring</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">WIP</span>
@@ -1217,6 +1234,77 @@ document.addEventListener("DOMContentLoaded", () => {
               networkTopologyModule?.destroyNetworkTopology();
             },
           },
+          subnetplanner: {
+            title: "Subnet Planner",
+            content: `
+                    <div id="subnet-app" class="lab-shell h-full flex select-none font-ui overflow-hidden">
+                        <!-- Left Panel: Plan Input -->
+                        <div id="subnet-sidebar" class="lab-rail flex-shrink-0 flex flex-col">
+                            <div class="lab-rail-header px-4 pt-4 pb-3 border-b">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div><div class="lab-eyebrow mb-1.5">Network Lab / 03</div><div class="text-sm font-semibold tracking-tight">Address plan</div></div>
+                                    <span id="subnet-mode" class="lab-badge text-[10px] font-mono px-2 py-1 rounded-full">VLSM · 6 requested</span>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5" role="group" aria-label="Example address plans">
+                                    <button id="subnet-manual" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M4 6h16v12H4zM12 6v12"/></svg>Manual</button>
+                                    <button id="subnet-vlsm" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M4 5h16v4H4zM4 11h9v4H4zM4 17h5v2H4z"/></svg>VLSM Plan</button>
+                                    <button id="subnet-vpc" class="lab-tab text-[11px] px-2.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M12 3l8 4v10l-8 4-8-4V7z"/></svg>Cloud VPC</button>
+                                </div>
+                            </div>
+                            <div class="lab-editor-tabs flex items-end border-b">
+                                <div class="lab-file-tab active flex items-center gap-2 px-4 py-2.5 text-xs font-medium"><svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M4 5h16v4H4zM4 11h9v4H4zM4 17h5v2H4z"/></svg><span id="subnet-filename">vlsm-plan.txt</span></div>
+                                <div class="lab-editor-status ml-auto px-3 py-2.5 text-[9px] font-mono">AUTO-PARSE</div>
+                            </div>
+                            <div class="lab-code-shell flex-1 min-h-0 flex">
+                                <pre id="subnet-line-numbers" class="lab-line-numbers" aria-hidden="true">1</pre>
+                                <div class="lab-code-viewport flex-1 min-w-0 relative">
+                                    <pre id="subnet-highlight" class="lab-code-highlight" aria-hidden="true"><code></code></pre>
+                                    <textarea id="subnet-code" aria-label="Subnet plan input" class="lab-code-input" spellcheck="false" wrap="off" placeholder="10.0.0.0/16&#10;Engineering  500&#10;Sales        220"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lab-rail-resizer" role="separator" aria-label="Resize plan editor" aria-orientation="vertical" tabindex="0"></div>
+
+                        <!-- Right Panel: Address Space Map + Inspector -->
+                        <div class="lab-workspace min-w-0 flex-1 flex flex-col">
+                            <div class="lab-toolbar min-h-14 px-4 py-3 border-b flex flex-wrap items-center justify-between gap-3">
+                                <div class="flex items-center gap-2">
+                                    <button class="lab-action lab-sidebar-toggle p-1.5 rounded-md" aria-controls="subnet-sidebar" aria-expanded="true" title="Hide plan editor"><svg class="w-3.5 h-3.5" viewBox="0 0 20 20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M3 4h14v12H3zM7 4v12m4-8l-2 2 2 2"/></svg></button>
+                                    <span class="relative flex h-2 w-2"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-her-red opacity-40"></span><span class="relative inline-flex h-2 w-2 rounded-full bg-her-red"></span></span>
+                                    <div><div class="lab-eyebrow">Address space</div><div id="subnet-count" class="lab-muted text-[11px] mt-1">0 blocks, 0 allocated</div></div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button id="subnet-export-csv" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Export allocation table as CSV">EXPORT CSV</button>
+                                    <button id="subnet-export-png" class="lab-action text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" title="Export PNG">EXPORT PNG</button>
+                                    <button class="lab-action lab-inspector-toggle text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-md transition-colors" aria-controls="subnet-details" aria-expanded="true" title="Hide inspector">INSPECTOR</button>
+                                    <span class="lab-shortcuts lab-muted text-[10px] font-mono ml-1">S · J · ESC</span>
+                                </div>
+                            </div>
+                            <div class="lab-stage flex-1 relative min-h-0">
+                                <canvas id="subnet-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                            </div>
+                            <div class="lab-inspector-resizer" role="separator" aria-label="Resize inspector" aria-orientation="horizontal" tabindex="0"></div>
+                            <div id="subnet-details" class="lab-inspector px-4 py-3 overflow-y-auto text-sm">
+                                <div class="lab-eyebrow mb-2">Inspector</div><div class="lab-muted text-xs">Click a block to inspect, split, or allocate it.</div>
+                            </div>
+                            <div id="subnet-errors" class="hidden bg-red-500/20 text-red-400 text-xs p-2 border-t border-red-500/30"></div>
+                        </div>
+                    </div>
+                `,
+            width: 1200,
+            height: 740,
+            onOpen: () => {
+              setTimeout(async () => {
+                const container = document.getElementById('subnet-app');
+                if (!container) return;
+                subnetPlannerModule = await import('./apps/subnet-planner');
+                if (container.isConnected) subnetPlannerModule.initSubnetPlanner(container);
+              }, 100);
+            },
+            onClose: () => {
+              subnetPlannerModule?.destroySubnetPlanner();
+            },
+          },
           threes: {
             title: "Threes!",
             content: `
@@ -1509,6 +1597,7 @@ document.addEventListener("DOMContentLoaded", () => {
             gymroutine: { title: "Gym Routine", icon: "assets/icons/text-x-generic.svg" },
             iacvisualizer: { title: "IaC Visualizer", icon: "assets/icons/org.gaphor.Gaphor.svg" },
             networktopology: { title: "Network Topology", icon: "assets/icons/network-wired.svg" },
+            subnetplanner: { title: "Subnet Planner", icon: "assets/icons/org.gnome.Calculator.svg" },
             monitor: { title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
             experiments: { title: "Lab", icon: "assets/icons/characters.svg" },
             sysinfo: { title: "About", icon: "assets/icons/contacts.svg" },
