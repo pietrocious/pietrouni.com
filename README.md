@@ -30,7 +30,7 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
   - **games arcade:** Snake, 2048, Tetris, Threes, Tic-Tac-Toe, and a Doom launcher
   - **experiments lab:** interactive DevOps demos (IaC Visualizer, Network Topology)
   - **dock:** macOS-style fish-eye magnification with Gaussian falloff and bounce animations
-  - **audio system:** synthesized UI sound effects (boot chime, clicks, window open/close) via Web Audio API — no external files needed
+  - **audio system:** synthesized UI sound effects (boot chime, clicks, window open/close) via Web Audio API; no external files needed
   - **dynamic theme:** system-aware dark mode with smooth transitions
 
 ## project structure

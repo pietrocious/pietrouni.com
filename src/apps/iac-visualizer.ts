@@ -1103,19 +1103,19 @@ export class IaCVisualizer {
       ctx.fill();
       ctx.globalAlpha = !focusIds || focusIds.has(node.id) ? 1 : 0.25;
       ctx.fillStyle = colors.text;
-      ctx.font = '700 9px ui-monospace, monospace';
+      ctx.font = '700 9px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
       const initials = node.resourceType.replace(/^aws_/, '').split('_').map(part => part[0]).join('').slice(0, 2).toUpperCase();
       ctx.fillText(initials || 'R', -NODE_WIDTH / 2 + 25, 3);
 
       ctx.textAlign = 'left';
       ctx.fillStyle = '#7f8c99';
-      ctx.font = '700 8px ui-monospace, monospace';
+      ctx.font = '700 8px "JetBrains Mono", monospace';
       ctx.fillText(node.resourceType.toUpperCase().slice(0, 18), -NODE_WIDTH / 2 + 47, -8);
 
       // Name
       ctx.fillStyle = '#f2f6fa';
-      ctx.font = '600 12px system-ui';
+      ctx.font = '600 12px "DM Sans", sans-serif';
       ctx.fillText(node.name.slice(0, 16), -NODE_WIDTH / 2 + 47, 11);
 
       ctx.fillStyle = colors.border;
@@ -1139,7 +1139,7 @@ export class IaCVisualizer {
       const doc = RESOURCE_DOCS[this.hoveredNode.resourceType];
       const text = doc ? doc.description : `${this.hoveredNode.resourceType} · ${this.hoveredNode.name}`;
 
-      ctx.font = '12px system-ui';
+      ctx.font = '12px "DM Sans", sans-serif';
       const metrics = ctx.measureText(text);
       const padding = 8;
       const boxW = metrics.width + padding * 2;
@@ -1180,10 +1180,10 @@ export class IaCVisualizer {
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.fillStyle = '#64748b';
-      ctx.font = '16px system-ui';
+      ctx.font = '16px "DM Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('No infrastructure to visualize', width / 2, height / 2);
-      ctx.font = '12px system-ui';
+      ctx.font = '12px "DM Sans", sans-serif';
       ctx.fillText('Paste Terraform or Kubernetes YAML', width / 2, height / 2 + 20);
       ctx.restore();
     }
@@ -1218,7 +1218,7 @@ export class IaCVisualizer {
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    ctx.font = '9px system-ui';
+    ctx.font = '9px "DM Sans", sans-serif';
     ctx.fillStyle = '#64748b';
     ctx.textAlign = 'left';
     ctx.fillText('LEGEND', 18, height - legendH + 4);
@@ -1233,7 +1233,7 @@ export class IaCVisualizer {
       ctx.roundRect(x, y - 8, 10, 10, 2);
       ctx.fill();
       ctx.fillStyle = '#94a3b8';
-      ctx.font = '10px system-ui';
+      ctx.font = '10px "DM Sans", sans-serif';
       ctx.fillText(item.label, x + 14, y);
     });
 

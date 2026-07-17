@@ -1010,7 +1010,7 @@ export class NetworkTopologyVisualizer {
           const midX = (source.x + target.x) / 2;
           const midY = (source.y + target.y) / 2;
           ctx.fillStyle = color;
-          ctx.font = '9px system-ui';
+          ctx.font = '9px "DM Sans", sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText(`${link.sourcePort}↔${link.targetPort}`, midX, midY - 5);
           ctx.restore();
@@ -1055,19 +1055,19 @@ export class NetworkTopologyVisualizer {
       ctx.shadowBlur = 0;
 
       // Icon
-      ctx.font = '16px system-ui';
+      ctx.font = '16px "DM Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(colors.icon, 0, -8);
 
       // Name
       ctx.fillStyle = colors.text;
-      ctx.font = 'bold 10px system-ui';
+      ctx.font = 'bold 10px "DM Sans", sans-serif';
       ctx.fillText(device.name.slice(0, 14), 0, 12);
 
       // IP if available
       if (device.ip) {
         ctx.fillStyle = colors.text + '99';
-        ctx.font = '8px system-ui';
+        ctx.font = '8px "DM Sans", sans-serif';
         ctx.fillText(device.ip, 0, 22);
       }
       
@@ -1086,7 +1086,7 @@ export class NetworkTopologyVisualizer {
       
       const text = `${this.hoveredDevice.type.toUpperCase()}: ${this.hoveredDevice.name}`;
 
-      ctx.font = '12px system-ui';
+      ctx.font = '12px "DM Sans", sans-serif';
       const metrics = ctx.measureText(text);
       const padding = 8;
       const boxW = metrics.width + padding * 2;
@@ -1127,10 +1127,10 @@ export class NetworkTopologyVisualizer {
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.fillStyle = '#64748b';
-      ctx.font = '16px system-ui';
+      ctx.font = '16px "DM Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('No network topology to visualize', width / 2, height / 2);
-      ctx.font = '12px system-ui';
+      ctx.font = '12px "DM Sans", sans-serif';
       ctx.fillText('Paste LLDP, CDP, or routing table output', width / 2, height / 2 + 20);
       ctx.restore();
     }
@@ -1173,7 +1173,7 @@ export class NetworkTopologyVisualizer {
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    ctx.font = '9px system-ui';
+    ctx.font = '9px "DM Sans", sans-serif';
     ctx.fillStyle = '#64748b';
     ctx.textAlign = 'left';
     ctx.fillText('DEVICES', 18, height - legendH + 4);
@@ -1183,17 +1183,17 @@ export class NetworkTopologyVisualizer {
       const row = Math.floor(i / cols);
       const x = 18 + col * 95;
       const y = height - legendH + 22 + row * 14;
-      ctx.font = '12px system-ui';
+      ctx.font = '12px "DM Sans", sans-serif';
       ctx.fillText(item.icon, x, y);
       ctx.fillStyle = item.color;
-      ctx.font = '10px system-ui';
+      ctx.font = '10px "DM Sans", sans-serif';
       ctx.fillText(item.label, x + 18, y);
       ctx.fillStyle = '#64748b';
     });
 
     if (linkItems.length > 0) {
       const linkStartY = height - legendH + 22 + deviceRows * 14;
-      ctx.font = '9px system-ui';
+      ctx.font = '9px "DM Sans", sans-serif';
       ctx.fillStyle = '#64748b';
       ctx.fillText('LINKS', 18, linkStartY + 2);
 
@@ -1207,7 +1207,7 @@ export class NetworkTopologyVisualizer {
         ctx.roundRect(x, y - 8, 10, 10, 2);
         ctx.fill();
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '10px system-ui';
+        ctx.font = '10px "DM Sans", sans-serif';
         ctx.fillText(item.label, x + 14, y);
       });
     }

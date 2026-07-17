@@ -4,7 +4,7 @@
 
 ## The situation
 
-An intermittent reachability problem appeared after a routing change. The initial report mixed several symptoms—timeouts, incomplete paths, and inconsistent results between locations—so the first challenge was not finding a command. It was turning an ambiguous incident into a small set of falsifiable hypotheses while keeping the production risk low.
+An intermittent reachability problem appeared after a routing change. The initial report mixed several symptoms, including timeouts, incomplete paths, and inconsistent results between locations. The first challenge was not finding a command. It was turning an ambiguous incident into a small set of falsifiable hypotheses while keeping the production risk low.
 
 ## My approach
 
@@ -40,6 +40,5 @@ That structure made the next decision clear to both the engineering team and the
 - Define the failure boundary before increasing the volume of telemetry.
 - Compare failing and healthy paths whenever possible.
 - Make each diagnostic step answer a named hypothesis.
-- Communicate confidence, unknowns, and rollback conditions—not just commands.
+- Communicate confidence, unknowns, and rollback conditions, not just commands.
 - Leave behind a reusable evidence timeline for the next engineer.
-

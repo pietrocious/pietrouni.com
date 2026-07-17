@@ -5,7 +5,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
             title: "About pietrOS",
             content: `
                      <div class="h-full flex flex-col text-her-text dark:text-her-textLight p-6 select-none font-ui">
-                        <h1 class="text-xl font-bold mb-1 font-serif">About pietrOS</h1>
+                        <h1 class="text-xl font-bold mb-1 font-headline">About pietrOS</h1>
                         <div class="text-xs opacity-60 mb-4 font-mono">Version 1.5 (Amber-Amy)</div>
                         <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-4"></div>
 
@@ -73,7 +73,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">Background</h2>
                                 <p class="opacity-90">
-                                    I'm a network and infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers — that foundation gave me a deep understanding of how distributed systems actually work. More recently I've been growing into cloud infrastructure: a new interest that builds naturally on those networking fundamentals, and on making things that are reliable by design.
+                                    I'm a network and infrastructure engineer with a background in enterprise networking. I spent over three years at <span class="font-semibold text-her-red dark:text-her-red">Cisco TAC</span> solving complex routing, switching, and SDN problems for Fortune 500 customers. That foundation gave me a deep understanding of how distributed systems actually work. More recently I've been growing into cloud infrastructure: a new interest that builds naturally on those networking fundamentals, and on making things that are reliable by design.
                                 </p>
                             </div>
 
@@ -81,14 +81,14 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">What I'm Building</h2>
                                 <p class="opacity-90 mb-4">
-                                    I have several projects here — a mix of infrastructure work and things I built out of curiosity. Check out <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" rel="noopener noreferrer" class="content-link">GitHub</a> to see what I'm working on.</p>
+                                    I have several projects here: a mix of infrastructure work and things I built out of curiosity. Check out <a href="#" onclick="openWindow('projects'); return false;" class="content-link">Projects</a> or my <a href="https://github.com/pietrocious" target="_blank" rel="noopener noreferrer" class="content-link">GitHub</a> to see what I'm working on.</p>
                             </div>
 
                             <!-- How I Think -->
                             <div>
                                 <h2 class="text-lg font-display font-bold text-her-dark dark:text-her-cream mt-4 mb-2">How I Think</h2>
                                 <p class="opacity-90">
-                                    I've always been more interested in how things are built than in any particular tool or title. Cloud is just where a lot of the interesting building happens right now — systems that scale, infrastructure that's code, things you can actually ship. It's a natural extension of understanding how networks work at the bottom, and a good foundation for whatever comes next.
+                                    I've always been more interested in how things are built than in any particular tool or title. Cloud is just where a lot of the interesting building happens right now: systems that scale, infrastructure that's code, things you can actually ship. It's a natural extension of understanding how networks work at the bottom, and a good foundation for whatever comes next.
                                 </p>
                             </div>
 
@@ -96,7 +96,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                             <div>
                                 <h2 class="text-lg font-display font-extrabold text-her-dark dark:text-her-cream mt-4 mb-2">Beyond the Screen</h2>
                                 <p class="opacity-90">
-                                    Outside of work, I listen to music across pretty much every genre, play games when I have time, and enjoy understanding how complex systems get built — I'm fascinated by how architecture decisions ripple all the way down, and how much we're all standing on the shoulders of giants.
+                                    Outside of work, I listen to music across pretty much every genre, play games when I have time, and enjoy understanding how complex systems get built. I'm fascinated by how architecture decisions ripple all the way down, and how much we're all standing on the shoulders of giants.
                                 </p>
                             </div>
 
@@ -127,7 +127,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
             height: 800,
           },
           resume: {
-            title: "Pietro Uni — Resume",
+            title: "Pietro Uni | Resume",
             content: `
                     <div class="h-full flex flex-col bg-her-paper dark:bg-[#2d1a14] text-her-dark dark:text-her-textLight">
                         <div class="px-4 py-3 border-b border-her-text/10 dark:border-white/10 flex flex-wrap items-center justify-between gap-3">
@@ -155,7 +155,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                      <div class="h-full flex flex-col font-ui window-content" style="min-width: 500px;">
                         <!-- Header Bar -->
                         <div class="px-6 pt-4 pb-4 flex flex-col gap-1">
-                            <h1 class="text-lg font-serif font-extrabold text-her-dark dark:text-her-textLight flex items-center gap-2">
+                            <h1 class="text-lg font-headline font-extrabold text-her-dark dark:text-her-textLight flex items-center gap-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                 Projects
                             </h1>
@@ -253,7 +253,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                         <div class="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
                             <div>
                                 <div class="text-[10px] font-mono font-bold tracking-[0.18em] uppercase text-her-red mb-2">Production delivery path</div>
-                                <h1 class="text-2xl md:text-3xl font-display font-bold">From commit to edge</h1>
+                                <h1 class="text-2xl md:text-3xl font-headline font-bold">From commit to edge</h1>
                                 <p class="text-sm opacity-65 mt-2 max-w-2xl">A deliberately small static architecture: Vercel builds the Vite application from GitHub and serves it through its edge network, while GitHub Actions provides an independent quality signal.</p>
                             </div>
                             <a href="https://github.com/pietrocious/pietrouni.com/blob/main/.github/workflows/production.yml" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-her-red hover:underline">View workflow ↗</a>
@@ -297,7 +297,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                             </button>
                             <div>
-                                <h2 id="vault-title" class="text-lg font-serif font-extrabold text-her-dark dark:text-her-textLight flex items-center gap-2">
+                                <h2 id="vault-title" class="text-lg font-headline font-extrabold text-her-dark dark:text-her-textLight flex items-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                     Personal Vault
                                 </h2>

@@ -41,7 +41,7 @@ export const systemWindowConfigs: Record<string, WindowConfig> = {
                         </div>
                         
                         <!-- Title -->
-                        <h2 class="text-2xl font-serif font-extrabold text-her-dark dark:text-her-textLight mb-3">Work in Progress</h2>
+                        <h2 class="text-2xl font-headline font-extrabold text-her-dark dark:text-her-textLight mb-3">Work in Progress</h2>
                         
                         <!-- Description -->
                         <p class="text-sm opacity-70 max-w-sm mb-6 text-her-text dark:text-her-textLight">
@@ -85,7 +85,7 @@ export const systemWindowConfigs: Record<string, WindowConfig> = {
             title: "Settings",
             content: `
                     <div class="h-full flex flex-col text-her-text dark:text-her-textLight p-6 select-none font-ui overflow-y-auto">
-                        <h1 class="text-xl font-bold mb-1 font-serif">Settings</h1>
+                        <h1 class="text-xl font-bold mb-1 font-headline">Settings</h1>
                         <div class="text-xs opacity-60 mb-4 font-mono">System Preferences</div>
                         <div class="h-px bg-her-text/10 dark:bg-white/10 w-full mb-6"></div>
                         
