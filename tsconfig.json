@@ -19,6 +19,6 @@
     "src/**/*.d.ts",
     "src/apps/iac-visualizer.ts",
     "src/apps/network-map.tsx"
-  ],
+, "experiments/cosmos.ts"  ],
   "exclude": ["node_modules", "dist"]
 }

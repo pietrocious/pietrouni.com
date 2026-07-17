@@ -14,4 +14,4 @@ dist/
 .idea/
 
 # Private experiments
-src/experiments
+experiments/
