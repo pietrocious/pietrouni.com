@@ -33,11 +33,11 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">README (Display)</span>
-                                        <span class="font-display font-bold text-base">Georgia (system)</span>
+                                        <span class="font-display font-bold text-base">Copernicus</span>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">README (Body)</span>
-                                        <span class="font-serif text-base">Georgia (system)</span>
+                                        <span class="font-serif text-base">Tiempos Text</span>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">Terminal</span>
@@ -228,12 +228,12 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                                                 <h3 class="font-semibold text-her-dark dark:text-her-textLight">How this site runs</h3>
                                                 <span class="text-[10px] px-2 py-0.5 rounded bg-her-red/10 text-her-red font-bold">LIVE ARCHITECTURE</span>
                                             </div>
-                                            <p class="text-xs opacity-70 text-her-dark dark:text-her-textLight">Follow a commit through typecheck, tests, build, S3 deployment, and CloudFront cache invalidation. Includes the design decisions behind the static delivery path.</p>
+                                            <p class="text-xs opacity-70 text-her-dark dark:text-her-textLight">Follow a commit through independent CI checks and Vercel's production build, deployment, and edge delivery path.</p>
                                         </div>
                                         <div class="flex flex-wrap gap-1.5 md:justify-end">
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10">GITHUB ACTIONS</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10">S3</span>
-                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10">CLOUDFRONT</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10">VERCEL</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10">VITE</span>
                                         </div>
                                     </div>
                                 </button>
@@ -254,33 +254,31 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                             <div>
                                 <div class="text-[10px] font-mono font-bold tracking-[0.18em] uppercase text-her-red mb-2">Production delivery path</div>
                                 <h1 class="text-2xl md:text-3xl font-display font-bold">From commit to edge</h1>
-                                <p class="text-sm opacity-65 mt-2 max-w-2xl">A deliberately small static architecture: validate every change, publish immutable build output, then let the CDN do the serving.</p>
+                                <p class="text-sm opacity-65 mt-2 max-w-2xl">A deliberately small static architecture: Vercel builds the Vite application from GitHub and serves it through its edge network, while GitHub Actions provides an independent quality signal.</p>
                             </div>
                             <a href="https://github.com/pietrocious/pietrouni.com/blob/main/.github/workflows/production.yml" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-her-red hover:underline">View workflow ↗</a>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-stretch gap-2 mb-6" aria-label="Deployment architecture">
+                        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch gap-2 mb-6" aria-label="Deployment architecture">
                             <div class="architecture-node"><span class="architecture-kicker">Source</span><strong>GitHub</strong><small>Push to main</small></div>
                             <div class="architecture-arrow" aria-hidden="true">→</div>
-                            <div class="architecture-node"><span class="architecture-kicker">Quality gate</span><strong>GitHub Actions</strong><small>npm ci · typecheck · test suite · build</small></div>
+                            <div class="architecture-node"><span class="architecture-kicker">Build + deploy</span><strong>Vercel</strong><small>Install · Vite build · immutable assets</small></div>
                             <div class="architecture-arrow" aria-hidden="true">→</div>
-                            <div class="architecture-node"><span class="architecture-kicker">Origin</span><strong>Amazon S3</strong><small>dist/ synchronized with deletion</small></div>
-                            <div class="architecture-arrow" aria-hidden="true">→</div>
-                            <div class="architecture-node"><span class="architecture-kicker">Edge</span><strong>CloudFront</strong><small>Global delivery + invalidation</small></div>
+                            <div class="architecture-node"><span class="architecture-kicker">Delivery</span><strong>Vercel Edge Network</strong><small>Production domain + CDN caching</small></div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-                            <article class="architecture-note"><h2>Failure stops delivery</h2><p>The deploy job depends on CI, so a type, test, or build failure never reaches the origin bucket.</p></article>
-                            <article class="architecture-note"><h2>Static by design</h2><p>No application server is required. S3 stores the artifact; CloudFront absorbs reads close to visitors.</p></article>
-                            <article class="architecture-note"><h2>Freshness is explicit</h2><p>After synchronization, the workflow invalidates CloudFront so the new application shell becomes visible.</p></article>
+                            <article class="architecture-note"><h2>Independent verification</h2><p>GitHub Actions runs npm ci, TypeScript, Vitest, and the production build on pushes and pull requests.</p></article>
+                            <article class="architecture-note"><h2>Static by design</h2><p>The output is a client-side Vite application, so Vercel can deploy immutable assets without an application server.</p></article>
+                            <article class="architecture-note"><h2>One hosting platform</h2><p>Deployment, edge delivery, and Web Analytics now live on Vercel instead of being split across providers.</p></article>
                         </div>
 
                         <div class="rounded-xl border border-her-text/10 dark:border-white/10 bg-black/[0.025] dark:bg-white/[0.035] p-4 md:p-5">
                             <h2 class="font-bold mb-3">Operational tradeoffs</h2>
                             <dl class="grid grid-cols-1 md:grid-cols-[9rem_1fr] gap-x-5 gap-y-3 text-sm">
                                 <dt class="font-mono text-xs text-her-red">Why this shape?</dt><dd class="opacity-75">Low operational overhead, low cost, and a delivery model that matches a client-side portfolio.</dd>
-                                <dt class="font-mono text-xs text-her-red">What is measured?</dt><dd class="opacity-75">The repository gates correctness through TypeScript, Vitest, and the production Vite build before deployment.</dd>
-                                <dt class="font-mono text-xs text-her-red">What would change?</dt><dd class="opacity-75">Dynamic APIs or authenticated data would introduce a separate compute boundary rather than turning the static origin into an application server.</dd>
+                                <dt class="font-mono text-xs text-her-red">What is checked?</dt><dd class="opacity-75">GitHub Actions reports TypeScript, Vitest, and production-build status independently of Vercel's deployment integration.</dd>
+                                <dt class="font-mono text-xs text-her-red">What would change?</dt><dd class="opacity-75">Dynamic APIs or authenticated data would introduce serverless or edge compute alongside the static application.</dd>
                             </dl>
                         </div>
                     </div>
@@ -322,4 +320,3 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
           },
 
 };
-

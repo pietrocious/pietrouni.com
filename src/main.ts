@@ -53,6 +53,11 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+        // The static summary remains crawlable and is visible without JS, but
+        // should not add duplicate invisible links to the interactive tab order.
+        const portfolioSummary = document.getElementById("portfolio-summary");
+        if (portfolioSummary instanceof HTMLElement) portfolioSummary.inert = true;
+
         let isHandlingAppRoute = false;
 
         // expose window manager functions globally for HTML onclick handlers
@@ -132,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         initTheme();
 
-        // Initialize Vercel Web Analytics
+        // Production is hosted on Vercel, so its first-party analytics endpoint is available.
         inject();
 
 

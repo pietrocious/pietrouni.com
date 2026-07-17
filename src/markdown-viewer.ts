@@ -28,7 +28,7 @@ export async function openMarkdownViewer(filePath: string, title: string): Promi
         <div class="text-center p-8">
           <div class="text-4xl mb-4">📁</div>
           <h3 class="text-lg font-bold mb-2 text-her-dark dark:text-her-textLight">Local Server Required</h3>
-          <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or deploy to S3.</p>
+          <p class="text-sm opacity-70 mb-4">Markdown files can't be loaded directly from the file system.<br>Please run a local server or open the hosted site.</p>
           <code class="text-xs bg-black/10 dark:bg-white/10 px-3 py-2 rounded block">npx serve .</code>
         </div>
       `;

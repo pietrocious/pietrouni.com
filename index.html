@@ -22,8 +22,10 @@
     />
     <title>Pietro Uni | Interactive Portfolio</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600..900&family=JetBrains+Mono:wght@400;700&family=Newsreader:ital,opsz,wght@0,6..72,400..800;1,6..72,400..700&family=Outfit:wght@500;700&display=swap"
       rel="stylesheet"
     />
     <meta
@@ -103,8 +105,6 @@
     />
 
     <!-- preconnects -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://www.googletagmanager.com" />
 
     <!-- fixedsys is essential -->
@@ -134,6 +134,7 @@
   <body
     class="h-screen w-screen text-her-text dark:text-her-textLight relative overflow-hidden transition-colors duration-1000 font-ui"
   >
+    <a class="skip-to-dock" href="#application-dock">Skip to application dock</a>
     <noscript>
       <style>
         body { height: auto !important; overflow: auto !important; background: #f4ebd9; }
@@ -180,7 +181,7 @@
       </ul>
       <h2>Technical exhibits and case studies</h2>
       <ul>
-        <li><a href="/?app=sitearchitecture">How this site runs</a> — the tested GitHub Actions, S3, and CloudFront delivery path.</li>
+        <li><a href="/?app=sitearchitecture">How this site runs</a> — the GitHub Actions CI and Vercel production-delivery path.</li>
         <li><a href="/vault/case-studies/cisco-tac-troubleshooting.md">Troubleshooting under pressure</a> — a generalized Cisco TAC problem-solving case study.</li>
         <li><a href="/vault/case-studies/iac-visualizer.md">Inside the IaC Visualizer</a> — implementation decisions and parser tradeoffs.</li>
       </ul>
@@ -371,9 +372,11 @@
         class="absolute bottom-0 md:bottom-10 left-1/2 transform -translate-x-1/2 z-[9999] mix-blend-normal pointer-events-auto w-full md:w-auto flex justify-center"
       >
         <div
+          id="application-dock"
           class="dock-container w-full md:w-auto md:rounded-3xl px-6 py-3 flex items-center justify-center gap-3 md:gap-4 shadow-2xl"
           role="navigation"
           aria-label="Application dock"
+          tabindex="-1"
         >
           <!-- README.md -->
           <button

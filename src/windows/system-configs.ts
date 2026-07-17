@@ -64,7 +64,7 @@ export const systemWindowConfigs: Record<string, WindowConfig> = {
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>
-                                    Object storage analytics
+                                    Web vitals and traffic analytics
                                 </li>
                                 <li class="flex items-center gap-2">
                                     <span class="w-1 h-1 rounded-full bg-her-red"></span>

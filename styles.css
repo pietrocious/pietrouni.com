@@ -17,9 +17,9 @@
 
   /* Font Families */
   --font-sans: "DM Sans", sans-serif;
-  --font-serif: Georgia, "Times New Roman", serif;
+  --font-serif: "Tiempos Text", "Newsreader", "Iowan Old Style", serif;
   --font-headline: "Outfit", sans-serif;
-  --font-display: Georgia, "Times New Roman", serif;
+  --font-display: "Copernicus", "Tiempos Headline", "Fraunces", serif;
   --font-ui: "DM Sans", sans-serif;
   --font-kernel: "Fixedsys", monospace;
   --font-mono: "JetBrains Mono", monospace;
@@ -51,6 +51,63 @@
   }
 }
 
+/* Editorial fonts — self-hosted WOFF2 builds with Google Fonts fallbacks. */
+@font-face {
+  font-family: "Copernicus";
+  src: url("/fonts/copernicus-title/CopernicusTrial-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Copernicus";
+  src: url("/fonts/copernicus-title/CopernicusTrial-Extrabold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Copernicus";
+  src: url("/fonts/copernicus-title/CopernicusTrial-Heavy.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Tiempos Headline";
+  src: url("/fonts/test-tiempos-text/TestTiemposHeadline-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Tiempos Text";
+  src: url("/fonts/test-tiempos-text/TestTiemposText-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Tiempos Text";
+  src: url("/fonts/test-tiempos-text/TestTiemposText-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Tiempos Text";
+  src: url("/fonts/test-tiempos-text/TestTiemposText-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Fixedsys — Terminal fallback */
 @font-face {
   font-family: "Fixedsys";
@@ -68,6 +125,32 @@ body {
   letter-spacing: 0.3px;
   /* Prevent pull-to-refresh on mobile */
   overscroll-behavior: none;
+}
+
+.skip-to-dock {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100000;
+  transform: translateY(calc(-100% - 1rem));
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.5rem;
+  background: #fdfbf7;
+  color: #3e2723;
+  font: 600 0.875rem/1 "DM Sans", sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  transition: transform 150ms ease;
+}
+
+.skip-to-dock:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid #4a7c9d;
+  outline-offset: 2px;
+}
+
+html.dark .skip-to-dock {
+  background: #2d1a14;
+  color: #efebe9;
 }
 
 /* Static-first wallpaper fallbacks. Vanta canvases progressively enhance these
@@ -1405,17 +1488,6 @@ canvas {
   border-bottom-color: #4a7c9d;
 }
 
-/* Typography Override */
-h1,
-h2,
-h3 {
-  font-family: "Outfit", sans-serif;
-}
-
-p {
-  font-family: "DM Sans", sans-serif;
-}
-
 /* Link styling in content */
 .content-link {
   color: #4a7c9d;
@@ -1438,7 +1510,8 @@ html.dark .content-link:hover {
 
 /* Markdown Body Styling (GitHub-style) */
 .markdown-body {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Tiempos Text", "Newsreader", "Iowan Old Style", serif;
+  font-optical-sizing: auto;
   font-size: 14px;
   line-height: 1.7;
   color: #4e342e;
@@ -1449,7 +1522,8 @@ html.dark .markdown-body {
 }
 
 .markdown-body h1 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Copernicus", "Tiempos Headline", "Fraunces", serif;
+  font-optical-sizing: auto;
   font-size: 2em;
   font-weight: 700;
   margin-bottom: 0.5em;
@@ -1459,7 +1533,8 @@ html.dark .markdown-body {
 }
 
 .markdown-body h2 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Copernicus", "Tiempos Headline", "Fraunces", serif;
+  font-optical-sizing: auto;
   font-size: 1.5em;
   font-weight: 700;
   margin-top: 1.5em;
@@ -1469,7 +1544,8 @@ html.dark .markdown-body {
 }
 
 .markdown-body h3 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Copernicus", "Tiempos Headline", "Fraunces", serif;
+  font-optical-sizing: auto;
   font-size: 1.25em;
   font-weight: 600;
   margin-top: 1.25em;

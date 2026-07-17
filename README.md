@@ -59,9 +59,11 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
 
 ### fonts
 
-this project uses Google Fonts, system serif fallbacks, and a self-hosted terminal font:
+this project uses self-hosted editorial and terminal fonts, with Google Fonts fallbacks:
 
-- **Georgia / Times New Roman** (system) – README and markdown serif text
+- **Copernicus** (self-hosted WOFF2) – README and markdown display headings
+- **Tiempos Text** (self-hosted WOFF2) – README and long-form serif text
+- **Fraunces / Newsreader** (Google Fonts) – editorial fallbacks
 - **DM Sans** (Google Fonts) – UI / sans body
 - **Outfit** (Google Fonts) – alt headline weight
 - **JetBrains Mono** (Google Fonts) – code/monospace

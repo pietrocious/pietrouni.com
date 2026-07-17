@@ -3,17 +3,17 @@ import { monitorInterval, setMonitorInterval } from "./state";
 
 export function switchMonitorTab(tab: string): void {
   const infra = document.getElementById("mon-view-infra");
-  const cf = document.getElementById("mon-view-cloudfront");
+  const edge = document.getElementById("mon-view-edge");
   const bill = document.getElementById("mon-view-billing");
   if (infra) infra.style.display = "none";
-  if (cf) cf.style.display = "none";
+  if (edge) edge.style.display = "none";
   if (bill) bill.style.display = "none";
 
   if (tab === "infra" && infra) infra.style.display = "block";
-  else if (tab === "cf" && cf) cf.style.display = "block";
+  else if (tab === "edge" && edge) edge.style.display = "block";
   else if (tab === "bill" && bill) bill.style.display = "flex";
 
-  ["infra", "cf", "bill"].forEach((t) => {
+  ["infra", "edge", "bill"].forEach((t) => {
     const el = document.getElementById(`tab-${t}`);
     if (!el) return;
     if (t === tab) {
@@ -38,11 +38,11 @@ export function startMonitor(): void {
   const logContainer = document.getElementById("sys-log");
 
   const logs = [
-    "[INFO] Auto-scaling group: +1 instance",
-    "[INFO] Route53 health check: Healthy",
-    "[WARN] High latency detected in ap-south-1",
-    "[INFO] S3 Lifecycle rule executed",
-    "[INFO] CloudFront cache refresh",
+    "[INFO] Vercel production deployment: Ready",
+    "[INFO] GitHub Actions checks: Passed",
+    "[WARN] Elevated edge latency detected",
+    "[INFO] Static asset cache revalidated",
+    "[INFO] Web Analytics event batch accepted",
   ];
 
   setMonitorInterval(setInterval(() => {
