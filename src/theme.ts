@@ -5,13 +5,67 @@ import {
 } from "./state";
 import { initVanta, destroyVanta, updateVantaTheme, isVantaActive } from "./vanta";
 
+type VantaStartMode = "auto" | "explicit";
+
+let idleVantaRequest: number | null = null;
+let idleVantaFallback: ReturnType<typeof setTimeout> | null = null;
+let loadListener: (() => void) | null = null;
+
+export function canAutoStartVanta(): boolean {
+  return window.innerWidth >= 768
+    && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function cancelScheduledVanta(): void {
+  if (loadListener) {
+    window.removeEventListener("load", loadListener);
+    loadListener = null;
+  }
+  if (idleVantaRequest !== null && "cancelIdleCallback" in window) {
+    window.cancelIdleCallback(idleVantaRequest);
+  }
+  if (idleVantaFallback !== null) clearTimeout(idleVantaFallback);
+  idleVantaRequest = null;
+  idleVantaFallback = null;
+}
+
+function scheduleVanta(effectName: string, isDark: boolean, desktop: HTMLElement): void {
+  cancelScheduledVanta();
+  if (!canAutoStartVanta()) return;
+
+  const start = () => {
+    idleVantaRequest = null;
+    idleVantaFallback = null;
+    const active = wallpapers[activeWallpaperIndex];
+    if (active.type === "vanta" && active.vantaEffect === effectName) {
+      void initVanta(effectName, isDark, desktop);
+    }
+  };
+  const queueWhenIdle = () => {
+    loadListener = null;
+    if ("requestIdleCallback" in window) {
+      idleVantaRequest = window.requestIdleCallback(start, { timeout: 3000 });
+    } else {
+      idleVantaFallback = setTimeout(start, 1500);
+    }
+  };
+
+  if (document.readyState === "complete") queueWhenIdle();
+  else {
+    loadListener = queueWhenIdle;
+    window.addEventListener("load", queueWhenIdle, { once: true });
+  }
+}
+
 function applyWallpaperClasses(
   wp: (typeof wallpapers)[0],
   isDark: boolean,
   desktop: HTMLElement,
+  vantaStartMode: VantaStartMode,
 ): void {
   desktop.style.background = "";
   allWallpaperClasses.forEach((cls) => desktop.classList.remove(cls));
+  cancelScheduledVanta();
   if (wp.type === "class") {
     desktop.classList.add(isDark ? wp.dark : wp.light);
     destroyVanta();
@@ -19,12 +73,21 @@ function applyWallpaperClasses(
     desktop.style.background = isDark ? wp.dark : wp.light;
     destroyVanta();
   } else if (wp.type === "vanta" && wp.vantaEffect) {
-    desktop.style.background = "";
-    initVanta(wp.vantaEffect, isDark, desktop);
+    const effectName = wp.vantaEffect.toLowerCase();
+    desktop.classList.add(`wallpaper-static-${effectName}`);
+    destroyVanta();
+    if (vantaStartMode === "explicit") {
+      void initVanta(wp.vantaEffect, isDark, desktop);
+    } else {
+      scheduleVanta(wp.vantaEffect, isDark, desktop);
+    }
   }
 }
 
-export function applyWallpaper(animate = false): void {
+export function applyWallpaper(
+  animate = false,
+  vantaStartMode: VantaStartMode = "auto",
+): void {
   const isDark = document.documentElement.classList.contains("dark");
   const wp = wallpapers[activeWallpaperIndex];
   const desktop = document.getElementById("desktop");
@@ -36,13 +99,13 @@ export function applyWallpaper(animate = false): void {
   if (animate && !skipFade) {
     desktop.classList.add("wallpaper-transitioning");
     requestAnimationFrame(() => {
-      applyWallpaperClasses(wp, isDark, desktop);
+      applyWallpaperClasses(wp, isDark, desktop, vantaStartMode);
       requestAnimationFrame(() => {
         desktop.classList.remove("wallpaper-transitioning");
       });
     });
   } else {
-    applyWallpaperClasses(wp, isDark, desktop);
+    applyWallpaperClasses(wp, isDark, desktop, vantaStartMode);
   }
 }
 
@@ -58,7 +121,7 @@ export function setTheme(dark: boolean): void {
   if (isVantaActive()) {
     updateVantaTheme(dark);
   }
-  applyWallpaper();
+  applyWallpaper(false, isVantaActive() ? "explicit" : "auto");
 
   const newTheme = dark ? "dark" : "light";
   document.querySelectorAll("iframe").forEach((frame) => {
@@ -112,13 +175,13 @@ export function toggleTheme(): void {
 
 export function cycleWallpaper(): void {
   setActiveWallpaperIndex((activeWallpaperIndex + 1) % wallpapers.length);
-  applyWallpaper(true);
+  applyWallpaper(true, "explicit");
 }
 
 export function setWallpaper(index: number): void {
   if (index >= 0 && index < wallpapers.length) {
     setActiveWallpaperIndex(index);
-    applyWallpaper(true);
+    applyWallpaper(true, "explicit");
   }
 }
 

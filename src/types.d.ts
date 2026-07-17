@@ -82,6 +82,7 @@ export interface WindowState {
   element: HTMLElement;
   config: WindowConfig;
   maximized: boolean;
+  opener?: HTMLElement | null;
   prevRect?: {
     left: string;
     top: string;
@@ -119,6 +120,8 @@ export interface VaultItem {
   url?: string;
   action?: string;
   file?: string;
+  appId?: string;
+  items?: { name: string; desc?: string; url?: string }[];
 }
 
 // Guess game state

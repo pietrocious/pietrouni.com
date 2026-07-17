@@ -7,6 +7,8 @@ export interface VaultItem {
   icon: string;
   desc: string;
   url?: string;
+  file?: string;
+  appId?: string;
   items?: { name: string; desc?: string; url?: string }[];
 }
 
@@ -16,7 +18,21 @@ export const vaultData: VaultItem[] = [
     title: "Resume",
     icon: '<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>',
     desc: "My resume in PDF format",
-    url: "https://pietrouni.com/vault/PietroUni_Resume_2026.pdf",
+    appId: "resume",
+  },
+  {
+    id: "cisco-tac-case-study",
+    title: "Troubleshooting under pressure",
+    icon: '<svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M7 4v6m10-6v6M5 13h4v6H5v-6Zm10 0h4v6h-4v-6Zm-3-3v4m-3 2h6"></path></svg>',
+    desc: "An anonymized Cisco TAC case study about turning an ambiguous incident into testable hypotheses",
+    file: "/vault/case-studies/cisco-tac-troubleshooting.md",
+  },
+  {
+    id: "iac-visualizer-case-study",
+    title: "Inside the IaC Visualizer",
+    icon: '<svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="m8 6-4 6 4 6m8-12 4 6-4 6M14 4l-4 16"></path></svg>',
+    desc: "How a lightweight parser turns Terraform and Kubernetes source into an explorable dependency graph",
+    file: "/vault/case-studies/iac-visualizer.md",
   },
   // TEMPORARILY DISABLED — Tech Stack hidden pending an honesty pass.
   // Trim the items below to only what's genuinely hands-on, then uncomment to re-enable.

@@ -7,7 +7,7 @@ import {
   updateWindowCursor, handleResizeStart,
 } from "./windows/manager";
 
-export async function openMarkdownViewer(title: string, filePath: string): Promise<void> {
+export async function openMarkdownViewer(filePath: string, title: string): Promise<void> {
   const viewerId = "md-viewer-" + title.replace(/[^a-z0-9]/gi, "");
 
   if (activeWindows[viewerId]) {

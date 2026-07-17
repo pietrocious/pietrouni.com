@@ -38,6 +38,7 @@ export function bringToFront(id: string): void {
 export function closeWindow(id: string): void {
   const win = document.getElementById(`win-${id}`);
   if (!win) return;
+  const opener = activeWindows[id]?.opener;
 
   // play close sound
   playWindowClose();
@@ -49,6 +50,8 @@ export function closeWindow(id: string): void {
   setTimeout(() => {
     if (win) win.remove();
     delete activeWindows[id];
+    if (opener?.isConnected) opener.focus();
+    else document.getElementById(`dock-${id}`)?.focus();
   }, 250);
 
   // update dock state

@@ -8,7 +8,8 @@ export let zIndexCounter = 100;
 export const activeWindows: Record<string, WindowState> = {};
 export let monitorInterval: ReturnType<typeof setInterval> | null = null;
 
-// wallpaper state — Halo (index 1) is default
+// wallpaper state — Halo (index 1) is default. It paints as CSS first and
+// progressively enhances to Vanta when the device can comfortably run it.
 export let activeWallpaperIndex = 1;
 
 // 3D vanta effects only
@@ -22,6 +23,9 @@ export const wallpapers: Wallpaper[] = [
 export const allWallpaperClasses: string[] = [
   "her-bg",
   "her-bg-dark",
+  "wallpaper-static-birds",
+  "wallpaper-static-halo",
+  "wallpaper-static-waves",
 ];
 
 // terminal stuff

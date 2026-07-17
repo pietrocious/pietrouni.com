@@ -23,7 +23,7 @@
     <title>Pietro Uni | Interactive Portfolio</title>
 
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;700&family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@600;700&family=Share+Tech+Mono&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <meta
@@ -106,7 +106,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://www.googletagmanager.com" />
-    <link rel="preconnect" href="https://images.unsplash.com" />
 
     <!-- fixedsys is essential -->
     <link
@@ -135,10 +134,69 @@
   <body
     class="h-screen w-screen text-her-text dark:text-her-textLight relative overflow-hidden transition-colors duration-1000 font-ui"
   >
+    <noscript>
+      <style>
+        body { height: auto !important; overflow: auto !important; background: #f4ebd9; }
+        #desktop { display: none !important; }
+        #portfolio-summary {
+          position: static !important;
+          width: auto !important;
+          height: auto !important;
+          max-width: 52rem;
+          margin: 0 auto !important;
+          padding: 2rem !important;
+          overflow: visible !important;
+          clip: auto !important;
+          white-space: normal !important;
+        }
+      </style>
+    </noscript>
+
+    <!-- Static semantic content for search engines, assistive technology, and
+         visitors browsing without JavaScript. The desktop remains the visual UI. -->
+    <main id="portfolio-summary" class="sr-only">
+      <h1>Pietro Uni — Network and Infrastructure Engineer</h1>
+      <p>
+        Pietro is a network and infrastructure engineer with more than three
+        years of Cisco TAC experience solving enterprise routing, switching,
+        and SDN problems. He now builds cloud infrastructure, automation, and
+        reliable systems with networking fundamentals at their core.
+      </p>
+      <h2>Featured projects</h2>
+      <ul>
+        <li>
+          <a href="https://github.com/pietrocious/terraform-aws-pietrouni" rel="noopener noreferrer">
+            Terraform AWS Modules
+          </a>
+          — Multi-AZ AWS networking, auto scaling, CloudFront, and automated deployment.
+        </li>
+        <li>
+          <a href="https://github.com/pietrocious/pietrouni.com" rel="noopener noreferrer">pietrouni.com</a>
+          — An interactive TypeScript portfolio with window management and DevOps demos.
+        </li>
+        <li>IaC Visualizer — an interactive dependency graph for Terraform and Kubernetes.</li>
+        <li>Network Topology — visualization for LLDP, CDP, and routing-table data.</li>
+        <li>Subnet Planner — an interactive VLSM and CIDR planning tool.</li>
+      </ul>
+      <h2>Technical exhibits and case studies</h2>
+      <ul>
+        <li><a href="/?app=sitearchitecture">How this site runs</a> — the tested GitHub Actions, S3, and CloudFront delivery path.</li>
+        <li><a href="/vault/case-studies/cisco-tac-troubleshooting.md">Troubleshooting under pressure</a> — a generalized Cisco TAC problem-solving case study.</li>
+        <li><a href="/vault/case-studies/iac-visualizer.md">Inside the IaC Visualizer</a> — implementation decisions and parser tradeoffs.</li>
+      </ul>
+      <h2>Contact</h2>
+      <p>
+        <a href="mailto:pietrouni@gmail.com">Email Pietro Uni</a> ·
+        <a href="https://github.com/pietrocious">GitHub</a> ·
+        <a href="https://linkedin.com/in/pietrouni">LinkedIn</a> ·
+        <a href="/PietroUni_Resume_2026.pdf">Resume (PDF)</a>
+      </p>
+    </main>
+
     <!-- Desktop Environment -->
     <div
       id="desktop"
-      class="absolute inset-0 transition-all duration-1000"
+      class="absolute inset-0 transition-all duration-1000 wallpaper-static-halo"
     >
       <!-- Menu Bar (MacOS Style) -->
       <div
@@ -318,12 +376,12 @@
           aria-label="Application dock"
         >
           <!-- README.md -->
-          <div
+          <button
+            type="button"
             id="dock-about"
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('about')"
             title="README.md"
-            role="button"
             aria-label="Open README.md"
           >
             <span class="dock-label">README.md</span>
@@ -333,15 +391,15 @@
               alt="README"
               aria-hidden="true"
             />
-          </div>
+          </button>
 
           <!-- Projects (Hexagon/Infrastructure) -->
-          <div
+          <button
+            type="button"
             id="dock-projects"
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('projects')"
             title="Projects"
-            role="button"
             aria-label="Open Projects"
           >
             <span class="dock-label">Projects</span>
@@ -351,15 +409,33 @@
               alt="Projects"
               aria-hidden="true"
             />
-          </div>
+          </button>
+
+          <!-- Resume -->
+          <button
+            type="button"
+            id="dock-resume"
+            class="dock-item cursor-pointer group"
+            onclick="restoreWindow('resume')"
+            title="Resume"
+            aria-label="Open Resume"
+          >
+            <span class="dock-label">Resume</span>
+            <img
+              class="dock-icon"
+              src="assets/icons/oasis-text.svg"
+              alt="Resume"
+              aria-hidden="true"
+            />
+          </button>
 
           <!-- Vault (Secure Archive/Briefcase) -->
-          <div
+          <button
+            type="button"
             id="dock-vault"
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('vault')"
             title="Vault"
-            role="button"
             aria-label="Open Vault"
           >
             <span class="dock-label">Vault</span>
@@ -369,15 +445,15 @@
               alt="Vault"
               aria-hidden="true"
             />
-          </div>
+          </button>
 
           <!-- Terminal (Command Console) -->
-          <div
+          <button
+            type="button"
             id="dock-terminal"
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('terminal')"
             title="Terminal"
-            role="button"
             aria-label="Open Terminal"
           >
             <span class="dock-label">Terminal</span>
@@ -387,15 +463,15 @@
               alt="Terminal"
               aria-hidden="true"
             />
-          </div>
+          </button>
 
           <!-- Lab (Experiments) -->
-          <div
+          <button
+            type="button"
             id="dock-experiments"
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('experiments')"
             title="Lab"
-            role="button"
             aria-label="Open Lab"
           >
             <span class="dock-label">Lab</span>
@@ -405,16 +481,16 @@
               alt="Lab"
               aria-hidden="true"
             />
-          </div>
+          </button>
 
 
           <!-- Settings -->
-          <div
+          <button
+            type="button"
             id="dock-settings"
             class="dock-item cursor-pointer group"
             onclick="restoreWindow('settings')"
             title="Settings"
-            role="button"
             aria-label="Open Settings"
           >
             <span class="dock-label">Settings</span>
@@ -424,7 +500,7 @@
               alt="Settings"
               aria-hidden="true"
             />
-          </div>
+          </button>
         </div>
       </div>
     </div>

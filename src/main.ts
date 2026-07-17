@@ -1,13 +1,4 @@
 
-// Lab Icons
-import snakeIcon from './assets/icons/lab/snake.png';
-import tictactoeIcon from './assets/icons/lab/tictactoe.png';
-import tetrisIcon from './assets/icons/lab/tetris.png';
-import threesIcon from './assets/icons/lab/threes.png';
-import doomIcon from './assets/icons/lab/doom.png';
-
-
-
 // config - static data
 import { fileSystem, asciiAlpha, PIETROS_COMMANDS, CYBERPUNK_COMMANDS, FALLOUT_COMMANDS } from './config';
 import { vaultData } from './vault';
@@ -21,6 +12,20 @@ import { initMonitor, startMonitor } from './monitor';
 import { initLaunchpadModule } from './launchpad';
 import { initMarkdownViewer } from './markdown-viewer';
 import { initTheme, updateThemeUI } from './theme';
+import { shouldOpenFirstVisitIntro } from './first-visit';
+import {
+  APP_REGISTRY,
+  buildAppUrl,
+  getAppMetadata,
+  getDeepLinkedApp,
+  isDeepLinkableApp,
+} from './app-registry';
+
+const snakeIcon = APP_REGISTRY.snake.icon;
+const tictactoeIcon = APP_REGISTRY.tictactoe.icon;
+const tetrisIcon = APP_REGISTRY.tetris.icon;
+const threesIcon = APP_REGISTRY.threes.icon;
+const doomIcon = APP_REGISTRY.doom.icon;
 
 // Vercel Web Analytics
 import { inject } from '@vercel/analytics';
@@ -99,8 +104,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // config object (kept for potential future use)
         const config = {};
 
+        let isHandlingAppRoute = false;
+
         // expose window manager functions globally for HTML onclick handlers
-        window.closeWindow = closeWindow;
+        window.closeWindow = (id) => {
+          closeWindow(id);
+          if (!isHandlingAppRoute && getDeepLinkedApp(window.location.href) === id) {
+            history.pushState({ app: null }, "", buildAppUrl(window.location.href, null));
+          }
+        };
         window.minimizeWindow = minimizeWindow;
         window.restoreWindow = (id) => restoreWindow(id, window.openWindow);
         window.toggleMaximize = toggleMaximize;
@@ -233,11 +245,11 @@ document.addEventListener("DOMContentLoaded", () => {
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">README (Display)</span>
-                                        <span class="font-display font-bold text-base">Copernicus</span>
+                                        <span class="font-display font-bold text-base">Georgia (system)</span>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">README (Body)</span>
-                                        <span class="font-serif text-base">Tiempos Text</span>
+                                        <span class="font-serif text-base">Georgia (system)</span>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">Terminal</span>
@@ -326,6 +338,29 @@ document.addEventListener("DOMContentLoaded", () => {
             width: 700,
             height: 800,
           },
+          resume: {
+            title: "Pietro Uni — Resume",
+            content: `
+                    <div class="h-full flex flex-col bg-her-paper dark:bg-[#2d1a14] text-her-dark dark:text-her-textLight">
+                        <div class="px-4 py-3 border-b border-her-text/10 dark:border-white/10 flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <div class="font-bold text-sm">PietroUni_Resume_2026.pdf</div>
+                                <div class="text-xs opacity-55">Network & infrastructure engineering</div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <a href="/PietroUni_Resume_2026.pdf" target="_blank" rel="noopener noreferrer" class="px-3 py-2 rounded-md border border-her-text/15 dark:border-white/15 text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/5 transition-colors">Open PDF</a>
+                                <a href="/PietroUni_Resume_2026.pdf" download="PietroUni_Resume_2026.pdf" class="px-3 py-2 rounded-md bg-her-red text-white text-xs font-semibold hover:opacity-85 transition-opacity">Download</a>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-h-0 bg-black/5 dark:bg-black/20">
+                            <iframe src="/PietroUni_Resume_2026.pdf#view=FitH" title="Pietro Uni resume PDF" class="w-full h-full border-0"></iframe>
+                        </div>
+                        <p class="px-4 py-2 text-[11px] opacity-55 md:hidden">If the embedded preview is unavailable on your browser, use Open PDF above.</p>
+                    </div>
+                `,
+            width: 900,
+            height: 720,
+          },
           projects: {
             title: "Projects",
             content: `
@@ -350,7 +385,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     
                                     <!-- Terraform AWS Modules -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" onclick="window.open('https://github.com/pietrocious/terraform-aws-pietrouni', '_blank', 'noopener,noreferrer')">
+                                    <a class="project-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 0ms" href="https://github.com/pietrocious/terraform-aws-pietrouni" target="_blank" rel="noopener noreferrer" aria-label="View Terraform AWS Modules on GitHub">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">Terraform AWS Modules</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Infrastructure</span>
@@ -366,10 +401,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                                 <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>GitHub</span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </a>
 
                                     <!-- pietrouni.com -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.open('https://github.com/pietrocious/pietrouni.com', '_blank', 'noopener,noreferrer')">
+                                    <a class="project-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-text/30 transition-colors cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" href="https://github.com/pietrocious/pietrouni.com" target="_blank" rel="noopener noreferrer" aria-label="View pietrouni.com on GitHub">
                                         <div class="flex justify-between items-start mb-2">
                                             <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">pietrouni.com</h3>
                                             <span class="text-[10px] px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 border border-her-text/10 opacity-70">Portfolio</span>
@@ -386,63 +421,34 @@ document.addEventListener("DOMContentLoaded", () => {
                                                 <span class="flex items-center gap-1 hover:underline hover:opacity-100 text-her-dark dark:text-her-textLight"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>GitHub</span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </a>
 
                                 </div>
                             </div>
 
-                            <!-- Coming Soon -->
+                            <!-- Featured Exhibit -->
                             <div>
                                 <div class="flex items-center gap-2 mb-4 opacity-50 text-xs font-bold tracking-widest uppercase text-her-dark dark:text-her-textLight">
-                                    <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Coming Soon
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h10"></path></svg>
+                                    Featured Exhibit
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                                    <!-- psbp-scripts -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 100ms">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">psbp-scripts</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
+                                <button type="button" class="project-card text-left w-full p-5 border border-her-red/25 bg-gradient-to-br from-blue-50/80 to-white/50 dark:from-blue-950/20 dark:to-white/5 rounded-xl hover:border-her-red/60 hover:-translate-y-0.5 hover:shadow-lg transition-all vault-card-animate" style="animation-delay: 100ms" onclick="window.openWindow('sitearchitecture')" aria-label="Open How this site runs">
+                                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                        <div class="max-w-xl">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <img src="assets/icons/network-wired.svg" class="w-6 h-6" alt="" />
+                                                <h3 class="font-semibold text-her-dark dark:text-her-textLight">How this site runs</h3>
+                                                <span class="text-[10px] px-2 py-0.5 rounded bg-her-red/10 text-her-red font-bold">LIVE ARCHITECTURE</span>
+                                            </div>
+                                            <p class="text-xs opacity-70 text-her-dark dark:text-her-textLight">Follow a commit through typecheck, tests, build, S3 deployment, and CloudFront cache invalidation. Includes the design decisions behind the static delivery path.</p>
                                         </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">PowerShell, bash and Python scripts for network automation, home lab automation and experiments.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">POWERSHELL</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">BASH</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PYTHON</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-50">
-                                                <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
-                                            </div>
+                                        <div class="flex flex-wrap gap-1.5 md:justify-end">
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10">GITHUB ACTIONS</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10">S3</span>
+                                            <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10">CLOUDFRONT</span>
                                         </div>
                                     </div>
-
-                                    <!-- runcible -->
-                                    <div class="p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg transition-colors vault-card-animate flex flex-col h-full" style="animation-delay: 150ms">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">runcible</h3>
-                                            <span class="text-[10px] px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 font-bold border border-yellow-200 dark:border-yellow-900/50">Coming Soon</span>
-                                        </div>
-                                        <p class="text-xs opacity-70 mb-4 text-her-dark dark:text-her-textLight flex-grow">An out-of-place artifact (OOPArt) — a self-contained AI knowledge system for edge hardware. Exploring how to compress human knowledge into the smallest viable form factor.</p>
-                                        <div class="mt-auto">
-                                            <div class="flex flex-wrap gap-1.5 mb-4">
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">PYTHON</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">LLM</span>
-                                                <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">RASPBERRY PI</span>
-                                            </div>
-                                            <div class="flex gap-3 text-xs opacity-50">
-                                                <span class="flex items-center gap-1 cursor-not-allowed"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>Coming soon</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Footer Message -->
-                            <div class="mt-8 text-center text-sm opacity-50 text-her-dark dark:text-her-textLight">
-                                <p class="font-semibold">More projects and categories will be added soon</p>
-                                <p class="text-xs mt-1">Including research papers, open source contributions, and experimental projects</p>
+                                </button>
                             </div>
 
                         </div>
@@ -450,6 +456,49 @@ document.addEventListener("DOMContentLoaded", () => {
                 `,
             width: 900,
             height: 700,
+          },
+
+          sitearchitecture: {
+            title: "How this site runs",
+            content: `
+                    <div class="h-full overflow-y-auto p-5 md:p-7 font-ui text-her-dark dark:text-her-textLight">
+                        <div class="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
+                            <div>
+                                <div class="text-[10px] font-mono font-bold tracking-[0.18em] uppercase text-her-red mb-2">Production delivery path</div>
+                                <h1 class="text-2xl md:text-3xl font-display font-bold">From commit to edge</h1>
+                                <p class="text-sm opacity-65 mt-2 max-w-2xl">A deliberately small static architecture: validate every change, publish immutable build output, then let the CDN do the serving.</p>
+                            </div>
+                            <a href="https://github.com/pietrocious/pietrouni.com/blob/main/.github/workflows/production.yml" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-her-red hover:underline">View workflow ↗</a>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-stretch gap-2 mb-6" aria-label="Deployment architecture">
+                            <div class="architecture-node"><span class="architecture-kicker">Source</span><strong>GitHub</strong><small>Push to main</small></div>
+                            <div class="architecture-arrow" aria-hidden="true">→</div>
+                            <div class="architecture-node"><span class="architecture-kicker">Quality gate</span><strong>GitHub Actions</strong><small>npm ci · typecheck · test suite · build</small></div>
+                            <div class="architecture-arrow" aria-hidden="true">→</div>
+                            <div class="architecture-node"><span class="architecture-kicker">Origin</span><strong>Amazon S3</strong><small>dist/ synchronized with deletion</small></div>
+                            <div class="architecture-arrow" aria-hidden="true">→</div>
+                            <div class="architecture-node"><span class="architecture-kicker">Edge</span><strong>CloudFront</strong><small>Global delivery + invalidation</small></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                            <article class="architecture-note"><h2>Failure stops delivery</h2><p>The deploy job depends on CI, so a type, test, or build failure never reaches the origin bucket.</p></article>
+                            <article class="architecture-note"><h2>Static by design</h2><p>No application server is required. S3 stores the artifact; CloudFront absorbs reads close to visitors.</p></article>
+                            <article class="architecture-note"><h2>Freshness is explicit</h2><p>After synchronization, the workflow invalidates CloudFront so the new application shell becomes visible.</p></article>
+                        </div>
+
+                        <div class="rounded-xl border border-her-text/10 dark:border-white/10 bg-black/[0.025] dark:bg-white/[0.035] p-4 md:p-5">
+                            <h2 class="font-bold mb-3">Operational tradeoffs</h2>
+                            <dl class="grid grid-cols-1 md:grid-cols-[9rem_1fr] gap-x-5 gap-y-3 text-sm">
+                                <dt class="font-mono text-xs text-her-red">Why this shape?</dt><dd class="opacity-75">Low operational overhead, low cost, and a delivery model that matches a client-side portfolio.</dd>
+                                <dt class="font-mono text-xs text-her-red">What is measured?</dt><dd class="opacity-75">The repository gates correctness through TypeScript, Vitest, and the production Vite build before deployment.</dd>
+                                <dt class="font-mono text-xs text-her-red">What would change?</dt><dd class="opacity-75">Dynamic APIs or authenticated data would introduce a separate compute boundary rather than turning the static origin into an application server.</dd>
+                            </dl>
+                        </div>
+                    </div>
+                `,
+            width: 980,
+            height: 680,
           },
 
           vault: {
@@ -599,7 +648,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
 
                                 <!-- IaC Visualizer -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.openWindow('iacvisualizer');">
+                                <button type="button" data-category="tools" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 50ms" onclick="window.openWindow('iacvisualizer');" aria-label="Open IaC Visualizer">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gaphor.Gaphor.svg" class="inline w-5 h-5 mr-1" alt="" /> IaC Visualizer</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">INTERACTIVE</span>
@@ -612,10 +661,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                                 <!-- Network Topology -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.openWindow('networktopology');">
+                                <button type="button" data-category="tools" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 100ms" onclick="window.openWindow('networktopology');" aria-label="Open Network Topology">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/network-wired.svg" class="inline w-5 h-5 mr-1" alt="" /> Network Topology</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">INTERACTIVE</span>
@@ -628,10 +677,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                                 <!-- Subnet Planner -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 150ms" onclick="window.openWindow('subnetplanner');">
+                                <button type="button" data-category="tools" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 150ms" onclick="window.openWindow('subnetplanner');" aria-label="Open Subnet Planner">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gnome.Calculator.svg" class="inline w-5 h-5 mr-1" alt="" /> Subnet Planner</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">INTERACTIVE</span>
@@ -644,10 +693,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">CANVAS</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                                 <!-- Finder -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 200ms" onclick="window.openWindow('finder');">
+                                <button type="button" data-category="tools" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 200ms" onclick="window.openWindow('finder');" aria-label="Open Finder">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight">📁 Finder</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-bold border border-purple-200 dark:border-purple-800">PROTOTYPE</span>
@@ -659,10 +708,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">UI</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                                 <!-- Monitoring -->
-                                <div data-category="tools" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 250ms" onclick="window.openWindow('monitor');">
+                                <button type="button" data-category="tools" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 250ms" onclick="window.openWindow('monitor');" aria-label="Open Monitoring">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight"><img src="assets/icons/org.gnome.SystemMonitor.svg" class="inline w-5 h-5 mr-1" alt="" /> Monitoring</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">WIP</span>
@@ -674,7 +723,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">MONITORING</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                                 <!-- ═══ Games ═══ -->
                                 <div class="col-span-full mt-4" data-category="games">
@@ -682,7 +731,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </div>
 
                                 <!-- DOOM -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 250ms" onclick="window.openWindow('doom');">
+                                <button type="button" data-category="games" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 250ms" onclick="window.openWindow('doom');" aria-label="Open DOOM">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${doomIcon}" class="w-5 h-5 object-contain" alt="DOOM" />DOOM</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
@@ -695,9 +744,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
                                     </div>
 
-                                </div>
+                                </button>
                                 <!-- Threes -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 500ms" onclick="window.openWindow('threes');">
+                                <button type="button" data-category="games" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 500ms" onclick="window.openWindow('threes');" aria-label="Open Threes">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${threesIcon}" class="w-5 h-5 object-contain" alt="Threes" />Threes!</h3>
                                         <div class="flex items-center gap-2">
@@ -712,10 +761,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                                 <!-- Snake -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 300ms" onclick="window.openWindow('snake');">
+                                <button type="button" data-category="games" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 300ms" onclick="window.openWindow('snake');" aria-label="Open Snake">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${snakeIcon}" class="w-5 h-5 object-contain" alt="Snake" />Snake</h3>
                                         <div class="flex items-center gap-2">
@@ -730,10 +779,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">ARCADE</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                                 <!-- Tic Tac Toe -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 400ms" onclick="window.openWindow('tictactoe');">
+                                <button type="button" data-category="games" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 400ms" onclick="window.openWindow('tictactoe');" aria-label="Open Tic Tac Toe">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${tictactoeIcon}" class="w-5 h-5 object-contain" alt="Tic Tac Toe" />Tic Tac Toe</h3>
                                         <span class="text-[10px] px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 font-bold border border-green-200 dark:border-green-800">PLAYABLE</span>
@@ -745,10 +794,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">MINIMAX</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                                 <!-- Tetris -->
-                                <div data-category="games" class="lab-card p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 450ms" onclick="window.openWindow('tetris');">
+                                <button type="button" data-category="games" class="lab-card text-left w-full p-4 border border-her-text/10 bg-white/40 dark:bg-white/5 rounded-lg hover:border-her-red/50 hover:-translate-y-1 hover:shadow-lg transition-all duration-200 cursor-pointer vault-card-animate flex flex-col h-full" style="animation-delay: 450ms" onclick="window.openWindow('tetris');" aria-label="Open Tetris">
                                     <div class="flex justify-between items-start mb-2">
                                         <h3 class="font-ui font-semibold text-her-dark dark:text-her-textLight flex items-center gap-1.5"><img src="${tetrisIcon}" class="w-5 h-5 object-contain" alt="Tetris" />Tetris</h3>
                                         <div class="flex items-center gap-2">
@@ -763,7 +812,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="px-2 py-1 text-[10px] rounded bg-black/5 dark:bg-white/10 text-her-dark dark:text-her-textLight">TYPESCRIPT</span>
                                         </div>
                                     </div>
-                                </div>
+                                </button>
 
                             </div>
                         </div>
@@ -1465,12 +1514,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // window ops
         window.openWindow = function (id) {
+          const winConfig = windows[id];
+          if (!winConfig) return;
+
+          if (!isHandlingAppRoute && isDeepLinkableApp(id)) {
+            const currentApp = getDeepLinkedApp(window.location.href);
+            if (currentApp !== id) {
+              history.pushState({ app: id }, "", buildAppUrl(window.location.href, id));
+            }
+          }
+
           if (activeWindows[id]) {
             restoreWindow(id);
             return;
           }
 
-          const winConfig = windows[id];
+          const activeElement = document.activeElement;
+          const opener = activeElement instanceof HTMLElement && activeElement !== document.body
+            ? activeElement
+            : null;
 
           // Random positioning offset to prevent stacking
           const randX = Math.floor(Math.random() * 50);
@@ -1572,8 +1634,16 @@ document.addEventListener("DOMContentLoaded", () => {
             element: winEl,
             config: winConfig,
             maximized: false,
+            opener,
             prevRect: null,
           };
+
+          // Move keyboard users into the new dialog. App-specific focus (for
+          // example the terminal input) can intentionally take over afterward.
+          requestAnimationFrame(() => {
+            winEl.querySelector<HTMLButtonElement>('.btn-neon.close')
+              ?.focus({ preventScroll: true });
+          });
 
           // Play window open sound
           playWindowOpen();
@@ -1587,38 +1657,21 @@ document.addEventListener("DOMContentLoaded", () => {
           }, 450);
 
           // Dock State + Launch Bounce
-          // Icon map for apps that don't have a static dock item
-          const dockIconMap: Record<string, { title: string; icon: string }> = {
-            snake: { title: "Snake", icon: snakeIcon },
-            tictactoe: { title: "Tic Tac Toe", icon: tictactoeIcon },
-            tetris: { title: "Tetris", icon: tetrisIcon },
-            threes: { title: "Threes!", icon: threesIcon },
-            doom: { title: "DOOM", icon: doomIcon },
-            gymroutine: { title: "Gym Routine", icon: "assets/icons/text-x-generic.svg" },
-            iacvisualizer: { title: "IaC Visualizer", icon: "assets/icons/org.gaphor.Gaphor.svg" },
-            networktopology: { title: "Network Topology", icon: "assets/icons/network-wired.svg" },
-            subnetplanner: { title: "Subnet Planner", icon: "assets/icons/org.gnome.Calculator.svg" },
-            monitor: { title: "Monitoring", icon: "assets/icons/org.gnome.SystemMonitor.svg" },
-            experiments: { title: "Lab", icon: "assets/icons/characters.svg" },
-            sysinfo: { title: "About", icon: "assets/icons/contacts.svg" },
-            finder: { title: "Finder", icon: "assets/icons/org.gnome.Nautilus.svg" },
-            launchpad: { title: "Launchpad", icon: "assets/icons/org.gnome.Extensions.svg" },
-          };
-
           let dockItem = document.getElementById(`dock-${id}`);
-          if (!dockItem && dockIconMap[id]) {
+          const appMetadata = getAppMetadata(id);
+          if (!dockItem && appMetadata) {
             // Dynamically create a dock item for this app
             const dockContainer = document.querySelector('.dock-container');
             if (dockContainer) {
-              const info = dockIconMap[id];
-              const div = document.createElement('div');
-              div.id = `dock-${id}`;
-              div.className = 'dock-item dock-item-dynamic cursor-pointer group';
-              div.setAttribute('onclick', `restoreWindow('${id}')`);
-              div.setAttribute('title', info.title);
-              div.setAttribute('role', 'button');
-              div.setAttribute('aria-label', `Open ${info.title}`);
-              div.innerHTML = `
+              const info = appMetadata;
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.id = `dock-${id}`;
+              button.className = 'dock-item dock-item-dynamic cursor-pointer group';
+              button.setAttribute('onclick', `restoreWindow('${id}')`);
+              button.setAttribute('title', info.title);
+              button.setAttribute('aria-label', `Open ${info.title}`);
+              button.innerHTML = `
                 <span class="dock-label">${info.title}</span>
                 ${['snake', 'tictactoe', 'tetris', 'threes', 'doom'].includes(id) 
                   ? `<div style="transform: scale(1.2); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"><img class="dock-icon" src="${info.icon}" alt="${info.title}" aria-hidden="true" /></div>`
@@ -1626,18 +1679,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
               `;
               // Add entry animation
-              div.style.opacity = '0';
-              div.style.transform = 'scale(0.3) translateY(20px)';
-              dockContainer.appendChild(div);
+              button.style.opacity = '0';
+              button.style.transform = 'scale(0.3) translateY(20px)';
+              dockContainer.appendChild(button);
               // Trigger animation
               requestAnimationFrame(() => {
-                div.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                div.style.opacity = '1';
-                div.style.transform = 'scale(1) translateY(0)';
-                setTimeout(() => { div.style.transition = ''; div.style.transform = ''; }, 350);
+                button.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                button.style.opacity = '1';
+                button.style.transform = 'scale(1) translateY(0)';
+                setTimeout(() => { button.style.transition = ''; button.style.transform = ''; }, 350);
               });
               refreshDockItems();
-              dockItem = div;
+              dockItem = button;
             }
           }
           if (dockItem) {
@@ -1650,18 +1703,6 @@ document.addEventListener("DOMContentLoaded", () => {
           if (id === "terminal")
             setTimeout(() => document.getElementById("cmd-input").focus(), 100);
           if (id === "vault") window.renderVault?.();
-          if (id === "resume") {
-            // Inject theme via URL param first
-            const theme = document.documentElement.classList.contains("dark")
-              ? "dark"
-              : "light";
-            const iframe = winEl.querySelector("iframe");
-            if (iframe) {
-              // Add theme param to src if not present
-              if (iframe.src.indexOf("?") === -1)
-                iframe.src += `?theme=${theme}`;
-            }
-          }
           if (id === "finder") window.initFinder();
           if (id === "launchpad") window.initLaunchpad();
           if (id === "settings") updateThemeUI();
@@ -1674,33 +1715,32 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         };
 
-        const deepLinkableApps = new Set(["gymroutine"]);
+        function openDeepLinkedApp(): boolean {
+          const appId = getDeepLinkedApp(window.location.href);
+          if (!appId) return false;
+          if (!isDeepLinkableApp(appId)) return false;
+          if (!windows[appId]) return false;
 
-        function getDeepLinkedApp(): string | null {
-          const queryParams = new URLSearchParams(window.location.search);
-          const queryApp = queryParams.get("app")?.toLowerCase();
-          if (queryApp) return queryApp;
-
-          const hash = window.location.hash.startsWith("#")
-            ? window.location.hash.slice(1)
-            : window.location.hash;
-          const hashParams = new URLSearchParams(hash);
-          const hashApp = hashParams.get("app")?.toLowerCase();
-
-          return hashApp || null;
+          isHandlingAppRoute = true;
+          try {
+            window.openWindow(appId);
+          } finally {
+            isHandlingAppRoute = false;
+          }
+          return true;
         }
 
-        function openDeepLinkedApp(): void {
-          const appId = getDeepLinkedApp();
-          if (!appId) return;
-          if (!deepLinkableApps.has(appId)) return;
-          if (!windows[appId]) return;
-
-          window.openWindow(appId);
-        }
-
+        window.addEventListener("popstate", openDeepLinkedApp);
         window.addEventListener("hashchange", openDeepLinkedApp);
-        openDeepLinkedApp();
+        const openedDeepLink = openDeepLinkedApp();
+        if (!openedDeepLink && shouldOpenFirstVisitIntro()) {
+          isHandlingAppRoute = true;
+          try {
+            window.openWindow("about");
+          } finally {
+            isHandlingAppRoute = false;
+          }
+        }
 
 
 
@@ -1767,21 +1807,33 @@ document.addEventListener("DOMContentLoaded", () => {
           grid.innerHTML = "";
 
           vaultData.forEach((item, i) => {
-            const card = document.createElement("div");
             const hasItems = item.items && item.items.length > 0;
-            const isClickable = !!(item.url || hasItems);
+            const isClickable = !!(item.url || item.file || item.appId || hasItems);
+            const card = document.createElement(item.url ? "a" : isClickable ? "button" : "div");
             card.className =
-              "p-3 md:p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-red/50 hover:-translate-y-0.5 transition-all group vault-card-animate" +
+              "p-3 md:p-4 border border-her-text/10 rounded-lg bg-white/60 dark:bg-white/5 hover:border-her-red/50 hover:-translate-y-0.5 transition-all group vault-card-animate text-left w-full" +
               (isClickable ? " cursor-pointer" : "");
             card.style.animationDelay = `${i * 50}ms`;
-            if (item.url) card.setAttribute("onclick", `window.open('${item.url}', '_blank', 'noopener,noreferrer')`);
-            else if (hasItems) card.setAttribute("onclick", `window.vaultShowDetail('${item.id}')`);
+            if (card instanceof HTMLButtonElement) card.type = "button";
+            if (card instanceof HTMLAnchorElement && item.url) {
+              card.href = item.url;
+              card.target = "_blank";
+              card.rel = "noopener noreferrer";
+            } else if (item.appId) {
+              card.addEventListener("click", () => window.openWindow(item.appId!));
+            } else if (item.file) {
+              card.addEventListener("click", () => window.openMarkdownViewer(item.file!, item.title));
+            } else if (hasItems) {
+              card.addEventListener("click", () => window.vaultShowDetail(item.id));
+            }
 
             // Badge icon
             let badge = '';
             if (item.url) {
               badge = '<svg class="w-3 h-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>';
-            } else if (hasItems) {
+            } else if (item.file) {
+              badge = '<svg class="w-3 h-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>';
+            } else if (item.appId || hasItems) {
               badge = '<svg class="w-3 h-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
             }
 
@@ -1934,8 +1986,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                  }
                  let imgSrc = '';
-                 if (fileName === 'vacation.jpg') imgSrc = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
-                 else if (fileName === 'setup.png') imgSrc = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80';
+                 if (fileName === 'vacation.jpg') imgSrc = '/assets/finder/vacation.webp';
+                 else if (fileName === 'setup.png') imgSrc = '/assets/finder/setup.webp';
                  else imgSrc = 'https://via.placeholder.com/400x300?text=' + fileName;
 
                  const winContent = `<div class="h-full flex items-center justify-center bg-black/90 p-4"><img src="${imgSrc}" class="max-w-full max-h-full rounded shadow-lg"></div>`;

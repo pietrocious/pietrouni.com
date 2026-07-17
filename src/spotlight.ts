@@ -1,5 +1,6 @@
 // Spotlight (Ctrl+K) search overlay
 import { vaultData } from "./vault";
+import { getLauncherApps } from "./app-registry";
 
 interface SpotlightApp {
   id: string;
@@ -7,16 +8,7 @@ interface SpotlightApp {
   icon: string;
 }
 
-const spotlightApps: SpotlightApp[] = [
-  { id: "finder", title: "Finder", icon: "assets/icons/org.gnome.Nautilus.svg" },
-  { id: "about", title: "README.md", icon: "assets/icons/org.gnome.Logs.svg" },
-  { id: "projects", title: "Projects", icon: "assets/icons/org.gnome.tweaks.svg" },
-  { id: "vault", title: "Vault", icon: "assets/icons/org.gnome.FileRoller.svg" },
-  { id: "terminal", title: "Terminal", icon: "assets/icons/org.gnome.Terminal.svg" },
-  { id: "settings", title: "Settings", icon: "assets/icons/org.gnome.Settings.svg" },
-  { id: "experiments", title: "Lab", icon: "assets/icons/characters.svg" },
-  { id: "sysinfo", title: "About", icon: "assets/icons/contacts.svg" },
-];
+const spotlightApps: SpotlightApp[] = getLauncherApps().map(({ id, title, icon }) => ({ id, title, icon }));
 
 export function toggleSpotlight(): void {
   const spot = document.getElementById("spotlight")!;
@@ -94,7 +86,11 @@ export function handleSearch(query: string): void {
         desc: `Vault • ${item.desc}`,
         action: item.url
           ? `window.open('${item.url}', '_blank', 'noopener,noreferrer'); toggleSpotlight();`
-          : `restoreWindow('vault'); toggleSpotlight();`,
+          : item.appId
+            ? `restoreWindow('${item.appId}'); toggleSpotlight();`
+            : item.file
+              ? `window.openMarkdownViewer('${item.file}', '${item.title}'); toggleSpotlight();`
+              : `restoreWindow('vault'); toggleSpotlight();`,
         icon: `<div class="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 text-gray-500 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>`,
       });
     }

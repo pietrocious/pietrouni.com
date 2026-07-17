@@ -6,6 +6,21 @@ import { fileSystem } from '../config';
 import { shuffledQuotes, quoteIndex, setQuoteIndex, shuffleArray, quotes, terminalHistory, registerTerminalCleanup } from '../state';
 import type { FileSystemNode, WindowConfig } from '../types';
 
+const TERMINAL_THEME_FONTS = {
+  cyberpunk: 'https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap',
+  fallout: 'https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap',
+} as const;
+
+function loadTerminalThemeFont(theme: keyof typeof TERMINAL_THEME_FONTS): void {
+  const id = `terminal-font-${theme}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  link.href = TERMINAL_THEME_FONTS[theme];
+  document.head.appendChild(link);
+}
+
 // sub-mode state - these are local to the terminal
 const guessGame = { active: false, target: 0 as number | null, attempts: 0 };
 const ciscoMode = { active: false };
@@ -114,6 +129,7 @@ export function handlePietrOSCommand(
 
   switch (cmd) {
     case "cyberpunk": {
+      loadTerminalThemeFont("cyberpunk");
       const termWin = document.getElementById("win-terminal");
       if (termWin) {
         termWin.classList.add("window-glitch");
@@ -138,6 +154,7 @@ export function handlePietrOSCommand(
     }
 
     case "fallout": {
+      loadTerminalThemeFont("fallout");
       const termWinFallout = document.getElementById("win-terminal");
       if (termWinFallout) {
         termWinFallout.classList.add("window-glitch");

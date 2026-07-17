@@ -1,20 +1,20 @@
 // service worker for pietrouni.com pwa
 // version-based cache busting
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const CACHE_NAME = `pietrouni-${CACHE_VERSION}`;
 
 // assets to cache on install (app shell)
 // note: styles.css is hashed by Vite at build time, so it can't be listed here —
 // it gets picked up by the runtime /assets/ pattern below on first fetch.
-// fixedsys.ttf is also omitted: the file isn't present under public/fonts/ right now,
-// and caches.addAll() fails the whole install if any single URL 404s.
-const SHELL_ASSETS = ["/", "/index.html"];
+// Fixedsys is preloaded by index.html and is part of the essential app shell.
+const SHELL_ASSETS = ["/", "/index.html", "/fonts/fixedsys.ttf"];
 
 // assets to cache on first fetch
 const RUNTIME_CACHE_PATTERNS = [
   /^https:\/\/fonts\.googleapis\.com/,
   /^https:\/\/fonts\.gstatic\.com/,
   /\/assets\//,
+  /\/fonts\//,
 ];
 
 // install event - cache shell assets
