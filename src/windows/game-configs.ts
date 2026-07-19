@@ -83,7 +83,7 @@ export const gameWindowConfigs: Record<string, WindowConfig> = {
           gymroutine: {
             title: "Gym Routine",
             content: `
-                    <div id="gym-routine-container" class="h-full w-full bg-[#0e0e0e]"></div>
+                    <div id="gym-routine-container" class="h-full w-full bg-her-paper dark:bg-her-darker"></div>
                 `,
             width: 1100,
             height: 820,

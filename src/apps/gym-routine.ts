@@ -1,4 +1,4 @@
-import gymRoutineHtml from '../experiments/gym-routine.html?raw';
+import gymRoutineHtml from '../../experiments/gym-routine.html?raw';
 
 let gymRoutineFrame: HTMLIFrameElement | null = null;
 

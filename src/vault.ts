@@ -34,6 +34,13 @@ export const vaultData: VaultItem[] = [
     desc: "How a lightweight parser turns Terraform and Kubernetes source into an explorable dependency graph",
     file: "/vault/case-studies/iac-visualizer.md",
   },
+  {
+    id: "gym-routine",
+    title: "Training",
+    icon: '<svg class="w-6 h-6 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M3.5 9v6m3-8v10m11-10v10m3-8v6M6.5 12h11"></path></svg>',
+    desc: "My five-day home gym routine and weekly training dashboard",
+    appId: "gymroutine",
+  },
   // TEMPORARILY DISABLED — Tech Stack hidden pending an honesty pass.
   // Trim the items below to only what's genuinely hands-on, then uncomment to re-enable.
   /*
