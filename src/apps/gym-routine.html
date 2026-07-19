@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pietro's Gym Routine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f2e7;
+    --bg-strong: #efe4d2;
+    --surface: rgba(255, 255, 255, 0.76);
+    --surface-strong: rgba(255, 255, 255, 0.92);
+    --surface-soft: rgba(74, 124, 157, 0.08);
+    --border: rgba(78, 52, 46, 0.12);
+    --border-strong: rgba(74, 124, 157, 0.24);
+    --text: #3e2723;
+    --muted: rgba(62, 39, 35, 0.7);
+    --accent: #4a7c9d;
+    --accent-soft: rgba(74, 124, 157, 0.12);
+    --accent-strong: #5b9ab8;
+    --shadow: 0 24px 70px rgba(62, 39, 35, 0.1);
+    --push: #cb7b4f;
+    --pull: #4a7c9d;
+    --legs: #76955d;
+    --upper: #8d5d86;
+    --lower: #b4823d;
+    --success: #6b9f59;
+  }
+
+  html[data-theme="dark"] {
+    --bg: #171310;
+    --bg-strong: #231c17;
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.08);
+    --surface-soft: rgba(91, 154, 184, 0.08);
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(91, 154, 184, 0.2);
+    --text: #efebe9;
+    --muted: rgba(239, 235, 233, 0.65);
+    --accent: #5b9ab8;
+    --accent-soft: rgba(91, 154, 184, 0.14);
+    --accent-strong: #85b7cf;
+    --shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+    --push: #e7a06c;
+    --pull: #85b7cf;
+    --legs: #aad089;
+    --upper: #c38fba;
+    --lower: #dfbc70;
+    --success: #8ec47a;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+  }
+
+  body {
+    font-family: "DM Sans", sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 12% 0%, rgba(74, 124, 157, 0.18), transparent 24%),
+      radial-gradient(circle at 88% 0%, rgba(203, 123, 79, 0.12), transparent 22%),
+      linear-gradient(180deg, var(--bg) 0%, var(--bg-strong) 100%);
+  }
+
+  button {
+    font: inherit;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .app-frame {
+    max-width: 1440px;
+    margin: 0 auto;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, var(--surface-strong) 0%, var(--surface) 100%);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow);
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent);
+  }
+
+  .topbar-label,
+  .chip,
+  .mini-label,
+  .stat-label,
+  .section-kicker,
+  .exercise-index,
+  .exercise-tag,
+  .exercise-load,
+  .day-meta,
+  .footer {
+    font-family: "JetBrains Mono", monospace;
+  }
+
+  .topbar-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .topbar-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--success);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--success) 16%, transparent);
+  }
+
+  .topbar-right {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-soft);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .hero {
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+    background:
+      linear-gradient(135deg, rgba(74, 124, 157, 0.12), transparent 56%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(340px, 0.95fr);
+    gap: 16px;
+  }
+
+  .hero-card {
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    background: var(--surface);
+    padding: 20px;
+    min-width: 0;
+  }
+
+  .hero-card.primary {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-card.primary::after {
+    content: "";
+    position: absolute;
+    top: -36px;
+    right: -32px;
+    width: 180px;
+    height: 180px;
+    border-radius: 999px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent), transparent 68%);
+    pointer-events: none;
+  }
+
+  .section-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .hero-title {
+    margin: 0;
+    font-family: "Rajdhani", sans-serif;
+    font-size: clamp(2.7rem, 5vw, 5rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .hero-title .accent {
+    color: var(--accent);
+  }
+
+  .hero-copy {
+    max-width: 680px;
+    margin: 12px 0 0;
+    font-size: 0.98rem;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .hero-insights {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .mini-stat {
+    padding: 12px 14px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+  }
+
+  .mini-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .mini-value {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .dashboard-tile {
+    padding: 16px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-strong) 84%, transparent);
+  }
+
+  .dashboard-tile.highlight {
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+      color-mix(in srgb, var(--surface-strong) 84%, transparent);
+    border-color: var(--border-strong);
+  }
+
+  .dashboard-title {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .dashboard-value {
+    display: block;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .dashboard-copy {
+    margin: 8px 0 0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .week-strip {
+    padding: 16px 24px 0;
+  }
+
+  .week-nav {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .week-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 15px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  }
+
+  .week-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--border-strong);
+  }
+
+  .week-btn.active {
+    border-color: color-mix(in srgb, var(--week-color) 24%, var(--border));
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--week-color) 18%, transparent), transparent 72%),
+      var(--surface-strong);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--week-color) 20%, transparent);
+  }
+
+  .week-btn[data-day="push"] { --week-color: var(--push); }
+  .week-btn[data-day="pull"] { --week-color: var(--pull); }
+  .week-btn[data-day="legs"] { --week-color: var(--legs); }
+  .week-btn[data-day="upper"] { --week-color: var(--upper); }
+  .week-btn[data-day="lower"] { --week-color: var(--lower); }
+
+  .week-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .week-day {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .week-kind {
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.45rem;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--week-color);
+  }
+
+  .week-focus {
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .app-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.85fr);
+    gap: 18px;
+    padding: 18px 24px 24px;
+  }
+
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .section-heading p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .session-stack {
+    display: grid;
+    gap: 12px;
+  }
+
+  .day-card {
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+  }
+
+  .day-card[data-kind="push"] { --day-color: var(--push); }
+  .day-card[data-kind="pull"] { --day-color: var(--pull); }
+  .day-card[data-kind="legs"] { --day-color: var(--legs); }
+  .day-card[data-kind="upper"] { --day-color: var(--upper); }
+  .day-card[data-kind="lower"] { --day-color: var(--lower); }
+
+  .day-card.open {
+    border-color: color-mix(in srgb, var(--day-color) 20%, var(--border));
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.05);
+  }
+
+  .day-card:hover {
+    transform: translateY(-1px);
+  }
+
+  .day-header {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    padding: 18px 18px 16px;
+    border: 0;
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--day-color) 13%, transparent), transparent 62%);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .day-badge {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--day-color) 24%, var(--border));
+    background: color-mix(in srgb, var(--day-color) 16%, var(--surface));
+    color: var(--day-color);
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .day-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .day-title {
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.8rem;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .day-pill,
+  .exercise-tag,
+  .exercise-load {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .day-pill {
+    color: var(--day-color);
+    border-color: color-mix(in srgb, var(--day-color) 18%, var(--border));
+  }
+
+  .day-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .day-summary {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .day-toggle {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface-strong);
+    color: var(--muted);
+    transition: transform 160ms ease, color 160ms ease;
+  }
+
+  .day-card.open .day-toggle {
+    transform: rotate(45deg);
+    color: var(--day-color);
+  }
+
+  .day-body {
+    display: none;
+    padding: 0 18px 18px;
+  }
+
+  .day-card.open .day-body {
+    display: block;
+  }
+
+  .exercise-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .exercise-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: start;
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-strong) 84%, transparent);
+  }
+
+  .exercise-index {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--day-color) 14%, transparent);
+    color: var(--day-color);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .exercise-name {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .exercise-note {
+    margin: 6px 0 0;
+    font-size: 0.92rem;
+    line-height: 1.58;
+    color: var(--muted);
+  }
+
+  .exercise-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: end;
+    min-width: 170px;
+  }
+
+  .exercise-load {
+    color: var(--day-color);
+    border-color: color-mix(in srgb, var(--day-color) 18%, var(--border));
+  }
+
+  .sidebar {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    position: sticky;
+    top: 18px;
+  }
+
+  .panel {
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 18px;
+  }
+
+  .panel h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .panel p {
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.62;
+    color: var(--muted);
+  }
+
+  .today-card {
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 72%),
+      var(--surface);
+  }
+
+  .today-grid {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .today-stat {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+    font-size: 0.92rem;
+  }
+
+  .today-stat strong {
+    font-weight: 700;
+  }
+
+  .distribution {
+    display: grid;
+    gap: 10px;
+  }
+
+  .distribution-row {
+    display: grid;
+    gap: 6px;
+  }
+
+  .distribution-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.88rem;
+  }
+
+  .distribution-track {
+    height: 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+    overflow: hidden;
+  }
+
+  .distribution-fill {
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  .checklist {
+    display: grid;
+    gap: 10px;
+  }
+
+  .check-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-strong) 84%, transparent);
+  }
+
+  .check-dot {
+    width: 10px;
+    height: 10px;
+    margin-top: 6px;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+
+  .check-item strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 0.92rem;
+  }
+
+  .check-item span {
+    display: block;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .footer {
+    padding: 0 24px 22px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  @media (max-width: 1120px) {
+    .hero-grid,
+    .app-content {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      position: static;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .week-nav {
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
+      overflow-x: auto;
+    }
+
+    .hero-insights,
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .exercise-row {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .exercise-meta {
+      grid-column: 2;
+      justify-content: start;
+      min-width: 0;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .app-shell {
+      padding: 0;
+    }
+
+    .app-frame {
+      min-height: 100vh;
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+    }
+
+    .topbar,
+    .hero,
+    .week-strip,
+    .app-content,
+    .footer {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .topbar {
+      align-items: start;
+      flex-direction: column;
+    }
+
+    .day-header {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .day-toggle {
+      display: none;
+    }
+  }
+</style>
+<style>
+  /* pietrOS visual alignment -------------------------------------------------
+     The routine remains isolated in an iframe, so the site's design tokens are
+     mirrored here rather than inherited from the parent document. */
+  @font-face {
+    font-family: "Copernicus";
+    src: url("/fonts/copernicus-title/CopernicusTrial-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Copernicus";
+    src: url("/fonts/copernicus-title/CopernicusTrial-Extrabold.woff2") format("woff2");
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Tiempos Text";
+    src: url("/fonts/test-tiempos-text/TestTiemposText-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #fdfbf7;
+    --bg-strong: #f4ebd9;
+    --surface: rgba(255, 255, 255, 0.58);
+    --surface-strong: rgba(255, 255, 255, 0.86);
+    --surface-soft: rgba(74, 124, 157, 0.07);
+    --border: rgba(78, 52, 46, 0.12);
+    --border-strong: rgba(74, 124, 157, 0.38);
+    --text: #3e2723;
+    --muted: rgba(78, 52, 46, 0.62);
+    --accent: #4a7c9d;
+    --accent-soft: rgba(74, 124, 157, 0.11);
+    --accent-strong: #345f7d;
+    --shadow: 0 10px 28px rgba(62, 39, 35, 0.06);
+  }
+
+  html[data-theme="dark"] {
+    --bg: #1a1412;
+    --bg-strong: #251d19;
+    --surface: rgba(255, 255, 255, 0.035);
+    --surface-strong: rgba(255, 255, 255, 0.065);
+    --surface-soft: rgba(91, 154, 184, 0.08);
+    --border: rgba(239, 235, 233, 0.1);
+    --border-strong: rgba(91, 154, 184, 0.42);
+    --text: #efebe9;
+    --muted: rgba(239, 235, 233, 0.58);
+    --accent: #5b9ab8;
+    --accent-soft: rgba(91, 154, 184, 0.13);
+    --accent-strong: #86bdd5;
+    --shadow: 0 12px 34px rgba(0, 0, 0, 0.16);
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    overflow: auto;
+    background: var(--bg);
+    font-family: "DM Sans", sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(rgba(74, 124, 157, 0.026) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74, 124, 157, 0.026) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(to bottom, black, transparent 65%);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .app-shell {
+    min-height: 100%;
+    padding: 0;
+  }
+
+  .app-frame {
+    width: 100%;
+    min-height: 100vh;
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .topbar {
+    min-height: 46px;
+    padding: 9px 20px;
+    border-bottom-color: var(--border);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(16px);
+  }
+
+  .topbar-label {
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+  }
+
+  .topbar-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  .topbar-right {
+    gap: 6px;
+  }
+
+  .chip {
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .hero {
+    padding: 28px 24px 22px;
+    border-bottom-color: var(--border);
+    background:
+      radial-gradient(circle at 82% 12%, var(--accent-soft), transparent 27%),
+      linear-gradient(180deg, color-mix(in srgb, var(--bg-strong) 34%, transparent), transparent);
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.8fr);
+    gap: 28px;
+    align-items: stretch;
+  }
+
+  .hero-card,
+  .hero-card.primary {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .hero-card.primary {
+    padding-right: 28px;
+    border-right: 1px solid var(--border);
+  }
+
+  .hero-card.primary::after {
+    display: none;
+  }
+
+  .section-kicker {
+    margin-bottom: 9px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+  }
+
+  .section-kicker::before {
+    content: "";
+    width: 18px;
+    height: 1px;
+    background: currentColor;
+  }
+
+  .hero-title {
+    font-family: "Copernicus", "Tiempos Headline", serif;
+    font-size: clamp(2.35rem, 5vw, 4.6rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+    text-transform: none;
+  }
+
+  .hero-title .accent {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .hero-copy {
+    max-width: 620px;
+    margin-top: 12px;
+    font-family: "Tiempos Text", "Iowan Old Style", serif;
+    font-size: 0.96rem;
+    line-height: 1.58;
+  }
+
+  .hero-insights {
+    gap: 0;
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .mini-stat {
+    min-width: 0;
+    padding: 12px 13px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .mini-stat + .mini-stat {
+    padding-left: 13px;
+    border-left: 1px solid var(--border);
+  }
+
+  .mini-label {
+    margin-bottom: 4px;
+    font-size: 8px;
+  }
+
+  .mini-value {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .dashboard-grid {
+    height: 100%;
+    gap: 8px;
+  }
+
+  .dashboard-tile,
+  .dashboard-tile.highlight {
+    padding: 13px 14px;
+    border-radius: 9px;
+    background: var(--surface);
+    box-shadow: none;
+  }
+
+  .dashboard-tile.highlight {
+    background: var(--accent-soft);
+  }
+
+  .dashboard-title {
+    margin-bottom: 5px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 8px;
+    letter-spacing: 0.13em;
+  }
+
+  .dashboard-value {
+    font-family: "Copernicus", serif;
+    font-size: 1.12rem;
+    font-weight: 500;
+  }
+
+  .dashboard-copy {
+    margin-top: 5px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .week-strip {
+    padding: 0;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface-strong) 54%, transparent);
+  }
+
+  .week-nav {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .week-btn {
+    min-width: 150px;
+    flex: 1 0 150px;
+    gap: 4px;
+    padding: 13px 16px 12px;
+    border: 0;
+    border-right: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset 0 -2px transparent;
+  }
+
+  .week-btn:hover {
+    transform: none;
+    border-color: var(--border);
+    background: var(--surface-soft);
+  }
+
+  .week-btn.active {
+    border-color: var(--border);
+    background: var(--accent-soft);
+    box-shadow: inset 0 -2px var(--accent);
+  }
+
+  .week-day {
+    font-size: 8px;
+  }
+
+  .week-kind {
+    font-family: "Copernicus", serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    text-transform: none;
+  }
+
+  .week-focus {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .day-pill,
+  .exercise-tag,
+  .exercise-load {
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-size: 8px;
+  }
+
+  .app-content {
+    grid-template-columns: minmax(0, 1.7fr) minmax(260px, 0.72fr);
+    gap: 20px;
+    padding: 22px 24px 26px;
+  }
+
+  .section-heading {
+    align-items: start;
+    margin-bottom: 10px;
+  }
+
+  .section-heading h2,
+  .panel h3 {
+    font-family: "Copernicus", serif;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+
+  .section-heading h2 {
+    font-size: 1.3rem;
+  }
+
+  .section-heading p {
+    margin-top: 2px;
+    font-size: 0.76rem;
+  }
+
+  .session-stack {
+    gap: 8px;
+  }
+
+  .day-card {
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--surface) 76%, transparent);
+  }
+
+  .day-card.open {
+    border-color: color-mix(in srgb, var(--day-color) 28%, var(--border));
+    box-shadow: var(--shadow);
+  }
+
+  .day-card:hover {
+    transform: none;
+    border-color: color-mix(in srgb, var(--day-color) 24%, var(--border));
+  }
+
+  .day-header {
+    gap: 13px;
+    padding: 12px 13px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--day-color) 8%, transparent), transparent 54%);
+  }
+
+  .day-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.8rem;
+  }
+
+  .day-title-row {
+    gap: 7px;
+    margin-bottom: 4px;
+  }
+
+  .day-title {
+    font-family: "Copernicus", serif;
+    font-size: 1.32rem;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    text-transform: none;
+  }
+
+  .day-meta {
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 8px;
+    letter-spacing: 0.06em;
+  }
+
+  .day-summary {
+    font-family: "Tiempos Text", serif;
+    font-size: 0.78rem;
+    line-height: 1.42;
+  }
+
+  .day-toggle {
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+  }
+
+  .day-body {
+    padding: 0 13px 13px;
+  }
+
+  .exercise-list {
+    gap: 6px;
+  }
+
+  .exercise-row {
+    grid-template-columns: auto minmax(0, 1fr) minmax(145px, auto);
+    gap: 11px;
+    padding: 10px 11px;
+    border-radius: 8px;
+    background: var(--surface-strong);
+  }
+
+  .exercise-index {
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
+    font-size: 8px;
+  }
+
+  .exercise-name {
+    font-size: 0.84rem;
+    letter-spacing: -0.01em;
+  }
+
+  .exercise-note {
+    margin-top: 3px;
+    font-family: "Tiempos Text", serif;
+    font-size: 0.76rem;
+    line-height: 1.42;
+  }
+
+  .exercise-meta {
+    min-width: 0;
+    gap: 5px;
+  }
+
+  .sidebar {
+    gap: 8px;
+    top: 12px;
+  }
+
+  .panel {
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--surface);
+  }
+
+  .panel h3 {
+    margin-bottom: 7px;
+    font-size: 1.04rem;
+  }
+
+  .panel p {
+    font-family: "Tiempos Text", serif;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .today-card {
+    background: linear-gradient(145deg, var(--accent-soft), var(--surface) 74%);
+  }
+
+  .today-grid,
+  .distribution,
+  .checklist {
+    gap: 6px;
+  }
+
+  .today-grid {
+    margin-top: 10px;
+  }
+
+  .today-stat,
+  .check-item {
+    padding: 8px 9px;
+    border-radius: 7px;
+    background: var(--surface-strong);
+    font-size: 0.73rem;
+  }
+
+  .today-stat {
+    align-items: start;
+  }
+
+  .today-stat strong {
+    max-width: 54%;
+    text-align: right;
+  }
+
+  .distribution-row {
+    gap: 4px;
+  }
+
+  .distribution-top {
+    font-size: 0.72rem;
+  }
+
+  .distribution-track {
+    height: 5px;
+  }
+
+  .check-item {
+    gap: 8px;
+  }
+
+  .check-dot {
+    width: 6px;
+    height: 6px;
+    margin-top: 5px;
+  }
+
+  .check-item strong {
+    margin-bottom: 2px;
+    font-size: 0.74rem;
+  }
+
+  .check-item span {
+    font-family: "Tiempos Text", serif;
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+
+  .footer {
+    padding: 0 24px 18px;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 960px) {
+    .hero-grid,
+    .app-content {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-card.primary {
+      padding: 0 0 22px;
+      border-right: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dashboard-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .sidebar {
+      position: static;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .topbar {
+      align-items: center;
+      flex-direction: row;
+      padding: 8px 14px;
+    }
+
+    .topbar-right .chip:not(:first-child) {
+      display: none;
+    }
+
+    .hero,
+    .app-content {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .hero {
+      padding-top: 22px;
+      padding-bottom: 18px;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 13vw, 3.25rem);
+    }
+
+    .hero-insights {
+      grid-template-columns: 1fr;
+    }
+
+    .mini-stat,
+    .mini-stat + .mini-stat {
+      padding: 9px 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dashboard-grid,
+    .sidebar {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .sidebar .panel:first-child {
+      grid-column: 1 / -1;
+    }
+
+    .app-content {
+      padding-top: 18px;
+    }
+
+    .exercise-row {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .exercise-meta {
+      grid-column: 2;
+      justify-content: start;
+    }
+
+    .footer {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .dashboard-grid,
+    .sidebar {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar .panel:first-child {
+      grid-column: auto;
+    }
+
+    .day-header {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .day-toggle {
+      display: none;
+    }
+
+    .day-meta span:last-child,
+    .day-summary {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="app-frame">
+    <div class="topbar">
+      <div class="topbar-label"><span class="topbar-dot"></span> pietrOS / private utility</div>
+      <div class="topbar-right">
+        <span class="chip">Current program</span>
+        <span class="chip">Beginner</span>
+        <span class="chip">Hypertrophy</span>
+      </div>
+    </div>
+
+    <header class="hero">
+      <div class="hero-grid">
+        <section class="hero-card primary">
+          <div class="section-kicker">Home gym program · Current block</div>
+          <h1 class="hero-title">Five days. <span class="accent">One rhythm.</span></h1>
+          <p class="hero-copy">
+            A five-day beginner hypertrophy program built around the home gym. Pick the day, keep the cues close, and add one clean rep before adding weight.
+          </p>
+          <div class="hero-insights">
+            <div class="mini-stat">
+              <span class="mini-label">Split</span>
+              <span class="mini-value">Push / Pull / Legs / Upper / Lower</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-label">Rest</span>
+              <span class="mini-value">2-3 min compounds · 60-90 sec isolation</span>
+            </div>
+            <div class="mini-stat">
+              <span class="mini-label">Target</span>
+              <span class="mini-value">Add 1 rep or a small load weekly</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="hero-card">
+          <div class="dashboard-grid">
+            <div class="dashboard-tile highlight">
+              <span class="dashboard-title">Today</span>
+              <span class="dashboard-value">D1 Push</span>
+              <p class="dashboard-copy">Heavy pressing, shoulder volume, and triceps with safe solo setup.</p>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-title">Weekly Sets</span>
+              <span class="dashboard-value">83</span>
+              <p class="dashboard-copy">Three heavy sessions and two lighter volume days across the week.</p>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-title">Session Length</span>
+              <span class="dashboard-value">55-75 min</span>
+              <p class="dashboard-copy">Heavy days run longer because compounds get full rest.</p>
+            </div>
+            <div class="dashboard-tile">
+              <span class="dashboard-title">Rule</span>
+              <span class="dashboard-value">1-2 RIR</span>
+              <p class="dashboard-copy">Work hard, but stop while bar speed and form are still clean.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </header>
+
+    <section class="week-strip" aria-label="Week overview">
+      <div class="week-nav">
+        <button class="week-btn active" type="button" data-day="push" onclick="activateDay('push')">
+          <div class="week-topline"><span class="week-day">Day 1</span><span class="day-pill">Heavy</span></div>
+          <div class="week-kind">Push</div>
+          <div class="week-focus">Chest, shoulders, triceps</div>
+        </button>
+        <button class="week-btn" type="button" data-day="pull" onclick="activateDay('pull')">
+          <div class="week-topline"><span class="week-day">Day 2</span><span class="day-pill">Heavy</span></div>
+          <div class="week-kind">Pull</div>
+          <div class="week-focus">Back, biceps, rear delts</div>
+        </button>
+        <button class="week-btn" type="button" data-day="legs" onclick="activateDay('legs')">
+          <div class="week-topline"><span class="week-day">Day 3</span><span class="day-pill">Heavy</span></div>
+          <div class="week-kind">Legs</div>
+          <div class="week-focus">Squat, hinge, calves</div>
+        </button>
+        <button class="week-btn" type="button" data-day="upper" onclick="activateDay('upper')">
+          <div class="week-topline"><span class="week-day">Day 4</span><span class="day-pill">Volume</span></div>
+          <div class="week-kind">Upper</div>
+          <div class="week-focus">Repeat patterns with lighter load</div>
+        </button>
+        <button class="week-btn" type="button" data-day="lower" onclick="activateDay('lower')">
+          <div class="week-topline"><span class="week-day">Day 5</span><span class="day-pill">Volume</span></div>
+          <div class="week-kind">Lower</div>
+          <div class="week-focus">Lower body and core finish</div>
+        </button>
+      </div>
+    </section>
+
+    <main class="app-content">
+      <section>
+        <div class="section-heading">
+          <div>
+            <h2>Sessions</h2>
+            <p>Open any day from the week strip or the card header.</p>
+          </div>
+        </div>
+
+        <div class="session-stack">
+          <article class="day-card open" data-kind="push" data-day="push">
+            <button class="day-header" type="button" aria-expanded="true" onclick="toggleDay(this)">
+              <div class="day-badge">D1</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Push</div>
+                  <span class="day-pill">Heavy</span>
+                </div>
+                <div class="day-meta">
+                  <span>5 exercises</span>
+                  <span>16 working sets</span>
+                  <span>Chest · Shoulders · Triceps</span>
+                </div>
+                <div class="day-summary">Open with stable pressing, then stack chest and shoulder volume without needing risky solo bench setup.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-list">
+                <div class="exercise-row">
+                  <div class="exercise-index">01</div>
+                  <div>
+                    <h3 class="exercise-name">Cable Chest Press</h3>
+                    <p class="exercise-note">Pulleys low, press forward with a slight forward lean.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">4 × 8-10</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">20kg</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">02</div>
+                  <div>
+                    <h3 class="exercise-name">Pec Deck Fly</h3>
+                    <p class="exercise-note">Squeeze the chest at the front and control the return.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 12-15</span><span class="exercise-tag">Domyos</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">03</div>
+                  <div>
+                    <h3 class="exercise-name">DB Overhead Press</h3>
+                    <p class="exercise-note">Seated or standing with a neutral spine.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 8-10</span><span class="exercise-tag">Dumbbells</span><span class="exercise-load">6kg DB</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">04</div>
+                  <div>
+                    <h3 class="exercise-name">Cable Lateral Raise</h3>
+                    <p class="exercise-note">Single handle, pulley low, raise to shoulder height for constant tension.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 15</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">05</div>
+                  <div>
+                    <h3 class="exercise-name">Tricep Pushdown</h3>
+                    <p class="exercise-note">Rope attachment, elbows pinned, full extension.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 12-15</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">20kg</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day-card" data-kind="pull" data-day="pull">
+            <button class="day-header" type="button" aria-expanded="false" onclick="toggleDay(this)">
+              <div class="day-badge">D2</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Pull</div>
+                  <span class="day-pill">Heavy</span>
+                </div>
+                <div class="day-meta">
+                  <span>5 exercises</span>
+                  <span>16 working sets</span>
+                  <span>Back · Biceps · Rear Delts</span>
+                </div>
+                <div class="day-summary">Open with straight-arm lat work, then build through vertical pulling, rowing, rear delts, and curls.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-list">
+                <div class="exercise-row">
+                  <div class="exercise-index">01</div>
+                  <div>
+                    <h3 class="exercise-name">Straight Arm Cable Pulldown</h3>
+                    <p class="exercise-note">Pulley high, rope attachment, arms straight, pull down in an arc to the hips.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">4 × 10-12</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">02</div>
+                  <div>
+                    <h3 class="exercise-name">Lat Pulldown</h3>
+                    <p class="exercise-note">Wide grip, lean back slightly, pull to the upper chest.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 8-10</span><span class="exercise-tag">Domyos</span><span class="exercise-load">~27kg · 6/11 plates</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">03</div>
+                  <div>
+                    <h3 class="exercise-name">Cable Row</h3>
+                    <p class="exercise-note">Low pulley, neutral grip, chest up, upright torso.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 10-12</span><span class="exercise-tag">Domyos</span><span class="exercise-load">20kg</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">04</div>
+                  <div>
+                    <h3 class="exercise-name">Face Pulls</h3>
+                    <p class="exercise-note">Pulley at face height, rope attachment, split the rope at the end with elbows flared.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 15</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">05</div>
+                  <div>
+                    <h3 class="exercise-name">DB Curl + Hammer Curl</h3>
+                    <p class="exercise-note">Alternate sets—regular then neutral grip—with no swinging.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 10-12</span><span class="exercise-tag">Dumbbells</span><span class="exercise-load">5kg DB</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day-card" data-kind="legs" data-day="legs">
+            <button class="day-header" type="button" aria-expanded="false" onclick="toggleDay(this)">
+              <div class="day-badge">D3</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Legs</div>
+                  <span class="day-pill">Heavy</span>
+                </div>
+                <div class="day-meta">
+                  <span>5 exercises</span>
+                  <span>17 working sets</span>
+                  <span>Quads · Hamstrings · Glutes · Calves</span>
+                </div>
+                <div class="day-summary">The anchor lower-body day: squat first, isolate quads and hamstrings, then finish with unilateral work and calves.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-list">
+                <div class="exercise-row">
+                  <div class="exercise-index">01</div>
+                  <div>
+                    <h3 class="exercise-name">Barbell Squat</h3>
+                    <p class="exercise-note">Use rack safeties, keep the chest up, and track the knees over the toes.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">4 × 6-8</span><span class="exercise-tag">Barbell + rack</span><span class="exercise-load">Bar + 5kg / side</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">02</div>
+                  <div>
+                    <h3 class="exercise-name">Leg Extension</h3>
+                    <p class="exercise-note">Full extension at the top with a slow eccentric for quad isolation.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 12-15</span><span class="exercise-tag">Domyos</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">03</div>
+                  <div>
+                    <h3 class="exercise-name">Lying Leg Curl</h3>
+                    <p class="exercise-note">Face down and curl the heels toward the glutes with zero lower-back involvement.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 12-15</span><span class="exercise-tag">Domyos</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">04</div>
+                  <div>
+                    <h3 class="exercise-name">DB Lunges</h3>
+                    <p class="exercise-note">Walking or stationary, torso upright, knees tracking cleanly over the toes.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 10 each</span><span class="exercise-tag">Dumbbells</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">05</div>
+                  <div>
+                    <h3 class="exercise-name">Calf Raises</h3>
+                    <p class="exercise-note">Use a full range of motion and a slow eccentric.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">4 × 15-20</span><span class="exercise-tag">DB / Barbell</span><span class="exercise-load">Load to set</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day-card" data-kind="upper" data-day="upper">
+            <button class="day-header" type="button" aria-expanded="false" onclick="toggleDay(this)">
+              <div class="day-badge">D4</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Upper</div>
+                  <span class="day-pill">Volume</span>
+                </div>
+                <div class="day-meta">
+                  <span>6 exercises</span>
+                  <span>16 working sets</span>
+                  <span>Chest · Back · Shoulders · Arms</span>
+                </div>
+                <div class="day-summary">This day should feel smooth and repeatable. It exists to accumulate work without stealing recovery from the heavy days.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-list">
+                <div class="exercise-row">
+                  <div class="exercise-index">01</div>
+                  <div>
+                    <h3 class="exercise-name">Cable Chest Fly</h3>
+                    <p class="exercise-note">Pulleys at mid height, slight forward lean, squeeze at the front.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 12-15</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">20kg</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">02</div>
+                  <div>
+                    <h3 class="exercise-name">Cable Pulldown · Narrow Grip</h3>
+                    <p class="exercise-note">Use the V-bar attachment, pull to the chest, and drive the elbows down.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 12-15</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">03</div>
+                  <div>
+                    <h3 class="exercise-name">DB Shoulder Press</h3>
+                    <p class="exercise-note">Seated with a controlled tempo; do not lock out at the top.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 12-15</span><span class="exercise-tag">Dumbbells</span><span class="exercise-load">4kg DB</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">04</div>
+                  <div>
+                    <h3 class="exercise-name">Cable Row · Single Arm</h3>
+                    <p class="exercise-note">Single handle, rotate the torso slightly, and reach a full stretch at the front.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 12 each</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">05</div>
+                  <div>
+                    <h3 class="exercise-name">Hammer Curl</h3>
+                    <p class="exercise-note">Neutral grip and controlled reps to target the brachialis.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">2 × 15</span><span class="exercise-tag">Dumbbells</span><span class="exercise-load">5kg DB</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">06</div>
+                  <div>
+                    <h3 class="exercise-name">Overhead Tricep Extension</h3>
+                    <p class="exercise-note">Rope overhead with the elbows staying pointed up.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">2 × 15</span><span class="exercise-tag">Functional trainer</span><span class="exercise-load">Load to set</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="day-card" data-kind="lower" data-day="lower">
+            <button class="day-header" type="button" aria-expanded="false" onclick="toggleDay(this)">
+              <div class="day-badge">D5</div>
+              <div>
+                <div class="day-title-row">
+                  <div class="day-title">Lower</div>
+                  <span class="day-pill">Volume</span>
+                </div>
+                <div class="day-meta">
+                  <span>6 exercises</span>
+                  <span>18 working sets</span>
+                  <span>Quads · Hamstrings · Glutes · Core</span>
+                </div>
+                <div class="day-summary">Lower-body volume and core control without turning the end of the week into a recovery hole.</div>
+              </div>
+              <div class="day-toggle">+</div>
+            </button>
+            <div class="day-body">
+              <div class="exercise-list">
+                <div class="exercise-row">
+                  <div class="exercise-index">01</div>
+                  <div>
+                    <h3 class="exercise-name">Goblet Squat</h3>
+                    <p class="exercise-note">Hold the dumbbell at the chest and squat deep to reinforce mobility.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 15</span><span class="exercise-tag">Dumbbells</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">02</div>
+                  <div>
+                    <h3 class="exercise-name">Leg Extension</h3>
+                    <p class="exercise-note">Lighter than day 3, focusing on the squeeze at the top.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 15</span><span class="exercise-tag">Domyos</span><span class="exercise-load">Light</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">03</div>
+                  <div>
+                    <h3 class="exercise-name">Lying Leg Curl</h3>
+                    <p class="exercise-note">Lighter than day 3 with a controlled tempo.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 15</span><span class="exercise-tag">Domyos</span><span class="exercise-load">Light</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">04</div>
+                  <div>
+                    <h3 class="exercise-name">Hip Thrust</h3>
+                    <p class="exercise-note">Barbell on the floor, shoulders on the bench, drive through the heels, and squeeze at the top.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 15</span><span class="exercise-tag">Barbell</span><span class="exercise-load">Load to set</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">05</div>
+                  <div>
+                    <h3 class="exercise-name">Plank</h3>
+                    <p class="exercise-note">Brace hard and stop before the lower back starts compensating.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 30-45s</span><span class="exercise-tag">Core</span><span class="exercise-load">Bodyweight</span></div>
+                </div>
+                <div class="exercise-row">
+                  <div class="exercise-index">06</div>
+                  <div>
+                    <h3 class="exercise-name">Dead Bug</h3>
+                    <p class="exercise-note">Move slowly and keep the lower back pressed to the floor.</p>
+                  </div>
+                  <div class="exercise-meta"><span class="exercise-tag">3 × 30-45s</span><span class="exercise-tag">Core control</span><span class="exercise-load">Bodyweight</span></div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel today-card">
+          <h3>Current Session Focus</h3>
+          <p>The routine opens on Push so you can start immediately. Heavy days get full rest; days 4 and 5 stay deliberately light enough to protect recovery.</p>
+          <div class="today-grid">
+            <div class="today-stat"><span>Main pattern</span><strong>Horizontal press</strong></div>
+            <div class="today-stat"><span>Estimated time</span><strong>60-70 min</strong></div>
+            <div class="today-stat"><span>Recovery target</span><strong>Finish with 1-2 reps in reserve</strong></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Weekly Load Distribution</h3>
+          <div class="distribution">
+            <div class="distribution-row">
+              <div class="distribution-top"><span>Heavy work</span><span>49 sets</span></div>
+              <div class="distribution-track"><div class="distribution-fill" style="width: 59%; background: linear-gradient(90deg, var(--push), var(--pull));"></div></div>
+            </div>
+            <div class="distribution-row">
+              <div class="distribution-top"><span>Volume work</span><span>34 sets</span></div>
+              <div class="distribution-track"><div class="distribution-fill" style="width: 41%; background: linear-gradient(90deg, var(--upper), var(--lower));"></div></div>
+            </div>
+            <div class="distribution-row">
+              <div class="distribution-top"><span>Upper emphasis</span><span>48 sets</span></div>
+              <div class="distribution-track"><div class="distribution-fill" style="width: 58%; background: linear-gradient(90deg, var(--pull), var(--upper));"></div></div>
+            </div>
+            <div class="distribution-row">
+              <div class="distribution-top"><span>Lower emphasis</span><span>35 sets</span></div>
+              <div class="distribution-track"><div class="distribution-fill" style="width: 42%; background: linear-gradient(90deg, var(--legs), var(--lower));"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Readiness Checklist</h3>
+          <div class="checklist">
+            <div class="check-item">
+              <span class="check-dot"></span>
+              <div><strong>Warm up every movement</strong><span>Take 2 light movement sets before each working weight—movement, not stretching.</span></div>
+            </div>
+            <div class="check-item">
+              <span class="check-dot"></span>
+              <div><strong>Log every working set</strong><span>If you do not track it, you lose the progression engine.</span></div>
+            </div>
+            <div class="check-item">
+              <span class="check-dot"></span>
+              <div><strong>Volume days stay lighter</strong><span>The plan only works if day 4 and day 5 leave recovery intact.</span></div>
+            </div>
+            <div class="check-item">
+              <span class="check-dot"></span>
+              <div><strong>Technical reps only</strong><span>Stop when a rep would turn ugly. That is the real autoregulation line.</span></div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <div class="footer">
+      <span>Pietro · Home Gym · Vallirana</span>
+      <span>Current program · Hypertrophy</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+  }
+
+  function resolveParentTheme() {
+    try {
+      return window.parent && window.parent.document.documentElement.classList.contains("dark")
+        ? "dark"
+        : "light";
+    } catch (error) {
+      return "light";
+    }
+  }
+
+  function setOpenState(card, shouldOpen) {
+    card.classList.toggle("open", shouldOpen);
+    const button = card.querySelector(".day-header");
+    if (button) {
+      button.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+    }
+  }
+
+  function activateDay(day) {
+    const cards = document.querySelectorAll(".day-card");
+    const buttons = document.querySelectorAll(".week-btn");
+
+    cards.forEach((card) => {
+      setOpenState(card, card.dataset.day === day);
+    });
+
+    buttons.forEach((button) => {
+      button.classList.toggle("active", button.dataset.day === day);
+    });
+  }
+
+  function toggleDay(button) {
+    const card = button.closest(".day-card");
+    const day = card.dataset.day;
+    const isAlreadyOpen = card.classList.contains("open");
+
+    if (isAlreadyOpen) {
+      setOpenState(card, false);
+      document.querySelectorAll(".week-btn").forEach((navButton) => {
+        navButton.classList.toggle("active", false);
+      });
+      return;
+    }
+
+    activateDay(day);
+  }
+
+  window.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "theme-change") {
+      applyTheme(event.data.theme);
+    }
+  });
+
+  applyTheme(resolveParentTheme());
+</script>
+</body>
+</html>
