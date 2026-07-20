@@ -17,6 +17,7 @@ export const wallpapers: Wallpaper[] = [
   { type: "vanta", light: "", dark: "", label: "Birds", vantaEffect: "BIRDS" },
   { type: "vanta", light: "", dark: "", label: "Halo",  vantaEffect: "HALO"  },
   { type: "vanta", light: "", dark: "", label: "Waves", vantaEffect: "WAVES" },
+  { type: "vanta", light: "", dark: "", label: "Fable", vantaEffect: "FABLE" },
 ];
 
 // CSS classes to clean up on wallpaper switch (legacy / her-bg variants)
@@ -26,6 +27,7 @@ export const allWallpaperClasses: string[] = [
   "wallpaper-static-birds",
   "wallpaper-static-halo",
   "wallpaper-static-waves",
+  "wallpaper-static-fable",
 ];
 
 // terminal stuff

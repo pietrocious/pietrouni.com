@@ -169,6 +169,20 @@ html.dark #desktop.wallpaper-static-halo {
     linear-gradient(145deg, #080019 0%, #1b073d 50%, #030008 100%);
 }
 
+#desktop.wallpaper-static-fable {
+  background:
+    radial-gradient(circle at 50% 46%, transparent 0 22%, rgba(255, 179, 71, 0.55) 26%, rgba(255, 200, 120, 0.75) 27%, rgba(255, 179, 71, 0.4) 29%, transparent 34%),
+    radial-gradient(ellipse 70% 55% at 50% 50%, rgba(138, 79, 208, 0.5), transparent 75%),
+    linear-gradient(150deg, #2c1450 0%, #241040 50%, #150826 100%);
+}
+
+html.dark #desktop.wallpaper-static-fable {
+  background:
+    radial-gradient(circle at 50% 46%, transparent 0 22%, rgba(242, 193, 78, 0.5) 26%, rgba(255, 220, 130, 0.7) 27%, rgba(242, 193, 78, 0.35) 29%, transparent 34%),
+    radial-gradient(ellipse 70% 55% at 50% 50%, rgba(53, 32, 160, 0.55), transparent 75%),
+    linear-gradient(150deg, #0a0424 0%, #040011 55%, #010008 100%);
+}
+
 #desktop.wallpaper-static-birds {
   background: linear-gradient(155deg, #dcecff 0%, #c8d9f1 48%, #bfa9df 100%);
 }

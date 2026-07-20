@@ -209,6 +209,15 @@ export const systemWindowConfigs: Record<string, WindowConfig> = {
                                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
                                             <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-sky-100 drop-shadow-md">Waves</div>
                                         </button>
+                                        <!-- Fable — custom shader effect -->
+                                        <button onclick="setWallpaper(3);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="3">
+                                            <div class="absolute inset-0" style="background:#040011"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 75% 70% at 50% 52%, rgba(53,32,160,0.6) 0%, transparent 75%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(circle at 50% 48%, transparent 0 24%, rgba(242,193,78,0.55) 29%, rgba(255,220,130,0.8) 31%, rgba(242,193,78,0.4) 33%, transparent 40%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 55% 35% at 50% 80%, rgba(10,4,36,0.85) 0%, transparent 100%)"></div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-amber-300 drop-shadow-md">Fable</div>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

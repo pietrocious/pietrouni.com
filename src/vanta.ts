@@ -1,6 +1,6 @@
 
-// vanta.ts — manages Vanta.js animated wallpaper effects
-// Effects: Birds (0), Halo (1), Waves (2)
+// vanta.ts — manages animated wallpaper effects
+// Effects: Birds (0), Halo (1), Waves (2) from Vanta.js, Fable (3) custom shader
 // three.js + the vanta effect modules are ~700KB combined, so they're loaded on demand
 // (via dynamic import) rather than bundled into the main chunk for visitors who never pick one.
 
@@ -17,6 +17,8 @@ const EFFECT_LOADERS: Record<string, () => Promise<(opts: Record<string, unknown
   BIRDS: () => import('vanta/dist/vanta.birds.min').then((m) => m.default),
   HALO: () => import('vanta/dist/vanta.halo.min').then((m) => m.default),
   WAVES: () => import('vanta/dist/vanta.waves.min').then((m) => m.default),
+  // Custom raw-WebGL effect — no three.js needed (see fable.ts)
+  FABLE: () => import('./fable').then((m) => m.default),
 };
 
 // Per-effect configs — correct option names from vanta source, tuned for each theme
@@ -75,6 +77,18 @@ const CONFIGS: Record<string, { light: Record<string, unknown>; dark: Record<str
       speed: 1.0,
     },
   },
+  FABLE: {
+    light: {
+      backgroundColor: 0x241040,   // deep plum canvas (dark base like HALO's light config)
+      baseColor: 0x8a4fd0,         // bright violet smoke
+      color2: 0xffb347,            // warm amber ring
+    },
+    dark: {
+      backgroundColor: 0x040011,   // near-black indigo
+      baseColor: 0x3520a0,         // deep indigo smoke
+      color2: 0xf2c14e,            // ember gold ring
+    },
+  },
   WAVES: {
     light: {
       color: 0x0099cc,             // clear ocean blue
@@ -101,7 +115,11 @@ export async function initVanta(effectName: string, isDark: boolean, desktop: HT
   if (!loadEffect) return;
 
   const thisRequest = ++requestId;
-  const [THREE, fn] = await Promise.all([import('three'), loadEffect()]);
+  // Fable is self-contained WebGL — skip the ~600KB three.js import for it
+  const [THREE, fn] = await Promise.all([
+    key === 'FABLE' ? Promise.resolve(null) : import('three'),
+    loadEffect(),
+  ]);
 
   // Superseded by a newer wallpaper switch (or destroyed) while modules were loading — bail out.
   if (thisRequest !== requestId) return;
@@ -123,7 +141,7 @@ export async function initVanta(effectName: string, isDark: boolean, desktop: HT
 
   activeEffect = fn({
     el: wrapper,
-    THREE,
+    ...(THREE ? { THREE } : {}),
     ...themeConfig,
   });
   activeEffectName = key;
