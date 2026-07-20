@@ -150,8 +150,17 @@ export const systemWindowConfigs: Record<string, WindowConfig> = {
                                         </div>
                                     </div>
                                     <div class="grid grid-cols-3 gap-3" id="wallpaper-grid">
+                                        <!-- Halo -->
+                                        <button onclick="setWallpaper(0);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="0" style="order:0">
+                                            <div class="absolute inset-0" style="background:#060010"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 70% 80% at 50% 55%, rgba(80,0,180,0.55) 0%, transparent 70%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(circle at 50% 48%, rgba(255,255,255,0.97) 0%, rgba(160,220,255,0.85) 6%, rgba(100,180,255,0.7) 12%, rgba(160,80,255,0.55) 20%, rgba(80,0,200,0.25) 32%, transparent 48%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 55% 35% at 50% 75%, rgba(30,0,70,0.85) 0%, transparent 100%)"></div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-yellow-300 drop-shadow-md">Halo</div>
+                                        </button>
                                         <!-- Birds -->
-                                        <button onclick="setWallpaper(0);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="0">
+                                        <button onclick="setWallpaper(1);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="1" style="order:1">
                                             <div class="absolute inset-0" style="background:#f0dfc0"></div>
                                             <svg class="absolute inset-0 w-full h-full" viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
                                                 <g fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -184,17 +193,8 @@ export const systemWindowConfigs: Record<string, WindowConfig> = {
                                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
                                             <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium drop-shadow-md" style="color:#7a3010">Birds</div>
                                         </button>
-                                        <!-- Halo -->
-                                        <button onclick="setWallpaper(1);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="1">
-                                            <div class="absolute inset-0" style="background:#060010"></div>
-                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 70% 80% at 50% 55%, rgba(80,0,180,0.55) 0%, transparent 70%)"></div>
-                                            <div class="absolute inset-0" style="background:radial-gradient(circle at 50% 48%, rgba(255,255,255,0.97) 0%, rgba(160,220,255,0.85) 6%, rgba(100,180,255,0.7) 12%, rgba(160,80,255,0.55) 20%, rgba(80,0,200,0.25) 32%, transparent 48%)"></div>
-                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 55% 35% at 50% 75%, rgba(30,0,70,0.85) 0%, transparent 100%)"></div>
-                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
-                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-yellow-300 drop-shadow-md">Halo</div>
-                                        </button>
                                         <!-- Waves -->
-                                        <button onclick="setWallpaper(2);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="2">
+                                        <button onclick="setWallpaper(2);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="2" style="order:2">
                                             <div class="absolute inset-0" style="background:#2196f3"></div>
                                             <svg class="absolute inset-0 w-full h-full" viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
                                                 <polygon points="0,0 40,0 20,25" fill="#1976d2"/><polygon points="40,0 80,0 60,25" fill="#1565c0"/><polygon points="80,0 120,0 100,25" fill="#1e88e5"/><polygon points="120,0 160,0 140,25" fill="#1976d2"/>
@@ -210,13 +210,53 @@ export const systemWindowConfigs: Record<string, WindowConfig> = {
                                             <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-sky-100 drop-shadow-md">Waves</div>
                                         </button>
                                         <!-- Fable — custom shader effect -->
-                                        <button onclick="setWallpaper(3);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="3">
+                                        <button onclick="setWallpaper(6);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="6" style="order:6">
                                             <div class="absolute inset-0" style="background:#040011"></div>
-                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 75% 70% at 50% 52%, rgba(53,32,160,0.6) 0%, transparent 75%)"></div>
-                                            <div class="absolute inset-0" style="background:radial-gradient(circle at 50% 48%, transparent 0 24%, rgba(242,193,78,0.55) 29%, rgba(255,220,130,0.8) 31%, rgba(242,193,78,0.4) 33%, transparent 40%)"></div>
-                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 55% 35% at 50% 80%, rgba(10,4,36,0.85) 0%, transparent 100%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 90% 52% at 24% 82%, rgba(90,55,150,0.78) 0%, transparent 72%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 80% 48% at 74% 72%, rgba(45,130,126,0.6) 0%, transparent 72%)"></div>
+                                            <div class="absolute w-5 h-5 rounded-full left-[31%] top-[42%]" style="background:radial-gradient(circle, #fff7d6 0 5%, rgba(242,201,99,.75) 18%, transparent 70%)"></div>
+                                            <div class="absolute w-4 h-4 rounded-full left-[67%] top-[54%]" style="background:radial-gradient(circle, #fff7d6 0 5%, rgba(242,201,99,.65) 18%, transparent 70%)"></div>
+                                            <div class="absolute inset-x-0 bottom-0 h-2/3 opacity-50" style="background:linear-gradient(165deg, transparent 15%, rgba(110,86,168,.6) 48%, transparent 78%)"></div>
                                             <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
                                             <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-amber-300 drop-shadow-md">Fable</div>
+                                        </button>
+                                        <!-- Nebula — custom shader effect -->
+                                        <button onclick="setWallpaper(7);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="7" style="order:7">
+                                            <div class="absolute inset-0" style="background:#02030d"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 75% 65% at 34% 70%, rgba(75,42,155,0.7) 0%, transparent 72%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(ellipse 70% 58% at 68% 28%, rgba(5,99,119,0.6) 0%, transparent 68%)"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(circle at 59% 43%, #fffdf1 0 1%, #f4c979 2%, rgba(244,201,121,0.28) 5%, transparent 14%)"></div>
+                                            <svg class="absolute inset-0 w-full h-full opacity-70" viewBox="0 0 160 120" aria-hidden="true">
+                                                <g fill="#fff8df"><circle cx="18" cy="25" r="0.8"/><circle cx="42" cy="15" r="0.45"/><circle cx="75" cy="29" r="0.6"/><circle cx="132" cy="19" r="0.7"/><circle cx="144" cy="68" r="0.45"/><circle cx="115" cy="91" r="0.65"/><circle cx="54" cy="101" r="0.5"/><circle cx="25" cy="78" r="0.6"/></g>
+                                            </svg>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-cyan-100 drop-shadow-md">Nebula</div>
+                                        </button>
+                                        <!-- Clouds — Vanta atmospheric sky -->
+                                        <button onclick="setWallpaper(3);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="3" style="order:3">
+                                            <div class="absolute inset-0" style="background:linear-gradient(165deg,#69a9c7 0%,#a7cbdc 55%,#dce8f0 100%)"></div>
+                                            <div class="absolute w-20 h-8 -left-3 top-[48%] rounded-full blur-sm bg-white/80"></div>
+                                            <div class="absolute w-24 h-9 right-[-12%] top-[61%] rounded-full blur-sm bg-slate-100/80"></div>
+                                            <div class="absolute w-8 h-8 right-[20%] top-[16%] rounded-full" style="background:radial-gradient(circle,#fff9df 0 18%,rgba(255,195,107,.75) 34%,transparent 72%)"></div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-slate-700 drop-shadow-md">Clouds</div>
+                                        </button>
+                                        <!-- Rings — Vanta floating ring field -->
+                                        <button onclick="setWallpaper(4);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="4" style="order:4">
+                                            <div class="absolute inset-0" style="background:linear-gradient(145deg,#202731,#0d1118)"></div>
+                                            <div class="absolute w-16 h-9 -left-2 top-[18%] rounded-[50%] border-[3px] border-rose-400 rotate-[-18deg]"></div>
+                                            <div class="absolute w-20 h-11 right-[-12%] top-[46%] rounded-[50%] border-[3px] border-emerald-400 rotate-[22deg]"></div>
+                                            <div class="absolute w-10 h-6 left-[34%] top-[61%] rounded-[50%] border-2 border-amber-400 rotate-[-8deg]"></div>
+                                            <div class="absolute w-8 h-5 right-[15%] top-[15%] rounded-[50%] border-2 border-blue-400 rotate-[15deg]"></div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-white drop-shadow-md">Rings</div>
+                                        </button>
+                                        <!-- Dots — Vanta connected point grid -->
+                                        <button onclick="setWallpaper(5);" class="wallpaper-option group relative aspect-[4/3] rounded-lg overflow-hidden border-2 border-transparent hover:border-her-red transition-all" data-wallpaper="5" style="order:5">
+                                            <div class="absolute inset-0" style="background-color:#080c14;background-image:radial-gradient(circle,rgba(103,197,200,.95) 0 2px,transparent 2.5px),linear-gradient(rgba(124,93,176,.25) 1px,transparent 1px),linear-gradient(90deg,rgba(124,93,176,.25) 1px,transparent 1px);background-size:20px 20px"></div>
+                                            <div class="absolute inset-0" style="background:radial-gradient(circle at 58% 44%,rgba(124,93,176,.42),transparent 48%)"></div>
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                            <div class="absolute bottom-1 left-0 right-0 text-center text-[10px] font-medium text-cyan-100 drop-shadow-md">Dots</div>
                                         </button>
                                     </div>
                                 </div>

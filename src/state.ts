@@ -8,16 +8,20 @@ export let zIndexCounter = 100;
 export const activeWindows: Record<string, WindowState> = {};
 export let monitorInterval: ReturnType<typeof setInterval> | null = null;
 
-// wallpaper state — Halo (index 1) is default. It paints as CSS first and
+// wallpaper state — Halo (index 0) is default. It paints as CSS first and
 // progressively enhances to Vanta when the device can comfortably run it.
-export let activeWallpaperIndex = 1;
+export let activeWallpaperIndex = 0;
 
-// 3D vanta effects only
+// Animated effects: Vanta modules and original raw-WebGL shaders.
 export const wallpapers: Wallpaper[] = [
-  { type: "vanta", light: "", dark: "", label: "Birds", vantaEffect: "BIRDS" },
   { type: "vanta", light: "", dark: "", label: "Halo",  vantaEffect: "HALO"  },
+  { type: "vanta", light: "", dark: "", label: "Birds", vantaEffect: "BIRDS" },
   { type: "vanta", light: "", dark: "", label: "Waves", vantaEffect: "WAVES" },
+  { type: "vanta", light: "", dark: "", label: "Clouds", vantaEffect: "CLOUDS" },
+  { type: "vanta", light: "", dark: "", label: "Rings", vantaEffect: "RINGS" },
+  { type: "vanta", light: "", dark: "", label: "Dots", vantaEffect: "DOTS" },
   { type: "vanta", light: "", dark: "", label: "Fable", vantaEffect: "FABLE" },
+  { type: "vanta", light: "", dark: "", label: "Nebula", vantaEffect: "NEBULA" },
 ];
 
 // CSS classes to clean up on wallpaper switch (legacy / her-bg variants)
@@ -28,6 +32,10 @@ export const allWallpaperClasses: string[] = [
   "wallpaper-static-halo",
   "wallpaper-static-waves",
   "wallpaper-static-fable",
+  "wallpaper-static-nebula",
+  "wallpaper-static-clouds",
+  "wallpaper-static-rings",
+  "wallpaper-static-dots",
 ];
 
 // terminal stuff

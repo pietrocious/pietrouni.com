@@ -24,7 +24,7 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
 - **features:**
   - **window management:** draggable, resizable window system
   - **terminal emulator:** custom shell with command history, filesystem simulation, tab completion, and fun commands. switchable themes: pietrOS, Cyberpunk, and Fallout
-  - **animated wallpapers:** 3D WebGL wallpapers powered by Vanta.js (Birds, Halo, Waves) with light/dark theme–aware configs. switchable from the settings panel
+  - **animated wallpapers:** Vanta.js effects (Halo, Birds, Waves, Clouds, Rings, Dots) plus original raw-WebGL shaders (Fable, Nebula), all with light/dark theme-aware palettes and switchable from the settings panel
   - **spotlight search:** global search (Ctrl+K) for apps and vault items
   - **vault:** markdown-based content files
   - **games arcade:** Snake, 2048, Tetris, Threes, Tic-Tac-Toe, and a Doom launcher
@@ -42,7 +42,7 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
 │   ├── main.ts         # core app logic, window definitions, terminal commands
 │   ├── config.ts       # static data (vault items, filesystem, commands)
 │   ├── state.ts        # shared app state (windows, terminal, wallpapers)
-│   ├── vanta.ts        # Vanta.js animated wallpaper manager (Birds, Halo, Waves)
+│   ├── vanta.ts        # lazy-loaded Vanta + original shader wallpaper manager
 │   ├── dock.ts         # macOS-style fish-eye dock magnification
 │   ├── audio.ts        # synthesized UI sound effects (Web Audio API)
 │   ├── terminal/       # terminal commands and theme modules (pietrOS, Cyberpunk, Fallout)
@@ -75,7 +75,7 @@ Tailwind v4 is configured via the `@theme` block in `styles.css` (no `tailwind.c
 
 dock icons are from the [Neuwaita](https://github.com/RusticBard/Neuwaita) icon theme by [RusticBard](https://github.com/RusticBard), a beautiful take on the Adwaita theme for GNOME
 
-animated desktop wallpapers are powered by [Vanta.js](https://github.com/tengbao/vanta) by [Teng Bao](https://github.com/tengbao), using [Three.js](https://threejs.org/) for WebGL rendering
+Halo, Birds, Waves, Clouds, Rings, and Dots are powered by [Vanta.js](https://github.com/tengbao/vanta) by [Teng Bao](https://github.com/tengbao), using [Three.js](https://threejs.org/) for WebGL rendering. Fable and Nebula are original, self-contained raw-WebGL shaders made for this site.
 
 ### special thanks
 

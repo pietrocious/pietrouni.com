@@ -63,6 +63,26 @@ describe('state module', () => {
         expect(wp.dark).toBeDefined();
       });
     });
+
+    it('includes the original Nebula shader wallpaper', () => {
+      expect(wallpapers).toContainEqual(expect.objectContaining({
+        label: 'Nebula',
+        vantaEffect: 'NEBULA',
+      }));
+    });
+
+    it('keeps Halo first and the original shaders at the end', () => {
+      expect(wallpapers.map(({ label, vantaEffect }) => ({ label, vantaEffect }))).toEqual([
+        { label: 'Halo', vantaEffect: 'HALO' },
+        { label: 'Birds', vantaEffect: 'BIRDS' },
+        { label: 'Waves', vantaEffect: 'WAVES' },
+        { label: 'Clouds', vantaEffect: 'CLOUDS' },
+        { label: 'Rings', vantaEffect: 'RINGS' },
+        { label: 'Dots', vantaEffect: 'DOTS' },
+        { label: 'Fable', vantaEffect: 'FABLE' },
+        { label: 'Nebula', vantaEffect: 'NEBULA' },
+      ]);
+    });
   });
 
   describe('quotes', () => {

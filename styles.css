@@ -169,18 +169,72 @@ html.dark #desktop.wallpaper-static-halo {
     linear-gradient(145deg, #080019 0%, #1b073d 50%, #030008 100%);
 }
 
+@keyframes fableMistDrift {
+  0%, 100% {
+    background-position: 0 0, 35px 20px, center, center, center, 70% 72%, 24% 78%, center;
+  }
+  50% {
+    background-position: 32px -44px, -26px -31px, center, center, center, 61% 65%, 34% 70%, center;
+  }
+}
+
 #desktop.wallpaper-static-fable {
   background:
-    radial-gradient(circle at 50% 46%, transparent 0 22%, rgba(255, 179, 71, 0.55) 26%, rgba(255, 200, 120, 0.75) 27%, rgba(255, 179, 71, 0.4) 29%, transparent 34%),
-    radial-gradient(ellipse 70% 55% at 50% 50%, rgba(138, 79, 208, 0.5), transparent 75%),
-    linear-gradient(150deg, #2c1450 0%, #241040 50%, #150826 100%);
+    radial-gradient(circle, rgba(255, 226, 145, 0.72) 0 0.75px, transparent 1.45px),
+    radial-gradient(circle, rgba(204, 255, 238, 0.5) 0 0.6px, transparent 1.2px),
+    radial-gradient(circle at 34% 48%, rgba(255, 207, 112, 0.32), transparent 8%),
+    radial-gradient(circle at 67% 58%, rgba(255, 207, 112, 0.24), transparent 7%),
+    radial-gradient(circle at 51% 35%, rgba(255, 235, 174, 0.16), transparent 10%),
+    radial-gradient(ellipse 72% 48% at 70% 72%, rgba(103, 184, 173, 0.5), transparent 72%),
+    radial-gradient(ellipse 82% 58% at 24% 78%, rgba(121, 86, 184, 0.62), transparent 74%),
+    linear-gradient(155deg, #241040 0%, #130926 52%, #070412 100%);
+  background-size: 191px 157px, 263px 211px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  animation: fableMistDrift 22s ease-in-out infinite;
 }
 
 html.dark #desktop.wallpaper-static-fable {
   background:
-    radial-gradient(circle at 50% 46%, transparent 0 22%, rgba(242, 193, 78, 0.5) 26%, rgba(255, 220, 130, 0.7) 27%, rgba(242, 193, 78, 0.35) 29%, transparent 34%),
-    radial-gradient(ellipse 70% 55% at 50% 50%, rgba(53, 32, 160, 0.55), transparent 75%),
-    linear-gradient(150deg, #0a0424 0%, #040011 55%, #010008 100%);
+    radial-gradient(circle, rgba(242, 201, 99, 0.66) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle, rgba(185, 239, 224, 0.42) 0 0.55px, transparent 1.15px),
+    radial-gradient(circle at 34% 48%, rgba(242, 201, 99, 0.25), transparent 8%),
+    radial-gradient(circle at 67% 58%, rgba(242, 201, 99, 0.2), transparent 7%),
+    radial-gradient(circle at 51% 35%, rgba(255, 235, 174, 0.12), transparent 10%),
+    radial-gradient(ellipse 72% 48% at 70% 72%, rgba(36, 109, 112, 0.46), transparent 72%),
+    radial-gradient(ellipse 82% 58% at 24% 78%, rgba(57, 35, 111, 0.68), transparent 74%),
+    linear-gradient(155deg, #090419 0%, #040011 55%, #010008 100%);
+  background-size: 191px 157px, 263px 211px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+}
+
+@keyframes nebulaFallbackDrift {
+  0%, 100% {
+    background-position: 0 0, 40px 15px, center, 66% 30%, 33% 70%, center;
+  }
+  50% {
+    background-position: 55px -28px, -35px 48px, center, 59% 37%, 41% 62%, center;
+  }
+}
+
+#desktop.wallpaper-static-nebula {
+  background:
+    radial-gradient(circle, rgba(235, 244, 255, 0.7) 0 0.7px, transparent 1.4px),
+    radial-gradient(circle, rgba(255, 227, 174, 0.55) 0 0.55px, transparent 1.2px),
+    radial-gradient(circle at 59% 43%, rgba(255, 255, 245, 0.98) 0 0.5%, rgba(255, 208, 138, 0.76) 1.4%, rgba(255, 208, 138, 0.22) 4%, transparent 13%),
+    radial-gradient(ellipse 72% 55% at 66% 30%, rgba(24, 116, 134, 0.5), transparent 67%),
+    radial-gradient(ellipse 75% 65% at 33% 70%, rgba(104, 70, 184, 0.56), transparent 72%),
+    linear-gradient(145deg, #100927 0%, #160e32 46%, #060716 100%);
+  background-size: 173px 137px, 251px 197px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  animation: nebulaFallbackDrift 24s ease-in-out infinite;
+}
+
+html.dark #desktop.wallpaper-static-nebula {
+  background:
+    radial-gradient(circle, rgba(220, 237, 255, 0.62) 0 0.65px, transparent 1.35px),
+    radial-gradient(circle, rgba(255, 222, 157, 0.48) 0 0.5px, transparent 1.1px),
+    radial-gradient(circle at 59% 43%, rgba(255, 255, 245, 0.96) 0 0.5%, rgba(244, 201, 121, 0.72) 1.3%, rgba(244, 201, 121, 0.18) 4%, transparent 13%),
+    radial-gradient(ellipse 72% 55% at 66% 30%, rgba(7, 82, 99, 0.42), transparent 67%),
+    radial-gradient(ellipse 75% 65% at 33% 70%, rgba(37, 19, 95, 0.62), transparent 72%),
+    linear-gradient(145deg, #02030d 0%, #070716 48%, #010207 100%);
+  background-size: 173px 137px, 251px 197px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
 }
 
 #desktop.wallpaper-static-birds {
@@ -197,6 +251,58 @@ html.dark #desktop.wallpaper-static-birds {
 
 html.dark #desktop.wallpaper-static-waves {
   background: linear-gradient(155deg, #08273d 0%, #064a70 52%, #021827 100%);
+}
+
+#desktop.wallpaper-static-clouds {
+  background:
+    radial-gradient(ellipse 32% 18% at 18% 62%, rgba(255, 255, 255, 0.82) 0 38%, transparent 72%),
+    radial-gradient(ellipse 39% 22% at 72% 72%, rgba(236, 242, 247, 0.8) 0 40%, transparent 74%),
+    radial-gradient(circle at 72% 25%, rgba(255, 247, 217, 0.96) 0 2%, rgba(255, 195, 107, 0.55) 5%, transparent 14%),
+    linear-gradient(165deg, #73afca 0%, #a8c9d9 48%, #dce8f0 100%);
+}
+
+html.dark #desktop.wallpaper-static-clouds {
+  background:
+    radial-gradient(ellipse 34% 19% at 19% 64%, rgba(75, 96, 121, 0.72) 0 38%, transparent 72%),
+    radial-gradient(ellipse 42% 23% at 74% 74%, rgba(49, 67, 91, 0.76) 0 40%, transparent 74%),
+    radial-gradient(circle at 72% 25%, rgba(244, 218, 173, 0.82) 0 2%, rgba(157, 86, 61, 0.4) 5%, transparent 14%),
+    linear-gradient(165deg, #172a46 0%, #111d31 50%, #07111f 100%);
+}
+
+#desktop.wallpaper-static-rings {
+  background:
+    radial-gradient(ellipse at 22% 36%, transparent 0 7%, rgba(215, 67, 92, 0.78) 7.3% 8.4%, transparent 8.8% 100%),
+    radial-gradient(ellipse at 67% 64%, transparent 0 13%, rgba(28, 170, 157, 0.72) 13.3% 14.4%, transparent 14.8% 100%),
+    radial-gradient(ellipse at 78% 21%, transparent 0 6%, rgba(228, 151, 46, 0.82) 6.3% 7.4%, transparent 7.8% 100%),
+    radial-gradient(ellipse at 39% 82%, transparent 0 10%, rgba(75, 104, 196, 0.72) 10.3% 11.3%, transparent 11.7% 100%),
+    linear-gradient(145deg, #efe9e2, #ddd3ca);
+}
+
+html.dark #desktop.wallpaper-static-rings {
+  background:
+    radial-gradient(ellipse at 22% 36%, transparent 0 7%, rgba(241, 79, 112, 0.82) 7.3% 8.4%, transparent 8.8% 100%),
+    radial-gradient(ellipse at 67% 64%, transparent 0 13%, rgba(35, 201, 183, 0.78) 13.3% 14.4%, transparent 14.8% 100%),
+    radial-gradient(ellipse at 78% 21%, transparent 0 6%, rgba(245, 169, 54, 0.86) 6.3% 7.4%, transparent 7.8% 100%),
+    radial-gradient(ellipse at 39% 82%, transparent 0 10%, rgba(95, 125, 224, 0.78) 10.3% 11.3%, transparent 11.7% 100%),
+    linear-gradient(145deg, #171b24, #0c0f15);
+}
+
+#desktop.wallpaper-static-dots {
+  background-color: #e9e4dc;
+  background-image:
+    radial-gradient(circle, rgba(74, 124, 157, 0.92) 0 2px, transparent 2.5px),
+    linear-gradient(rgba(92, 105, 115, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(92, 105, 115, 0.12) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+html.dark #desktop.wallpaper-static-dots {
+  background-color: #080c14;
+  background-image:
+    radial-gradient(circle, rgba(103, 197, 200, 0.94) 0 2px, transparent 2.5px),
+    linear-gradient(rgba(124, 93, 176, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 93, 176, 0.16) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 /* Warm Ambient Background - Base Classes */

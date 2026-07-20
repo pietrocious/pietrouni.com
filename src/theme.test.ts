@@ -41,7 +41,7 @@ describe("automatic Vanta eligibility", () => {
     setWallpaper(0);
 
     expect(vantaMocks.initVanta).toHaveBeenCalledWith(
-      "BIRDS",
+      "HALO",
       false,
       document.getElementById("desktop"),
     );

@@ -1,6 +1,7 @@
 
 // vanta.ts — manages animated wallpaper effects
-// Effects: Birds (0), Halo (1), Waves (2) from Vanta.js, Fable (3) custom shader
+// Effects: Halo, Birds, Waves, Clouds, Rings and Dots from Vanta.js;
+// Fable and Nebula are custom shaders.
 // three.js + the vanta effect modules are ~700KB combined, so they're loaded on demand
 // (via dynamic import) rather than bundled into the main chunk for visitors who never pick one.
 
@@ -17,9 +18,15 @@ const EFFECT_LOADERS: Record<string, () => Promise<(opts: Record<string, unknown
   BIRDS: () => import('vanta/dist/vanta.birds.min').then((m) => m.default),
   HALO: () => import('vanta/dist/vanta.halo.min').then((m) => m.default),
   WAVES: () => import('vanta/dist/vanta.waves.min').then((m) => m.default),
-  // Custom raw-WebGL effect — no three.js needed (see fable.ts)
+  CLOUDS: () => import('vanta/dist/vanta.clouds.min').then((m) => m.default),
+  RINGS: () => import('vanta/dist/vanta.rings.min').then((m) => m.default),
+  DOTS: () => import('vanta/dist/vanta.dots.min').then((m) => m.default),
+  // Custom raw-WebGL effects — no three.js needed.
   FABLE: () => import('./fable').then((m) => m.default),
+  NEBULA: () => import('./nebula').then((m) => m.default),
 };
+
+const SELF_CONTAINED_EFFECTS = new Set(['FABLE', 'NEBULA']);
 
 // Per-effect configs — correct option names from vanta source, tuned for each theme
 const CONFIGS: Record<string, { light: Record<string, unknown>; dark: Record<string, unknown> }> = {
@@ -80,13 +87,29 @@ const CONFIGS: Record<string, { light: Record<string, unknown>; dark: Record<str
   FABLE: {
     light: {
       backgroundColor: 0x241040,   // deep plum canvas (dark base like HALO's light config)
-      baseColor: 0x8a4fd0,         // bright violet smoke
-      color2: 0xffb347,            // warm amber ring
+      baseColor: 0x7956b8,         // violet enchanted fog
+      color2: 0xffcf70,            // warm spell motes
+      color3: 0x67b8ad,            // moonlit teal mist
     },
     dark: {
       backgroundColor: 0x040011,   // near-black indigo
-      baseColor: 0x3520a0,         // deep indigo smoke
-      color2: 0xf2c14e,            // ember gold ring
+      baseColor: 0x39236f,         // deep violet fog
+      color2: 0xf2c963,            // ember-gold motes
+      color3: 0x246d70,            // cool forest mist
+    },
+  },
+  NEBULA: {
+    light: {
+      backgroundColor: 0x100927,   // aubergine night sky
+      baseColor: 0x6846b8,         // violet molecular cloud
+      color2: 0xffd08a,            // warm young-star glow
+      color3: 0x187486,            // teal gas veil
+    },
+    dark: {
+      backgroundColor: 0x02030d,   // blue-black deep space
+      baseColor: 0x25135f,         // subdued indigo cloud
+      color2: 0xf4c979,            // soft gold stellar core
+      color3: 0x075263,            // cool cyan dust
     },
   },
   WAVES: {
@@ -105,6 +128,62 @@ const CONFIGS: Record<string, { light: Record<string, unknown>; dark: Record<str
       zoom: 0.85,
     },
   },
+  CLOUDS: {
+    light: {
+      backgroundColor: 0xdce8f0,
+      skyColor: 0x7fb9d1,
+      cloudColor: 0xe8edf2,
+      cloudShadowColor: 0x506a80,
+      sunColor: 0xffc36b,
+      sunGlareColor: 0xff9a66,
+      sunlightColor: 0xffddb2,
+      scale: 3,
+      scaleMobile: 5,
+      speed: 0.6,
+      mouseEase: true,
+    },
+    dark: {
+      backgroundColor: 0x07111f,
+      skyColor: 0x172a46,
+      cloudColor: 0x3d5068,
+      cloudShadowColor: 0x050b14,
+      sunColor: 0xd8a75e,
+      sunGlareColor: 0x9d563d,
+      sunlightColor: 0x8a6a53,
+      scale: 3,
+      scaleMobile: 5,
+      speed: 0.55,
+      mouseEase: true,
+    },
+  },
+  RINGS: {
+    light: {
+      backgroundColor: 0xe8e0d8,
+      color: 0x88ff00,
+    },
+    dark: {
+      backgroundColor: 0x10131a,
+      color: 0x88ff00,
+    },
+  },
+  DOTS: {
+    light: {
+      backgroundColor: 0xe9e4dc,
+      color: 0x4a7c9d,
+      color2: 0xa48362,
+      size: 3.5,
+      spacing: 40,
+      showLines: true,
+    },
+    dark: {
+      backgroundColor: 0x080c14,
+      color: 0x67c5c8,
+      color2: 0x7c5db0,
+      size: 3.5,
+      spacing: 40,
+      showLines: true,
+    },
+  },
 };
 
 export async function initVanta(effectName: string, isDark: boolean, desktop: HTMLElement): Promise<void> {
@@ -115,11 +194,20 @@ export async function initVanta(effectName: string, isDark: boolean, desktop: HT
   if (!loadEffect) return;
 
   const thisRequest = ++requestId;
-  // Fable is self-contained WebGL — skip the ~600KB three.js import for it
-  const [THREE, fn] = await Promise.all([
-    key === 'FABLE' ? Promise.resolve(null) : import('three'),
-    loadEffect(),
-  ]);
+  // Our shaders are self-contained WebGL — skip the ~600KB three.js import for them.
+  // Several Vanta bundles capture window.THREE as soon as their module is evaluated.
+  // Load and expose Three first; importing both in parallel creates a browser-dependent
+  // race that can leave Rings or Dots stuck on the static fallback.
+  let THREE: typeof import('three') | null;
+  let fn: (opts: Record<string, unknown>) => VantaEffect;
+  if (SELF_CONTAINED_EFFECTS.has(key)) {
+    THREE = null;
+    fn = await loadEffect();
+  } else {
+    THREE = await import('three');
+    (window as Window & { THREE?: typeof import('three') }).THREE = THREE;
+    fn = await loadEffect();
+  }
 
   // Superseded by a newer wallpaper switch (or destroyed) while modules were loading — bail out.
   if (thisRequest !== requestId) return;
@@ -139,15 +227,25 @@ export async function initVanta(effectName: string, isDark: boolean, desktop: HT
 
   const themeConfig = CONFIGS[key]?.[isDark ? 'dark' : 'light'] ?? {};
 
-  activeEffect = fn({
-    el: wrapper,
-    ...(THREE ? { THREE } : {}),
-    ...themeConfig,
-  });
-  activeEffectName = key;
-
-  // Keep wrapper filling the viewport on resize, then let Vanta's own resize handle the canvas
+  // Register before constructing Vanta so its own resize listener measures the
+  // wrapper after we have updated the explicit pixel dimensions.
   window.addEventListener('resize', resizeVantaBg);
+
+  try {
+    activeEffect = fn({
+      el: wrapper,
+      ...(THREE ? { THREE } : {}),
+      ...themeConfig,
+    });
+  } catch (error) {
+    console.error(`Unable to start ${key} wallpaper.`, error);
+    window.removeEventListener('resize', resizeVantaBg);
+    wrapper.remove();
+    activeEffect = null;
+    activeEffectName = null;
+    return;
+  }
+  activeEffectName = key;
 
   // Force Vanta to resize its canvas to full dimensions on next frame
   requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
