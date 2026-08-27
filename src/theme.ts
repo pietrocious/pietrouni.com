@@ -11,9 +11,12 @@ let idleVantaRequest: number | null = null;
 let idleVantaFallback: ReturnType<typeof setTimeout> | null = null;
 let loadListener: (() => void) | null = null;
 
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function canAutoStartVanta(): boolean {
-  return window.innerWidth >= 768
-    && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return window.innerWidth >= 768 && !prefersReducedMotion();
 }
 
 function cancelScheduledVanta(): void {
@@ -77,7 +80,11 @@ function applyWallpaperClasses(
     desktop.classList.add(`wallpaper-static-${effectName}`);
     destroyVanta();
     if (vantaStartMode === "explicit") {
-      void initVanta(wp.vantaEffect, isDark, desktop);
+      // Respect reduced motion even on a deliberate pick — it's an accessibility
+      // setting, not the "don't spend battery nobody asked for" performance
+      // heuristic that gates the automatic boot-time start below. The visitor
+      // still gets the wallpaper's static gradient.
+      if (!prefersReducedMotion()) void initVanta(wp.vantaEffect, isDark, desktop);
     } else {
       scheduleVanta(wp.vantaEffect, isDark, desktop);
     }

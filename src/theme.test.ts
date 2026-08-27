@@ -36,7 +36,9 @@ describe("automatic Vanta eligibility", () => {
 
   it("honors an explicit animated-wallpaper choice on small screens", () => {
     Object.defineProperty(window, "innerWidth", { value: 390, configurable: true });
-    window.matchMedia = vi.fn().mockReturnValue({ matches: true });
+    // Motion is fine — only the screen-size heuristic (which auto-start uses,
+    // but an explicit pick overrides) would otherwise block this.
+    window.matchMedia = vi.fn().mockReturnValue({ matches: false });
 
     setWallpaper(0);
 
@@ -45,5 +47,14 @@ describe("automatic Vanta eligibility", () => {
       false,
       document.getElementById("desktop"),
     );
+  });
+
+  it("still respects reduced motion on an explicit choice", () => {
+    Object.defineProperty(window, "innerWidth", { value: 1280, configurable: true });
+    window.matchMedia = vi.fn().mockReturnValue({ matches: true });
+
+    setWallpaper(0);
+
+    expect(vantaMocks.initVanta).not.toHaveBeenCalled();
   });
 });

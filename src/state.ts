@@ -8,10 +8,6 @@ export let zIndexCounter = 100;
 export const activeWindows: Record<string, WindowState> = {};
 export let monitorInterval: ReturnType<typeof setInterval> | null = null;
 
-// wallpaper state — Halo (index 0) is default. It paints as CSS first and
-// progressively enhances to Vanta when the device can comfortably run it.
-export let activeWallpaperIndex = 0;
-
 // Animated effects: Vanta modules and original raw-WebGL shaders.
 export const wallpapers: Wallpaper[] = [
   { type: "vanta", light: "", dark: "", label: "Halo",  vantaEffect: "HALO"  },
@@ -23,6 +19,23 @@ export const wallpapers: Wallpaper[] = [
   { type: "vanta", light: "", dark: "", label: "Fable", vantaEffect: "FABLE" },
   { type: "vanta", light: "", dark: "", label: "Nebula", vantaEffect: "NEBULA" },
 ];
+
+const WALLPAPER_STORAGE_KEY = "pietros:wallpaper";
+
+function readStoredWallpaperIndex(): number {
+  try {
+    const idx = Number(window.localStorage.getItem(WALLPAPER_STORAGE_KEY));
+    return Number.isInteger(idx) && idx >= 0 && idx < wallpapers.length ? idx : 0;
+  } catch {
+    // Storage can be unavailable in strict privacy contexts — default to Halo.
+    return 0;
+  }
+}
+
+// wallpaper state — Halo (index 0) is default, unless the visitor previously
+// picked a different one. It paints as CSS first and progressively enhances
+// to Vanta when the device can comfortably run it.
+export let activeWallpaperIndex = readStoredWallpaperIndex();
 
 // CSS classes to clean up on wallpaper switch (legacy / her-bg variants)
 export const allWallpaperClasses: string[] = [
@@ -89,6 +102,11 @@ export function incrementZIndex(): number {
 
 export function setActiveWallpaperIndex(idx: number): void {
   activeWallpaperIndex = idx;
+  try {
+    window.localStorage.setItem(WALLPAPER_STORAGE_KEY, String(idx));
+  } catch {
+    // Storage can be unavailable in strict privacy contexts — in-memory state still updates.
+  }
 }
 
 export function setMonitorInterval(interval: ReturnType<typeof setInterval> | null): void {
