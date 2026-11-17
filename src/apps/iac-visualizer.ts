@@ -1115,7 +1115,7 @@ export class IaCVisualizer {
 
       // Name
       ctx.fillStyle = '#f2f6fa';
-      ctx.font = '600 12px "DM Sans", sans-serif';
+      ctx.font = '600 12px "Allo", system-ui, sans-serif';
       ctx.fillText(node.name.slice(0, 16), -NODE_WIDTH / 2 + 47, 11);
 
       ctx.fillStyle = colors.border;
@@ -1139,7 +1139,7 @@ export class IaCVisualizer {
       const doc = RESOURCE_DOCS[this.hoveredNode.resourceType];
       const text = doc ? doc.description : `${this.hoveredNode.resourceType} · ${this.hoveredNode.name}`;
 
-      ctx.font = '12px "DM Sans", sans-serif';
+      ctx.font = '12px "Allo", system-ui, sans-serif';
       const metrics = ctx.measureText(text);
       const padding = 8;
       const boxW = metrics.width + padding * 2;
@@ -1180,10 +1180,10 @@ export class IaCVisualizer {
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.fillStyle = '#64748b';
-      ctx.font = '16px "DM Sans", sans-serif';
+      ctx.font = '16px "Allo", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('No infrastructure to visualize', width / 2, height / 2);
-      ctx.font = '12px "DM Sans", sans-serif';
+      ctx.font = '12px "Allo", system-ui, sans-serif';
       ctx.fillText('Paste Terraform or Kubernetes YAML', width / 2, height / 2 + 20);
       ctx.restore();
     }
@@ -1218,7 +1218,7 @@ export class IaCVisualizer {
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    ctx.font = '9px "DM Sans", sans-serif';
+    ctx.font = '9px "Allo", system-ui, sans-serif';
     ctx.fillStyle = '#64748b';
     ctx.textAlign = 'left';
     ctx.fillText('LEGEND', 18, height - legendH + 4);
@@ -1233,7 +1233,7 @@ export class IaCVisualizer {
       ctx.roundRect(x, y - 8, 10, 10, 2);
       ctx.fill();
       ctx.fillStyle = '#94a3b8';
-      ctx.font = '10px "DM Sans", sans-serif';
+      ctx.font = '10px "Allo", system-ui, sans-serif';
       ctx.fillText(item.label, x + 14, y);
     });
 

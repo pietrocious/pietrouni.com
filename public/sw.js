@@ -1,6 +1,6 @@
 // service worker for pietrouni.com pwa
 // version-based cache busting
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_NAME = `pietrouni-${CACHE_VERSION}`;
 
 // assets to cache on install (app shell)

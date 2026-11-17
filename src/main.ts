@@ -1,4 +1,8 @@
 
+// Allo — UI, body, and headlines (Josh Puckett, OFL-1.1).
+// The package CSS uses font-display: swap; Vite emits the woff2 files.
+import "allo-font";
+
 // config - static data
 import { fileSystem } from './config';
 import { vaultData } from './vault';

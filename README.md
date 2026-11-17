@@ -59,15 +59,15 @@ this project started as a single HTML file with vanilla JavaScript, CSS, and Tai
 
 ### fonts
 
-this project uses self-hosted editorial and terminal fonts, with Google Fonts fallbacks:
+UI, body, and headlines use [Allo by Josh Puckett](https://allo.joshpuckett.me/) (`allo-font` on npm, SIL OFL-1.1). Editorial and terminal faces stay self-hosted, with Google Fonts where noted:
 
+- **Allo** by [Josh Puckett](https://allo.joshpuckett.me/) – UI, body, and headlines
 - **Copernicus** (self-hosted WOFF2) – README and markdown display headings
 - **Tiempos Text** (self-hosted WOFF2) – README and long-form serif text
 - **Fraunces / Newsreader** (Google Fonts) – editorial fallbacks
-- **DM Sans** (Google Fonts) – UI / sans body
-- **Outfit** (Google Fonts) – alt headline weight
 - **JetBrains Mono** (Google Fonts) – code/monospace
 - **Fixedsys** (self-hosted) – terminal emulator font
+- **Rajdhani / Share Tech Mono** (Google Fonts) – Cyberpunk and Fallout terminal themes
 
 Tailwind v4 is configured via the `@theme` block in `styles.css` (no `tailwind.config.js`).
 
