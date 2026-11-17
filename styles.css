@@ -15,12 +15,13 @@
   --color-her-text: #4e342e;
   --color-her-textLight: #efebe9;
 
-  /* Font Families */
-  --font-sans: "DM Sans", sans-serif;
+  /* Font Families
+     Allo is loaded in src/main.ts (`import "allo-font"`, font-display: swap). */
+  --font-sans: "Allo", system-ui, sans-serif;
   --font-serif: "Tiempos Text", "Newsreader", "Iowan Old Style", serif;
-  --font-headline: "Outfit", sans-serif;
+  --font-headline: "Allo", system-ui, sans-serif;
   --font-display: "Copernicus", "Tiempos Headline", "Fraunces", serif;
-  --font-ui: "DM Sans", sans-serif;
+  --font-ui: "Allo", system-ui, sans-serif;
   --font-kernel: "Fixedsys", monospace;
   --font-mono: "JetBrains Mono", monospace;
 
@@ -118,7 +119,7 @@
 }
 
 body {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Allo", system-ui, sans-serif;
   overflow: hidden;
   user-select: none;
   cursor: default;
@@ -137,7 +138,7 @@ body {
   border-radius: 0.5rem;
   background: #fdfbf7;
   color: #3e2723;
-  font: 600 0.875rem/1 "DM Sans", sans-serif;
+  font: 600 0.875rem/1 "Allo", system-ui, sans-serif;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
   transition: transform 150ms ease;
 }
@@ -1042,7 +1043,7 @@ html.dark .window-header {
 }
 
 .window-title {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Allo", system-ui, sans-serif;
   font-size: 13px;
   font-weight: 500;
   opacity: 0.7;
@@ -1375,7 +1376,7 @@ html.dark .dock-item {
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 11px;
-  font-family: "DM Sans", sans-serif;
+  font-family: "Allo", system-ui, sans-serif;
   font-weight: 700;
   white-space: nowrap;
   opacity: 0;
@@ -1422,7 +1423,7 @@ html.dark .dock-container {
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   background: rgba(244, 235, 217, 0.45);
   border-bottom: 1px solid rgba(74, 124, 157, 0.1);
-  font-family: "DM Sans", system-ui, sans-serif;
+  font-family: "Allo", system-ui, sans-serif;
   transition:
     background 0.4s ease,
     backdrop-filter 0.4s ease;
@@ -1450,7 +1451,7 @@ html.dark #menubar {
 .clock-flip {
   display: inline-flex;
   overflow: hidden;
-  font-family: "DM Sans", system-ui, sans-serif;
+  font-family: "Allo", system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: normal;
   font-feature-settings: "tnum";
@@ -1599,7 +1600,7 @@ canvas {
   background: transparent;
   border-bottom: 2px solid #4a7c9d;
   color: inherit;
-  font-family: "Outfit", sans-serif;
+  font-family: "Allo", system-ui, sans-serif;
   font-weight: 700;
 }
 
@@ -2162,7 +2163,7 @@ html.dark .markdown-body pre {
   --lab-inspector-height: 144px;
   background: var(--lab-surface);
   color: var(--lab-text);
-  font-family: "DM Sans", sans-serif;
+  font-family: "Allo", system-ui, sans-serif;
 }
 
 #netmap-app {

@@ -645,7 +645,7 @@ export class SubnetPlannerController {
       ctx.textBaseline = 'top';
       let ly = ry + 9;
       if (allocated) {
-        ctx.font = '700 12px "DM Sans", sans-serif';
+        ctx.font = '700 12px "Allo", system-ui, sans-serif';
         ctx.fillStyle = colors.text;
         ctx.fillText(this.truncateText(node.label!, rw - 16), rx + 10, ly);
         ly += 17;

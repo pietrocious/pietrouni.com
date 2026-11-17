@@ -24,12 +24,9 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                                 <div class="font-bold opacity-40 mb-2 text-xs uppercase tracking-wider">Typography</div>
                                 <ul class="space-y-3 opacity-80">
                                     <li class="flex flex-col">
-                                        <span class="text-[10px] uppercase opacity-50">Headlines</span>
-                                        <span class="font-headline font-bold text-base">Outfit</span>
-                                    </li>
-                                    <li class="flex flex-col">
-                                        <span class="text-[10px] uppercase opacity-50">System UI</span>
-                                        <span class="font-ui text-base">DM Sans</span>
+                                        <span class="text-[10px] uppercase opacity-50">UI & headlines</span>
+                                        <span class="font-headline font-bold text-base">Allo</span>
+                                        <a href="https://allo.joshpuckett.me/" target="_blank" rel="noopener noreferrer" class="text-[10px] mt-0.5 opacity-60 underline underline-offset-2 hover:opacity-100">Allo by Josh Puckett</a>
                                     </li>
                                     <li class="flex flex-col">
                                         <span class="text-[10px] uppercase opacity-50">README (Display)</span>
