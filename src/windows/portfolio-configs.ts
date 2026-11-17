@@ -137,10 +137,15 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
                                 <a href="/PietroUni_Resume_2026.pdf" download="PietroUni_Resume_2026.pdf" class="px-3 py-2 rounded-md bg-her-red text-white text-xs font-semibold hover:opacity-85 transition-opacity">Download</a>
                             </div>
                         </div>
-                        <div class="flex-1 min-h-0 bg-black/5 dark:bg-black/20">
-                            <iframe src="/PietroUni_Resume_2026.pdf#view=FitH" title="Pietro Uni resume PDF" class="w-full h-full border-0"></iframe>
+                        <!-- ponytail: mobile Safari renders iframe PDFs at full page width with no zoom, so phones get a link instead of a preview -->
+                        <div class="flex-1 min-h-0 bg-black/5 dark:bg-black/20 hidden md:block">
+                            <iframe src="/PietroUni_Resume_2026.pdf#view=FitH" title="Pietro Uni resume PDF" class="w-full h-full border-0" loading="lazy"></iframe>
                         </div>
-                        <p class="px-4 py-2 text-[11px] opacity-55 md:hidden">If the embedded preview is unavailable on your browser, use Open PDF above.</p>
+                        <a href="/PietroUni_Resume_2026.pdf" target="_blank" rel="noopener noreferrer" class="md:hidden flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
+                            <svg class="w-14 h-14 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span class="font-semibold">Tap to view the full resume</span>
+                            <span class="text-xs opacity-55">Opens the PDF in your browser's viewer</span>
+                        </a>
                     </div>
                 `,
             width: 900,
@@ -149,7 +154,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
           projects: {
             title: "Projects",
             content: `
-                     <div class="h-full flex flex-col font-ui window-content" style="min-width: 500px;">
+                     <div class="h-full flex flex-col font-ui window-content md:min-w-[500px]">
                         <!-- Header Bar -->
                         <div class="px-6 pt-4 pb-4 flex flex-col gap-1">
                             <h1 class="text-lg font-headline font-extrabold text-her-dark dark:text-her-textLight flex items-center gap-2">
@@ -287,7 +292,7 @@ export const portfolioWindowConfigs: Record<string, WindowConfig> = {
           vault: {
             title: "Personal Vault",
             content: `
-                    <div id="vault-app" class="h-full flex flex-col font-ui" style="min-width: 400px;">
+                    <div id="vault-app" class="h-full flex flex-col font-ui md:min-w-[400px]">
                         <!-- Header -->
                         <div class="px-6 pt-4 pb-4 flex items-center gap-3">
                             <button id="vault-back-btn" onclick="window.vaultShowGrid()" class="hidden p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors" title="Back to files">
