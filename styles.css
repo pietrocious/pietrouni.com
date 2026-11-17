@@ -118,6 +118,16 @@
   font-display: swap;
 }
 
+/* iOS 26 Safari tints its bars with this, not <meta theme-color>.
+   theme.ts overrides it per wallpaper. */
+html {
+  background-color: #f4ebd9;
+}
+
+html.dark {
+  background-color: #3e2723;
+}
+
 body {
   font-family: "Allo", system-ui, sans-serif;
   overflow: hidden;

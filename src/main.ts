@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (isMobile) {
             // Mobile: Adjust for dock and potential safe area
             // using dynamic height so it resizes with keyboard
-            heightStyle = "calc(100vh - 85px)"; // slightly more than dock buffer to be safe
+            heightStyle = "calc(100dvh - 85px)"; // slightly more than dock buffer to be safe
             finalH = maxAvailableHeight; // For initial calculation if needed, though style takes precedence
           } else {
             if (finalH > maxAvailableHeight) {

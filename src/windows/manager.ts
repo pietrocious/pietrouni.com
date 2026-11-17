@@ -177,7 +177,7 @@ export function toggleMaximize(id: string): void {
 
     const isMobile = window.innerWidth < 768;
     // on mobile maximize full height, on desktop leave room for dock
-    el.style.height = isMobile ? 'calc(100vh - 85px)' : 'calc(100% - 90px)';
+    el.style.height = isMobile ? 'calc(100dvh - 85px)' : 'calc(100% - 90px)';
 
     winObj.maximized = true;
   } else {

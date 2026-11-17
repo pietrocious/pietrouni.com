@@ -82,6 +82,23 @@ function applyWallpaperClasses(
       scheduleVanta(wp.vantaEffect, isDark, desktop);
     }
   }
+  syncBrowserChromeColor(desktop);
+}
+
+// iOS 26 Safari ignores <meta theme-color> and tints the status bar and the
+// strip under its floating address bar with the page background colour.
+// ponytail: takes the wallpaper's last opaque gradient stop; wallpapers with
+// only translucent stops fall back to the html colour in styles.css. Give
+// wallpapers an explicit chrome colour in state.ts if a tint looks off.
+function syncBrowserChromeColor(desktop: HTMLElement): void {
+  // #desktop has transition-all; without this we'd read a mid-fade colour.
+  desktop.style.transition = "none";
+  const cs = getComputedStyle(desktop);
+  const solid = cs.backgroundColor.startsWith("rgb(") ? cs.backgroundColor : null;
+  const lastStop = cs.backgroundImage.match(/rgba?\([^)]+\)/g)?.pop();
+  const color = solid ?? (lastStop?.startsWith("rgb(") ? lastStop : "");
+  desktop.style.transition = "";
+  document.documentElement.style.backgroundColor = color;
 }
 
 export function applyWallpaper(
